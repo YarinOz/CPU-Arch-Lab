@@ -2,8 +2,9 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 --------------------------------------------------------
 ENTITY LOGIC IS
-    GENERIC (N: INTEGER := 8);
+    GENERIC (n: INTEGER := 8);
 	PORT (x, y: IN std_logic_vector(n-1 DOWNTO 0);
+              m: IN std_logic_vector(2 DOWNTO 0);
 			  s: OUT std_logic_vector(n-1 DOWNTO 0));
 END LOGIC;
 --------------------------------------------------------
