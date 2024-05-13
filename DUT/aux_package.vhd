@@ -21,20 +21,28 @@ package aux_package is
 			      s, cout: OUT std_logic);
 	end component;
 ---------------------------------------------------------	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	COMPONENT AdderSub IS
+	GENERIC (n: INTEGER := 8);
+	PORT (sub_c, cin: IN std_logic;
+			x, y: IN std_logic_vector(n-1 DOWNTO 0);
+			s: OUT std_logic_vector(n-1 DOWNTO 0);
+			cout: OUT std_logic);
+	END COMPONENT;
+---------------------------------------------------------	
+	COMPONENT LOGIC IS
+	GENERIC (n: INTEGER := 8);
+	PORT (x, y: IN std_logic_vector(n-1 DOWNTO 0);
+				s: OUT std_logic_vector(n-1 DOWNTO 0));
+	END COMPONENT;
+---------------------------------------------------------	
+	COMPONENT Shifter IS
+	GENERIC (n: INTEGER := 8);
+	PORT (x, y : IN std_logic_vector(n-1 DOWNTO 0);
+			dir: IN std_logic;
+			cout: OUT std_logic;
+			res : OUT std_logic_vector(n-1 DOWNTO 0));
+	END COMPONENT;
+---------------------------------------------------------	
 	
 end aux_package;
 

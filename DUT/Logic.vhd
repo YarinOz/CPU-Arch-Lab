@@ -9,7 +9,6 @@ ENTITY LOGIC IS
 END LOGIC;
 --------------------------------------------------------
 ARCHITECTURE boolean OF LOGIC IS
-    SIGNAL m: std_logic_vector(2 DOWNTO 0);
     SIGNAL zeros : std_logic_vector(n-1 DOWNTO 0) := (OTHERS => '0');
 BEGIN
     s <= NOT y WHEN m = "000" ELSE
