@@ -24,7 +24,7 @@ ARCHITECTURE struct OF top IS
 	BEGIN
 		extended_ALUFN_i <= (others => ALUFN_i(1)); -- extend ALUFN_i(1) to n bits
 		-- component instantiation
-		Adder: AdderSub PORT MAP(
+	Adder: AdderSub PORT MAP(
         sub_c => ALUFN_i(0) OR ALUFN_i(1), --sub "001","010"
         cin => ALUFN_i(0) OR ALUFN_i(1),
         x => X_i,
@@ -61,10 +61,10 @@ ARCHITECTURE struct OF top IS
 		Zflag_o <= '1' WHEN Shiftout = (OTHERS => '0') ELSE '0';
     	);
 
-		ALUout_o <=  Addout WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE
-					 Logicout WHEN ALUFN_i(4 DOWNTO 3)="11" ELSE
-					 Shiftout WHEN ALUFN_i(4 DOWNTO 3)="10" ELSE
-					 (OTHERS => '0');
+	ALUout_o <=  Addout WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE
+					Logicout WHEN ALUFN_i(4 DOWNTO 3)="11" ELSE
+					Shiftout WHEN ALUFN_i(4 DOWNTO 3)="10" ELSE
+					(OTHERS => '0');
 
  	END struct;
 	
