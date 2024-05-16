@@ -20,16 +20,18 @@ END top;
 
 ARCHITECTURE struct OF top IS
   -- signal declaration
-  SIGNAL Addout, Shiftout, Logicout, extended_ALUFN_i : STD_LOGIC_VECTOR(n-1 DOWNTO 0);
-  SIgnal cout_vec :std_logic_vector(1 DOWNTO 0);-- need to check if thats the correct placement
+  SIGNAL Addout, Shiftout, Logicout, minus : STD_LOGIC_VECTOR(n-1 DOWNTO 0);
+  SIGNAL cout_vec :std_logic_vector(1 DOWNTO 0);-- need to check if thats the correct placement
+  SIGNAL subtract : std_logic;
 BEGIN
-  extended_ALUFN_i <= (others => ALUFN_i(1)); -- extend ALUFN_i(1) to n bits
+  minus <= (Y_i AND NOT (others => ALUFN_i(1))); -- for neg(x)
+  subtract <= ALUFN_i(0) OR ALUFN_i(1); -- subtract when ALUFN_i(0) OR ALUFN_i(1) = 1
   -- component instantiation
   Adder : AdderSub PORT MAP (
-    sub_c => ALUFN_i(0) OR ALUFN_i(1), --sub "001","010" ,in case temp inputs are being used this logic needs to be changed
-    cin => ALUFN_i(0) OR ALUFN_i(1),
+    sub_c => subtract, --sub "001","010" ,in case temp inputs are being used this logic needs to be changed
+    cin => subtract,
     x => X_i,
-    y => Y_i AND NOT extended_ALUFN_i, -- 0 -> 0 , 1 -> Y ,in case temp inputs are being used this logic might  need to be changeded
+    y => minus, -- 0 -> 0 , 1 -> Y ,in case temp inputs are being used this logic might  need to be changeded
     s => Addout,
     cout => cout_vec(0)
   );

@@ -6,6 +6,9 @@ no integers are allowed other then n k m
 
 -- adder and logic unit done. shift reg left
 
+16.05.24:
+- shifter re-vamped, compiling with no warnings and is tidier.
+
 # Questions to Hanan:
 1. Do we need to implement the shift register using 2*1 mux, and if not how should we? - no need to use mux , our realization is fine though the carry should only be the last digit being shifted out
 
