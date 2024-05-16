@@ -52,7 +52,7 @@ BEGIN
     x => X_i,
     y => Y_i,
     dir => ALUFN_i(0),
-    cout => cout_vec(1),
+    cout => cout_vec(1),-- need to change carry signal of the shifter module   from k length vector to std logic and update the algorithm
     res => Shiftout
   );
   --Nflag_o <= Shiftout(n-1);
