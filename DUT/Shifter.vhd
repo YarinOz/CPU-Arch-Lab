@@ -12,29 +12,33 @@ END Shifter;
 --------------------------------------------------------
 ARCHITECTURE BarShift OF Shifter IS
 	SUBTYPE vector IS std_logic_vector(n-1 downto 0);
-	TYPE matrix is ARRAY (k-1 downto 0) OF vector; -- log2n x n
+	TYPE matrix is ARRAY (k downto 0) OF vector; -- log2n x n
 	SIGNAL STEP: matrix;
 	SIGNAL carry: std_logic_vector(k-1 downto 0);
-	SIGNAL zero_vector : std_logic_vector(k-1 downto 0) := (OTHERS => '0');
 BEGIN
 	first: for i in 0 to n-1 generate  -- initialize first layer
 		STEP(0)(i) <= y(i) when dir = '0' else y(n-1-i);
 	end generate first;
 
-	shift: for i in 1 to k-1 generate  -- zero fill
+	shift: for i in 1 to k generate  -- zero fill
 		-- add zeroes if x(i) = 1, else copy [2^(i-1)-1:0]
 		STEP(i)((2**(i-1) - 1) downto 0) <= STEP(i-1)((2**(i-1) - 1) downto 0)
-		when  x(i)='0' else (others => '0');
+		when  x(i-1)='0' else (others => '0');
 		-- copy if x(i) = 0, else shift [n-1:2^(i-1)]
 		STEP(i)(n-1 downto (2**(i-1))) <= STEP(i-1)(n-1 downto (2**(i-1))) 
-		when  x(i)='0' else STEP(i-1)(n-1-(2**(i-1)) downto 0);
-		-- carry
-		carry(i) <= '0' when x(i)='0' else STEP(i-1)(n-1);
-	end generate shift;
+		when  x(i-1)='0' else STEP(i-1)(n-1-(2**(i-1)) downto 0);
 
-	final: for i in 0 to n-1 generate 
-		res(i) <= STEP(k-1)(i) when dir = '0' else STEP(k-1)(n-1-i);
+	end generate shift;
+	-- carry
+	carry(0) <= STEP(0)(n-1) when x(0) = '1' else '0';
+	carryloop: for i in 1 to k-1 generate -- carry propagation  
+			carry(i) <= STEP(i)(n-1-(2**(i-1))) when x(i) = '1' else carry(i-1);
+	end generate carryloop;
+
+	final: for i in 0 to n-1 generate -- final layer, reverse if subtracting
+		res(i) <= STEP(k)(i) when dir = '0' else STEP(k)(n-1-i);
 	end generate final;
 
-	cout <= '0' when carry = zero_vector else '1';
+	cout <= carry(k-1);
+
 end BarShift;

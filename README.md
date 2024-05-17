@@ -4,7 +4,7 @@ when output not defined -> output is 0 and only zero flag lit
 no integers are allowed other then n k m
 
 
--- adder and logic unit done. shift reg left
+-- remove delta in TB: configure list -delta collapse
 
 16.05.24:
 - shifter re-vamped, compiling with no warnings and is tidier.
