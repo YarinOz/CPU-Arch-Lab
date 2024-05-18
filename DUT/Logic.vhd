@@ -17,7 +17,7 @@ BEGIN
          y XOR x WHEN mode = "011" ELSE
          y NOR x WHEN mode = "100" ELSE
          y NAND x WHEN mode = "101" ELSE
-         y XNOR x WHEN mode = "110" ELSE
+         y XNOR x WHEN mode = "111" ELSE
          zeros;
 END boolean;
 

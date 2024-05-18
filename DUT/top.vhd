@@ -68,7 +68,7 @@ BEGIN
   PORT MAP (
     x => SHX,
     y => SHY,
-    dir => ALUFN_i(0),
+    dir => ALUFN_i(2 DOWNTO 0),
     cout => cout_vec(1),-- need to change carry signal of the shifter module   from k length vector to std logic and update the algorithm
     res => Shiftout
   );

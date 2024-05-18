@@ -5,7 +5,7 @@ ENTITY Shifter IS
     GENERIC (n: INTEGER := 8; -- number of bits
 			 k: INTEGER := 3); -- log2(n)
 	PORT (x, y : IN std_logic_vector(n-1 DOWNTO 0); -- shift y x times
-          dir: IN std_logic;	-- 0: left, 1: right
+          dir: IN std_logic_vector(2 DOWNTO 0);	-- 0: left, 1: right
 		  cout: OUT std_logic;
           res : OUT std_logic_vector(n-1 DOWNTO 0));
 END Shifter;
@@ -17,7 +17,7 @@ ARCHITECTURE BarShift OF Shifter IS
 	SIGNAL carry: std_logic_vector(k-1 downto 0);
 BEGIN
 	first: for i in 0 to n-1 generate  -- initialize first layer
-		STEP(0)(i) <= y(i) when dir = '0' else y(n-1-i);
+		STEP(0)(i) <= y(i) when dir = "000" else y(n-1-i);
 	end generate first;
 
 	shift: for i in 1 to k generate  -- zero fill
@@ -32,13 +32,15 @@ BEGIN
 	-- carry
 	carry(0) <= STEP(0)(n-1) when x(0) = '1' else '0';
 	carryloop: for i in 1 to k-1 generate -- carry propagation  
-			carry(i) <= STEP(i)(n-1-(2**(i-1))) when x(i) = '1' else carry(i-1);
+			carry(i) <= STEP(i)(n-(2**(i))) when x(i) = '1' else carry(i-1);
 	end generate carryloop;
 
-	final: for i in 0 to n-1 generate -- final layer, reverse if subtracting
-		res(i) <= STEP(k)(i) when dir = '0' else STEP(k)(n-1-i);
+	final: for i in 0 to n-1 generate -- final layer, reverse if subtracting, else 0
+		res(i) <= STEP(k)(i) when dir = "000" else 
+				  STEP(k)(n-1-i) when dir = "001" else
+				  '0'; 
 	end generate final;
 
-	cout <= carry(k-1);
+	cout <= carry(k-1) when (dir = "000" or dir = "001") else '0';
 
 end BarShift;

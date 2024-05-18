@@ -40,7 +40,7 @@ package aux_package is
     GENERIC (n: INTEGER := 8; 
 			 k: INTEGER := 3); 
 	PORT (x, y : IN std_logic_vector(n-1 DOWNTO 0);
-			dir: IN std_logic;
+			dir: IN std_logic_vector(2 DOWNTO 0);
 			cout: OUT std_logic;
 			res : OUT std_logic_vector(n-1 DOWNTO 0));
 	END COMPONENT;
