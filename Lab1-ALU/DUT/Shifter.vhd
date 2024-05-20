@@ -5,39 +5,42 @@ ENTITY Shifter IS
     GENERIC (n: INTEGER := 8; -- number of bits
 			 k: INTEGER := 3); -- log2(n)
 	PORT (x, y : IN std_logic_vector(n-1 DOWNTO 0); -- shift y x times
-          dir: IN std_logic;	-- 0: left, 1: right
+          dir: IN std_logic_vector(2 DOWNTO 0);	-- 0: left, 1: right
 		  cout: OUT std_logic;
           res : OUT std_logic_vector(n-1 DOWNTO 0));
 END Shifter;
 --------------------------------------------------------
 ARCHITECTURE BarShift OF Shifter IS
-	SIGNAL jump: INTEGER := 1;
-	SUBTYPE vector IS std_logic_vector(n-1 DOWNTO 0);
-	TYPE matrix is ARRAY (k-1 DOWNTO 0) OF vector; -- log2n x n
+	SUBTYPE vector IS std_logic_vector(n-1 downto 0);
+	TYPE matrix is ARRAY (k downto 0) OF vector; -- log2n x n
 	SIGNAL STEP: matrix;
-	SIGNAL carry: std_logic_vector(k-1 DOWNTO 0);
-	SIGNAL zero_vector : std_logic_vector(k-1 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL carry: std_logic_vector(k-1 downto 0);
 BEGIN
-	first: for i in 0 to n-1 generate  -- initialize
-		STEP(0)(i) <= y(i) WHEN dir = '0' ELSE y(n-1-i);
-	END generate first;
+	first: for i in 0 to n-1 generate  -- initialize first layer
+		STEP(0)(i) <= y(i) when dir = "000" else y(n-1-i);
+	end generate first;
 
-	zeroloop: for i in 1 to k-1 generate  -- zero fill
-		STEP(i)(2**(i-1) downto 0) <= (OTHERS => '0');
-	END generate zeroloop;
+	shift: for i in 1 to k generate  -- zero fill
+		-- add zeroes if x(i) = 1, else copy [2^(i-1)-1:0]
+		STEP(i)((2**(i-1) - 1) downto 0) <= STEP(i-1)((2**(i-1) - 1) downto 0)
+		when  x(i-1)='0' else (others => '0');
+		-- copy if x(i) = 0, else shift [n-1:2^(i-1)]
+		STEP(i)(n-1 downto (2**(i-1))) <= STEP(i-1)(n-1 downto (2**(i-1))) 
+		when  x(i-1)='0' else STEP(i-1)(n-1-(2**(i-1)) downto 0);
 
-	looprow: for j in 1 to k-1 generate	-- 
-		loopcol: for i in 0 to n-1 generate
-			STEP(j)(i) <= STEP(j-1)(i) WHEN x(j)='0' ELSE -- no shift
-				STEP(j-1)(i-jump) WHEN (i-jump)>=0 ELSE '0';
-				carry(j)<=STEP(j-1)(n-1); -- save carry
-		END generate loopcol;
-		jump <= jump*2;
-	END generate looprow;
+	end generate shift;
+	-- carry
+	carry(0) <= STEP(0)(n-1) when x(0) = '1' else '0';
+	carryloop: for i in 1 to k-1 generate -- carry propagation  
+			carry(i) <= STEP(i)(n-(2**(i))) when x(i) = '1' else carry(i-1);
+	end generate carryloop;
 
-	final: for i in 0 to n-1 generate 
-		res(i) <= STEP(k-1)(i) WHEN dir = '0' ELSE STEP(k-1)(n-1-i);
-	END generate final;
+	final: for i in 0 to n-1 generate -- final layer, reverse if subtracting, else 0
+		res(i) <= STEP(k)(i) when dir = "000" else 
+				  STEP(k)(n-1-i) when dir = "001" else
+				  '0'; 
+	end generate final;
 
-	cout <= '0' WHEN carry = zero_vector ELSE '1';
-END BarShift;
+	cout <= carry(k-1) when (dir = "000" or dir = "001") else '0';
+
+end BarShift;
