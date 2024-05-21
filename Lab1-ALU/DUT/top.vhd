@@ -26,7 +26,7 @@ ARCHITECTURE struct OF top IS
   SIGNAL cout_vec :std_logic_vector(1 DOWNTO 0);-- carry vector for the adder[0] and shifter[1]
   SIGNAL subtract, OVF : std_logic;
 BEGIN
-  -- input assignment (zero input if not used [HIGH Z?])
+  -- input assignment (zero input if not used)
   AddX <= X_i WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE (OTHERS=>'0');
   AddY <= Y_i WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE (OTHERS=>'0');
 
@@ -69,7 +69,7 @@ BEGIN
     x => SHX,
     y => SHY,
     dir => ALUFN_i(2 DOWNTO 0),
-    cout => cout_vec(1),-- need to change carry signal of the shifter module   from k length vector to std logic and update the algorithm
+    cout => cout_vec(1),
     res => Shiftout
   );
   -- output assignment
