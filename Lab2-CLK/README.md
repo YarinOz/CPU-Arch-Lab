@@ -1,3 +1,3 @@
-# CPU and Hardware Accelerators - Lab1
+# CPU and Hardware Accelerators - Lab2
 
 -- remove delta in TB: configure list -delta collapse

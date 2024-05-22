@@ -21,6 +21,17 @@ architecture arc_sys of top is
 	
 begin
 	
+	process1: process(clk,rst)
+
+	end process process1;
+
+	process2: process(clk,rst)
+
+	end process process2;
+
+	process3: process(clk,rst)
+
+	end process process3;
 				
 	
 	

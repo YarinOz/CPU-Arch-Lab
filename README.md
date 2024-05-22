@@ -20,8 +20,22 @@ as part of a Course Lab performed on an Intel's FPGA chip.
 5. **Shifter Module**: Design a shifter module based on a barrel-shifter without using forbidden operators.
 6. **Test and Timing**: Develop a test bench for the system and analyze timing and outputs.
 
-### Lab 2: VHDL Sequential Code - ?
+### Lab 2: VHDL Sequential Code - Behavioral Modeling
 
+**Lab aims**
+- Develop skills in VHDL part 2, focusing on sequential code and behavioral modeling.
+- Enhance knowledge in digital systems design.
+- Properly analyze and understand architecture design.
+
+**Tasks**
+
+1. **Design the System**:
+    Implement a synchronous digital system to detect valid sub-series.
+    Ensure the system uses the given VHDL files and adheres to the structural constraints.
+2. **Test and Timing**:
+        Develop a test bench to validate the system.
+        Analyze timing and outputs using the provided timing diagrams.
+        
 ### Lab 3: Digital System Design - ?
 
 ### Lab 4: FPGA, Quartus & Memory - ?
