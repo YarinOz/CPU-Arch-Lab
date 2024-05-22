@@ -33,32 +33,38 @@ BEGIN
     -- Stimulus process
     stim_proc: process
     begin
-        -- Initialize Inputs
-        x <= "00000000";
-        y <= "00000000";
-        sub_c <= '0';
-        wait for 20 ns;
 
-        -- Test case 1: Addition 
+        -- Test case 1: Addition  
         x <= "00000001";  -- 1
         y <= "00000010";  -- 2
         sub_c <= '0';     -- Addition
         wait for 20 ns;
+        assert(s = "00000011" and cout = '0')
+            report "Test case 1 failed" severity error;
 
-	-- Test case 2: Addition carry out
+	    -- Test case 2: Addition carry out
         x <= "11111111";  -- 255
         y <= "00000010";  -- 2
         sub_c <= '0';     -- Addition
         wait for 20 ns;
+        assert(s = "00000001" and cout = '1')
+            report "Test case 2 failed" severity error;
 
         -- Test case 3: Subtraction 
         x <= "00000111";  -- 7
         y <= "00000010";  -- 2
         sub_c <= '1';     -- Subtraction
         wait for 20 ns;
+        assert(s = "11111011" and cout = '0')
+            report "Test case 3 failed" severity error;
 
-        -- Add more test cases as needed
-        -- ...
+        -- Test case 4: Negative
+        x <= "00100111";  -- 39
+        y <= "00000000";  -- 0
+        sub_c <= '1';     -- negative
+        wait for 20 ns;
+        assert(s = "11011001" and cout = '0')
+            report "Test case 4 failed" severity error;
         
         -- End simulation
         wait;

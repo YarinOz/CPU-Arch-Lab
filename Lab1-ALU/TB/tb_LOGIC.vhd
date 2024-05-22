@@ -31,59 +31,71 @@ BEGIN
     -- Stimulus process
     stim_proc: process
     begin
-        -- Initialize Inputs
-        x <= "00000000";
-        y <= "00000000";
-        mode <= "000";
-        wait for 20 ns;
 
         -- Test case 1: NOT y
         x <= "00000000";
         y <= "11110000";
         mode <= "000";
         wait for 20 ns;
+        assert(s = "00001111")
+            report "Test case 1 failed" severity error;
 
         -- Test case 2: OR
         x <= "00001111";
         y <= "11110000";
         mode <= "001";
         wait for 20 ns;
+        assert(s = "11111111")
+            report "Test case 2 failed" severity error;
 
         -- Test case 3: AND
         x <= "00001111";
         y <= "11110000";
         mode <= "010";
         wait for 20 ns;
+        assert(s = "00000000")
+            report "Test case 3 failed" severity error;
 
         -- Test case 4: XOR
         x <= "00001111";
-        y <= "11110000";
+        y <= "11111000";
         mode <= "011";
         wait for 20 ns;
+        assert(s = "11110111")
+            report "Test case 4 failed" severity error;
 
         -- Test case 5: NOR
         x <= "00001111";
-        y <= "11110000";
+        y <= "11111000";
         mode <= "100";
         wait for 20 ns;
+        assert(s = "00000000")
+            report "Test case 5 failed" severity error;
 
         -- Test case 6: NAND
         x <= "00001111";
-        y <= "11110000";
+        y <= "11111000";
         mode <= "101";
         wait for 20 ns;
+        assert(s = "11110111")
+            report "Test case 6 failed" severity error;
 
         -- Test case 7: XNOR
+        x <= "00001111";
+        y <= "11111000";
+        mode <= "111";
+        wait for 20 ns;
+        assert(s = "00001000")
+            report "Test case 7 failed" severity error;
+
+        -- Test case 8: undefined (zero)
         x <= "00001111";
         y <= "11110000";
         mode <= "110";
         wait for 20 ns;
+        assert(s = "00000000")
+            report "Test case 8 failed" severity error;
 
-        -- Test case 8: Default (zeros)
-        x <= "00001111";
-        y <= "11110000";
-        mode <= "111";
-        wait for 20 ns;
         wait;
     end process;
 
