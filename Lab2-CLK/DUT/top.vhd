@@ -23,6 +23,7 @@ architecture arc_sys of top is
     signal diff : std_logic_vector(n-1 downto 0) := (others => '0'); -- need to see if n downto 0 if OF
 	signal diff_cout : std_logic;
     signal cin : std_logic := '1'; -- For two's complement subtraction
+	signal counter : integer := 0; -- Counter for the number of consecutive detections
 
 begin
 	
@@ -41,11 +42,8 @@ begin
 		end if;
 	end process process1;
 
-	-- Create the two's complement of x_j2
-    process2: process(x_j2)
-    begin
-        x_j2_not <= not x_j2;
-    end process process2;
+	-- Invert x_j2 for two's complement subtraction
+	x_j2_not <= not x_j2;
 
 	-- Use the Adder to compute diff = x_j1 - x_j2
 	Adder_inst: Adder -- X + not(Y) + 1 = X - Y
@@ -58,36 +56,51 @@ begin
 		cout => diff_cout
 	);
 
-	process3: process(diff, DetectionCode)
+	process3: process(clk, rst)
 	begin
-        case DetectionCode is
-            when 0 => -- DetectionCode 0: x[j-1] - x[j-2] = 1
-                if diff = "000000001" then
-                    detector <= '1';
-                else
-                    detector <= '0';
-                end if;
-            when 1 => -- DetectionCode 1: x[j-1] - x[j-2] = 2
-                if diff = "000000010" then
-                    detector <= '1';
-                else
-                    detector <= '0';
-                end if;
-            when 2 => -- DetectionCode 2: x[j-1] - x[j-2] = 3
-                if diff = "000000011" then
-                    detector <= '1';
-                else
-                    detector <= '0';
-                end if;
-            when 3 => -- DetectionCode 3: x[j-1] - x[j-2] = 4
-                if diff = "000000100" then
-                    detector <= '1';
-                else
-                    detector <= '0';
-                end if;
-            when others =>
-                detector <= '0';
-        end case;
+		-- asynchronous reset
+		if rst = '1' then
+            counter <= 0;
+            detector <= '0';
+		-- synchronous logic
+        elsif rising_edge(clk) then
+			if ena = '1' then
+				case DetectionCode is
+					when 0 => -- DetectionCode 0: x[j-1] - x[j-2] = 1
+						if diff = "00000001" then
+							counter <= counter + 1;
+						else 
+							counter <= 0;
+						end if;
+					when 1 => -- DetectionCode 1: x[j-1] - x[j-2] = 2
+						if diff = "00000010" then
+							counter <= counter + 1;
+						else 
+							counter <= 0;
+						end if;
+					when 2 => -- DetectionCode 2: x[j-1] - x[j-2] = 3
+						if diff = "00000011" then
+							counter <= counter + 1;
+						else 
+							counter <= 0;
+						end if;
+					when 3 => -- DetectionCode 3: x[j-1] - x[j-2] = 4
+						if diff = "00000100" then
+							counter <= counter + 1;
+						else 
+							counter <= 0;
+						end if;
+					when others =>
+						null; -- NOP
+				end case;
+				-- If counter reaches m, set detector to 1
+				if counter >= m then
+					detector <= '1';
+				else
+					detector <= '0';
+				end if;
+			end if;
+		end if;
 	end process process3;
 				
 end arc_sys;
