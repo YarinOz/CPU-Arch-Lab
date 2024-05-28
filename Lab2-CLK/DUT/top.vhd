@@ -42,6 +42,7 @@ begin
 		end if;
 	end process process1;
 
+	-- concurrent 
 	-- Invert x_j2 for two's complement subtraction
 	x_j2_not <= not x_j2;
 
