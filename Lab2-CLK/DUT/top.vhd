@@ -45,7 +45,15 @@ begin
 
                 -- Compute diff = x_j1 - x_j2
                 x_j2_not <= not x_j2;
-                diff <= x_j1 + x_j2_not + cin;
+				Adder_inst: Adder
+				generic map (length => n)
+				port map (
+					a => x_j1,
+					b => x_j2_not, -- Two's complement: invert x_j2
+					cin => cin, -- Carry in for two's complement subtraction
+					s => diff,
+					cout => diff_cout
+				);
 
                 -- Check detection condition
                 case DetectionCode is
