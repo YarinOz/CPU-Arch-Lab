@@ -37,7 +37,7 @@ begin
     );
 
     process(clk, rst)
-        variable tmp : std_logic_vector(n-1 downto 0);
+        variable tmp : std_logic_vector(n-1 downto 0); -- diff as a variable
         variable counter : integer := 0; -- Counter as a variable
     begin
         -- Asynchronous reset
