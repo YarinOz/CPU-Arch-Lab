@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
+use work.aux_package.all;
 
 entity Datapath is
 generic(
@@ -10,124 +11,70 @@ generic(
     dept: integer := 64
 );
 port(
-    clk: in std_logic;
+    clk, rst: in std_logic;
     -- control signals
-    Mem_wr,Mem_out,Men_in,Cout,Cin,Ain,RFin,RFout,Rfaddr,IRin,PCin,Imm1_in,Imm2_in :in std_logic;
-    PCsel: in std_logic_vector(1 downto 0);
-    OPC : in std_logic_vector(3 downto 0);
-    -- status signal
-    Status: out std_logic_vector(Dwidth-1 downto 0);
-    Cflag, Zflag, Nflag: out std_logic;
-    -- data bus
-    progMemEn: out std_logic;
-    dataMemEn: out std_logic;
-    progWmemAddr: out std_logic_vector(Awidth-1 downto 0);
-    readAddr: out std_logic_vector(Awidth-1 downto 0);
-    progRmemData: in std_logic_vector(Dwidth-1 downto 0);
-    dataWmemData: out std_logic_vector(Dwidth-1 downto 0);
-    dataRmemAddr: out std_logic_vector(Awidth-1 downto 0);
-    dataRmemData: in std_logic_vector(Dwidth-1 downto 0)
+    Mem_wr,Mem_out,Men_in,Cout,Cin,Ain,RFin,RFout,IRin,PCin,Imm1_in,Imm2_in :in std_logic;
+    PCsel, Rfaddr: in std_logic_vector(1 downto 0);
+    OPC: in std_logic_vector(3 downto 0);
+    -- status signals
+    st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
+    orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4: out std_logic;
+    -- program memory signals
+    -- test bench signals
+    -- progMemEn: in std_logic;
+    -- progdataIn: in std_logic_vector(Dwidth-1 downto 0);
+    -- progwriteAddr: in std_logic_vector(Awidth-1 downto 0);
+    -- --synthesis signals
+    -- progreadAddr: in std_logic_vector(Awidth-1 downto 0);
+    -- progdataOut: out std_logic_vector(Dwidth-1 downto 0);
+    -- -- data memory signals
+    -- -- test bench signals
+    -- dataMemEn: in std_logic;
+    -- datadataIn: in std_logic_vector(Dwidth-1 downto 0);
+    -- datawriteAddr: in std_logic_vector(Awidth-1 downto 0);
+    -- --synthesis signals
+    -- datareadAddr: out std_logic_vector(Awidth-1 downto 0);
+    -- datadataOut: in std_logic_vector(Dwidth-1 downto 0);
+
 );
 end Datapath;
  
 architecture behav of Datapath is
-
-    -- ProgMem component
-    component ProgMem
-        generic(
-            Dwidth: integer := 16;
-            Awidth: integer := 6;
-            dept: integer := 64
-        );
-        port(
-            clk, memEn: in std_logic;
-            WmemData: in std_logic_vector(Dwidth-1 downto 0);
-            WmemAddr, RmemAddr: in std_logic_vector(Awidth-1 downto 0);
-            RmemData: out std_logic_vector(Dwidth-1 downto 0)
-        );
-    end component;
-
-    -- dataMem component
-    component dataMem
-        generic(
-            Dwidth: integer := 16;
-            Awidth: integer := 6;
-            dept: integer := 64
-        );
-        port(
-            clk, memEn: in std_logic;
-            WmemData: in std_logic_vector(Dwidth-1 downto 0);
-            WmemAddr, RmemAddr: in std_logic_vector(Awidth-1 downto 0);
-            RmemData: out std_logic_vector(Dwidth-1 downto 0)
-        );
-    end component;
-
-    -- ALU component
-    component ALU
-    generic (
-      Dwidth: integer := 16;
-      k : integer := 4;   -- k=log2(n)
-      m : integer := 8    -- m=2^(k-1)
-    );
-    PORT (
-      Y_i, X_i : IN STD_LOGIC_VECTOR (n-1 DOWNTO 0);
-      ALUFN_i : IN STD_LOGIC_VECTOR (4 DOWNTO 0);
-      ALUout_o : OUT STD_LOGIC_VECTOR(n-1 downto 0);
-      Nflag_o, Cflag_o, Zflag_o, OF_flag_o : OUT STD_LOGIC 
-    ); -- Zflag, Cflag, Nflag, Vflag
-    end component;
-
-    -- Signals for connecting to ProgMem
-    signal progMemEn_sig: std_logic := '0';
-    signal progWmemAddr_sig, progRmemAddr_sig: std_logic_vector(Awidth-1 downto 0) := (others => '0');
-    signal progWmemData_sig: std_logic_vector(Dwidth-1 downto 0) := (others => '0');
-    signal progRmemData_sig: std_logic_vector(Dwidth-1 downto 0);
-
-    -- Signals for connecting to dataMem
-    signal dataMemEn_sig: std_logic := '0';
-    signal dataWmemAddr_sig, dataRmemAddr_sig: std_logic_vector(Awidth-1 downto 0) := (others => '0');
-    signal dataWmemData_sig: std_logic_vector(Dwidth-1 downto 0) := (others => '0');
-    signal dataRmemData_sig: std_logic_vector(Dwidth-1 downto 0);
-
-    -- File reading process variables
-    file prog_memory_file: text open read_mode is "./program/ITCMinit.txt";
-    file data_memory_file: text open read_mode is "./program/DTCMinit.txt";
-    variable file_line: line;
-    variable read_addr: integer;
-    variable read_data: std_logic_vector(Dwidth-1 downto 0);
-
     -- Program counter
     signal PCin, PCout: std_logic_vector(Awidth-1 downto 0);
 
     -- IR register
     signal IR: std_logic_vector(Dwidth-1 downto 0);
 
+    -- RF signals
+    signal RWAddr: std_logic_vector(3 downto 0);           -- RF write address
+    signal RFRData, RFWData: std_logic_vector(Dwidth-1 downto 0); -- RF read and write data
+
+    -- ALU signals  
+    signal REGA, REGC, Bin, C: std_logic_vector(Dwidth-1 downto 0);
+
     -- Bi directional bus
-    signal fabric: std_logic_vector(Dwidth-1 downto 0);
+    signal fabric, Immediate: std_logic_vector(Dwidth-1 downto 0);
 
-begin
+begin 
+-------------------- port mapping ---------------------------------------------------------------
+U1: ProgMem generic map (Dwidth, Awidth, dept) port map (clk, progMemEn, progdataIn, progwriteAddr, PCout, progdataOut);
+U2: DataMem generic map (Dwidth, Awidth, dept) port map (clk, dataMemEn, datadataIn, datawriteAddr, datareadAddr, datadataOut);
+U3: RF generic map (Dwidth, Awidth) port map (clk, rst, RFin, RFWData, RWAddr, RWAddr, RFRData);
+U4: ALU generic map (Dwidth) port map (REGA, Bin, OPC, C, Nflag, Cflag, Zflag); -- B-A, B+A
+-----------------------------------------------------------------------------------------------
 
-    -- Instantiate ProgMem
-    U1: ProgMem
-        port map (
-            clk => clk,
-            memEn => progMemEn_sig,
-            WmemData => progWmemData_sig,
-            WmemAddr => progWmemAddr_sig,
-            RmemAddr => PCout,
-            RmemData => progRmemData_sig
-        );
+------------------- Bi-directional bus ---------------------------------------------------------
+DatamemOut: BidirPin generic map (Dwidth) port map (datadataOut, Mem_out, datareadAddr, fabric);
+ALUout: BidirPin generic map (Dwidth) port map (REGC, Cout, Bin, fabric);
+RFout: BidirPin generic map (Dwidth) port map (RFRData, RFout, RFWData, fabric);
+IMM1out: BidirPin generic map (Dwidth) port map (Immediate, Imm1_in, RFWData, fabric);
+IMM2out: BidirPin generic map (Dwidth) port map (Immediate, Imm2_in, RFWData, fabric);
 
-    -- Instantiate dataMem
-    U2: dataMem
-        port map (
-            clk => clk,
-            memEn => dataMemEn_sig,
-            WmemData => dataWmemData_sig,
-            WmemAddr => dataWmemAddr_sig,
-            RmemAddr => dataRmemAddr_sig,
-            RmemData => dataRmemData_sig
-        );
+Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
+             "000000000000" & IR(3 downto 0) when Imm2_in = '1' else
+             (others => 'Z');
+-----------------------------------------------------------------------------------------------
 
     -- Process to read data from prog_memory_file and write to program memory
     process(clk)
@@ -138,33 +85,20 @@ begin
                 read(file_line, read_addr);
                 read(file_line, read_data);
 
-                progWmemAddr_sig <= std_logic_vector(to_unsigned(read_addr, Awidth));
-                progWmemData_sig <= read_data;
-                progMemEn_sig <= '1';
+                progwriteAddr <= std_logic_vector(to_unsigned(read_addr, Awidth));
+                progdataIn <= read_data;
+                progMemEn <= '1';
             else
-                progMemEn_sig <= '0';
+                progMemEn <= '0';
             end if;
         end if;
     end process;
 
-    -- Process to read data from data_memory_file and write to data memory
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            if not endfile(data_memory_file) then
-                readline(data_memory_file, file_line);
-                read(file_line, read_addr);
-                read(file_line, read_data);
-
-                dataWmemAddr_sig <= std_logic_vector(to_unsigned(read_addr, Awidth));
-                dataWmemData_sig <= read_data;
-                dataMemEn_sig <= '1';
-            else
-                dataMemEn_sig <= '0';
-            end if;
-        end if;
-    end process;
-
+    -- offset address in J-Type instructions
+    variable offset_addr: std_logic_vector(7 downto 0);
+        begin
+            offset_addr := IR(7 downto 0);
+        end;
     -- Program counter process
     process(clk, PCin, PCsel)
     begin
@@ -177,45 +111,103 @@ begin
         end if;
     end process;
 
-    -- OPCdecoder concurrent statement
-    Status <= IR(Dwidth-1 downto Dwidth-4);
-
     -- IR register process
     process(clk)
+    variable ra, rb, rc: std_logic_vector(3 downto 0);
+    ra := IR(11 downto 8);
+    rb := IR(7 downto 4);
+    rc := IR(3 downto 0);
+
     begin
         if rising_edge(clk) then
-            IR <= RmemData when IRin = '1';
+            IR <= progdataOut when IRin = '1';
         end if;
+        RFWAddr <= rc when RFaddr = "00" else
+                   rb when RFaddr = "01" else
+                   ra when RFaddr = "10" else
+                   (others => '0');
+        RFRData <= rc when RFaddr = "00" else
+                   rb when RFaddr = "01" else
+                   ra when RFaddr = "10" else
+                   (others => '0');
     end process;
 
-    -- RF register process WIP
+    -- OPC decoder process
     process(clk)
     begin
+        -- asynchronous reset
+        if rst = '1' then
+            add <= '0';
+            sub <= '0';
+            andf <= '0';
+            orf <= '0';
+            xorf <= '0';
+            un1 <= '0';
+            un2 <= '0';
+            jmp <= '0';
+            jc <= '0';
+            jnc <= '0';
+            un3 <= '0';
+            un4 <= '0';
+            mov <= '0';
+            ld <= '0';
+            st <= '0';
+            done <= '0';
+        end if;
+        -- synchronous decoding
         if rising_edge(clk) then
-            RFout <= RmemData when RFout = '1';
+            case IR(Dwidth-1 downto Dwidth-4) is
+                when "0000" =>
+                    add <= '1';
+                when "0001" =>
+                    sub <= '1';
+                when "0010" =>
+                    andf <= '1';
+                when "0011" =>
+                    orf <= '1';
+                when "0100" =>
+                    xorf <= '1';
+                when "0101" =>
+                    un1 <= '1';
+                when "0110" =>
+                    un2 <= '1';
+                when "0111" =>
+                    jmp <= '1';
+                when "1000" =>
+                    jc <= '1';
+                when "1001" =>
+                    jnc <= '1';
+                when "1010" =>
+                    un3 <= '1';
+                when "1011" =>
+                    un4 <= '1';
+                when "1100" =>
+                    mov <= '1';
+                when "1101" =>
+                    ld <= '1';
+                when "1110" =>
+                    st <= '1';
+                when "1111" =>
+                    done <= '1';
+            end case;
         end if;
     end process;
 
     -- ALU process 
     process(clk)
-    signal REGA, REGC: std_logic_vector(Dwidth-1 downto 0);
     begin
         if rising_edge(clk) then
             if Ain = '1' then
                 REGA <= fabric;
             end if;
             if Cin = '1' then
-                REGC <= s;
+                REGC <= C;
             end if;
         end if;
         --concurrent statement
-        ALUFN_i <= OPC;
-        if Cout = '1' then
-            fabric <= REGC;
-        end if;
-        Cflag <= Cf;
-        Zflag <= Zf;
-        Nflag <= Nf;
+        -- Cflag <= Cf;
+        -- Zflag <= Zf;
+        -- Nflag <= Nf;
     end process;
     
 
