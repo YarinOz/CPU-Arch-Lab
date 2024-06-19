@@ -18,7 +18,7 @@ port(
     OPC: in std_logic_vector(3 downto 0);
     -- status signals
     st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
-    orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4: out std_logic;
+    orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4: out std_logic
     -- program memory signals
     -- test bench signals
     -- progMemEn: in std_logic;
@@ -41,7 +41,7 @@ end Datapath;
  
 architecture behav of Datapath is
     -- Program counter
-    signal PCin, PCout: std_logic_vector(Awidth-1 downto 0);
+    signal PCout, CurrPC: std_logic_vector(Awidth-1 downto 0);
 
     -- IR register
     signal IR: std_logic_vector(Dwidth-1 downto 0);
@@ -56,18 +56,21 @@ architecture behav of Datapath is
     -- Bi directional bus
     signal fabric, Immediate: std_logic_vector(Dwidth-1 downto 0);
 
+    -- offset address in J-Type instructions
+    variable offset_addr: std_logic_vector(7 downto 0);
+
 begin 
 -------------------- port mapping ---------------------------------------------------------------
-U1: ProgMem generic map (Dwidth, Awidth, dept) port map (clk, progMemEn, progdataIn, progwriteAddr, PCout, progdataOut);
-U2: DataMem generic map (Dwidth, Awidth, dept) port map (clk, dataMemEn, datadataIn, datawriteAddr, datareadAddr, datadataOut);
+-- U1: ProgMem generic map (Dwidth, Awidth, dept) port map (clk, progMemEn, progdataIn, progwriteAddr, PCout, progdataOut);
+-- U2: DataMem generic map (Dwidth, Awidth, dept) port map (clk, dataMemEn, datadataIn, datawriteAddr, datareadAddr, datadataOut);
 U3: RF generic map (Dwidth, Awidth) port map (clk, rst, RFin, RFWData, RWAddr, RWAddr, RFRData);
-U4: ALU generic map (Dwidth) port map (REGA, Bin, OPC, C, Nflag, Cflag, Zflag); -- B-A, B+A
+U4: ALU generic map (Dwidth, k, m) port map (REGA, Bin, OPC, C, Nflag, Cflag, Zflag); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
 
 ------------------- Bi-directional bus ---------------------------------------------------------
-DatamemOut: BidirPin generic map (Dwidth) port map (datadataOut, Mem_out, datareadAddr, fabric);
+-- DatamemOut: BidirPin generic map (Dwidth) port map (datadataOut, Mem_out, datareadAddr, fabric);
 ALUout: BidirPin generic map (Dwidth) port map (REGC, Cout, Bin, fabric);
-RFout: BidirPin generic map (Dwidth) port map (RFRData, RFout, RFWData, fabric);
+RegFout: BidirPin generic map (Dwidth) port map (RFRData, RFout, RFWData, fabric);
 IMM1out: BidirPin generic map (Dwidth) port map (Immediate, Imm1_in, RFWData, fabric);
 IMM2out: BidirPin generic map (Dwidth) port map (Immediate, Imm2_in, RFWData, fabric);
 
@@ -77,39 +80,39 @@ Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
 -----------------------------------------------------------------------------------------------
 
     -- Process to read data from prog_memory_file and write to program memory
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            if not endfile(prog_memory_file) then
-                readline(prog_memory_file, file_line);
-                read(file_line, read_addr);
-                read(file_line, read_data);
+    -- process(clk)
+    -- begin
+    --     if rising_edge(clk) then
+    --         if not endfile(prog_memory_file) then
+    --             readline(prog_memory_file, file_line);
+    --             read(file_line, read_addr);
+    --             read(file_line, read_data);
 
-                progwriteAddr <= std_logic_vector(to_unsigned(read_addr, Awidth));
-                progdataIn <= read_data;
-                progMemEn <= '1';
-            else
-                progMemEn <= '0';
-            end if;
-        end if;
-    end process;
+    --             progwriteAddr <= std_logic_vector(to_unsigned(read_addr, Awidth));
+    --             progdataIn <= read_data;
+    --             progMemEn <= '1';
+    --         else
+    --             progMemEn <= '0';
+    --         end if;
+    --     end if;
+    -- end process;
 
-    -- offset address in J-Type instructions
-    variable offset_addr: std_logic_vector(7 downto 0);
-        begin
-            offset_addr := IR(7 downto 0);
-        end;
     -- Program counter process
     process(clk, PCin, PCsel)
     begin
+        offset_addr := IR(7 downto 0);
         if rising_edge(clk) then
             if PCin = '1' then
-                PCout <= PCin + 1 when PCsel = '00' else
-                         PCin + 1 + offset_addr when PCsel = '01' else
-                         (others => '0') when PCsel = '10';
+                PCout <= CurrPC;
             end if;
         end if;
     end process;
+
+    PC: with PCsel select
+        CurrPC <= (PCout + 1) when "00" ,
+                (PCout + 1 + offset_addr) when "01" ,
+                (others => '0') when "10",
+                unaffected when others;
 
     -- IR register process
     process(clk)
@@ -204,11 +207,6 @@ Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
                 REGC <= C;
             end if;
         end if;
-        --concurrent statement
-        -- Cflag <= Cf;
-        -- Zflag <= Zf;
-        -- Nflag <= Nf;
     end process;
     
-
 end behav;
