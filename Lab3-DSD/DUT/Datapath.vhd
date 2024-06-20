@@ -18,30 +18,23 @@ port(
     OPC: in std_logic_vector(3 downto 0);
     -- status signals
     st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
-    orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4: out std_logic
-    -- program memory signals
+    orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4: out std_logic;
     -- test bench signals
-    -- progMemEn: in std_logic;
-    -- progdataIn: in std_logic_vector(Dwidth-1 downto 0);
-    -- progwriteAddr: in std_logic_vector(Awidth-1 downto 0);
-    -- --synthesis signals
-    -- progreadAddr: in std_logic_vector(Awidth-1 downto 0);
-    -- progdataOut: out std_logic_vector(Dwidth-1 downto 0);
+    -- program memory signals
+    progMemEn: in std_logic;
+    progDataIn: in std_logic_vector(Dwidth-1 downto 0);
+    progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
     -- -- data memory signals
-    -- -- test bench signals
-    -- dataMemEn: in std_logic;
-    -- datadataIn: in std_logic_vector(Dwidth-1 downto 0);
-    -- datawriteAddr: in std_logic_vector(Awidth-1 downto 0);
-    -- --synthesis signals
-    -- datareadAddr: out std_logic_vector(Awidth-1 downto 0);
-    -- datadataOut: in std_logic_vector(Dwidth-1 downto 0);
-
+    dataMemEn: in std_logic;
+    dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
+    dataWriteAddr, dataReadAddr: in std_logic_vector(Awidth-1 downto 0);
+    dataDataOut: out std_logic_vector(Dwidth-1 downto 0)
 );
 end Datapath;
  
 architecture behav of Datapath is
     -- Program counter
-    signal PCout, CurrPC: std_logic_vector(Awidth-1 downto 0);
+    signal PCout, CurrPC, NextPC: std_logic_vector(Dwidth-1 downto 0);
 
     -- IR register
     signal IR: std_logic_vector(Dwidth-1 downto 0);
@@ -56,15 +49,15 @@ architecture behav of Datapath is
     -- Bi directional bus
     signal fabric, Immediate: std_logic_vector(Dwidth-1 downto 0);
 
-    -- offset address in J-Type instructions
-    variable offset_addr: std_logic_vector(7 downto 0);
+    -- Memory signals
+    signal progDataOut: std_logic_vector(Dwidth-1 downto 0);
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
--- U1: ProgMem generic map (Dwidth, Awidth, dept) port map (clk, progMemEn, progdataIn, progwriteAddr, PCout, progdataOut);
--- U2: DataMem generic map (Dwidth, Awidth, dept) port map (clk, dataMemEn, datadataIn, datawriteAddr, datareadAddr, datadataOut);
+U1: progMem generic map (Dwidth, Awidth, dept) port map (clk, progMemEn, progDataIn, progWriteAddr, PCout, progDataOut);
+U2: dataMem generic map (Dwidth, Awidth, dept) port map (clk, dataMemEn, dataDataIn, dataWriteAddr, dataReadAddr, dataDataOut);
 U3: RF generic map (Dwidth, Awidth) port map (clk, rst, RFin, RFWData, RWAddr, RWAddr, RFRData);
-U4: ALU generic map (Dwidth, k, m) port map (REGA, Bin, OPC, C, Nflag, Cflag, Zflag); -- B-A, B+A
+U4: ALU generic map (Dwidth) port map (REGA, Bin, OPC, C, Nflag, Cflag, Zflag); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
 
 ------------------- Bi-directional bus ---------------------------------------------------------
@@ -99,45 +92,58 @@ Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
 
     -- Program counter process
     process(clk, PCin, PCsel)
+    -- offset address in J-Type instructions
+    variable offset_addr: std_logic_vector(7 downto 0);
     begin
         offset_addr := IR(7 downto 0);
         if rising_edge(clk) then
             if PCin = '1' then
-                PCout <= CurrPC;
+                CurrPC <= NextPC;
             end if;
         end if;
+        case PCsel is
+            when "00" =>
+                NextPC <= CurrPC + 1;
+            when "01" =>
+                NextPC <= CurrPC + 1 + offset_addr;
+            when "10" =>
+                NextPC <= (others => '0');
+            when others =>
+                NextPC <= PCout;
+        end case;
+        PCout <= CurrPC(Awidth-1 downto 0); -- 6-bit PC addressing functionality
     end process;
-
-    PC: with PCsel select
-        CurrPC <= (PCout + 1) when "00" ,
-                (PCout + 1 + offset_addr) when "01" ,
-                (others => '0') when "10",
-                unaffected when others;
 
     -- IR register process
     process(clk)
     variable ra, rb, rc: std_logic_vector(3 downto 0);
-    ra := IR(11 downto 8);
-    rb := IR(7 downto 4);
-    rc := IR(3 downto 0);
-
     begin
+        ra := IR(11 downto 8);
+        rb := IR(7 downto 4);
+        rc := IR(3 downto 0);
         if rising_edge(clk) then
-            IR <= progdataOut when IRin = '1';
+            if IRin = '1' then
+                IR <= progDataOut;
+            end if;
         end if;
-        RFWAddr <= rc when RFaddr = "00" else
-                   rb when RFaddr = "01" else
-                   ra when RFaddr = "10" else
-                   (others => '0');
-        RFRData <= rc when RFaddr = "00" else
-                   rb when RFaddr = "01" else
-                   ra when RFaddr = "10" else
-                   (others => '0');
+        -- R/W ra.rb.rc to RF process
+        case RFaddr is
+            when "00" => 
+                RWAddr <= rc;
+            when "01" => 
+                RWAddr <= rb;
+            when "10" => 
+                RWAddr <= ra;
+            when others => 
+                RWAddr <= RWAddr;  -- Unaffected
+        end case;
     end process;
 
     -- OPC decoder process
     process(clk)
+    variable opcode: std_logic_vector(3 downto 0);
     begin
+        opcode := IR(Dwidth-1 downto Dwidth-4);
         -- asynchronous reset
         if rst = '1' then
             add <= '0';
@@ -159,7 +165,7 @@ Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
         end if;
         -- synchronous decoding
         if rising_edge(clk) then
-            case IR(Dwidth-1 downto Dwidth-4) is
+            case opcode is
                 when "0000" =>
                     add <= '1';
                 when "0001" =>
@@ -192,6 +198,23 @@ Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
                     st <= '1';
                 when "1111" =>
                     done <= '1';
+                when others =>
+                    add <= '0';
+                    sub <= '0';
+                    andf <= '0';
+                    orf <= '0';
+                    xorf <= '0';
+                    un1 <= '0';
+                    un2 <= '0';
+                    jmp <= '0';
+                    jc <= '0';
+                    jnc <= '0';
+                    un3 <= '0';
+                    un4 <= '0';
+                    mov <= '0';
+                    ld <= '0';
+                    st <= '0';
+                    done <= '0';
             end case;
         end if;
     end process;

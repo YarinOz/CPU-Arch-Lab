@@ -18,7 +18,7 @@ entity ControlUnit is
 end ControlUnit;
 
 architecture behavioral of ControlUnit is
-    type state_type is (Fetch, Decode, Execute, Memory, WriteBack);
+    type state_type is (Reset, Fetch, Decode, Execute, Memory, WriteBack);
     signal current_state, next_state: state_type;
 
 begin
@@ -27,22 +27,7 @@ begin
     process(clk, rst)
     begin
         if rst = '1' then
-            Mem_wr <= '0';
-            Mem_out <= '0';
-            Mem_in <= '0';
-            Cout <= '0';
-            Cin <= '0';
-            Ain <= '0';
-            RFin <= '0';
-            RFout <= '0';
-            IRin <= '0';
-            PCin <= '0';
-            Imm1_in <= '0';
-            Imm2_in <= '0';
-            PCsel <= "00";  -- zero initially
-            Rfaddr <= "11";
-            OPC <= "0000";
-            current_state <= Fetch;
+            current_state <= Reset;
         elsif rising_edge(clk) then
             current_state <= next_state;
         end if;
@@ -58,6 +43,26 @@ begin
         IType := mov or ld or st or done;
 
         case current_state is
+            when Reset =>
+                if (done='1') then 
+                    Mem_wr <= '0';
+                    Mem_out <= '0';
+                    Mem_in <= '0';
+                    Cout <= '0';
+                    Cin <= '0';
+                    Ain <= '0';
+                    RFin <= '0';
+                    RFout <= '0';
+                    IRin <= '0';
+                    PCin <= '1';
+                    Imm1_in <= '0';
+                    Imm2_in <= '0';
+                    Rfaddr <= "11";
+                    OPC <= "0000";
+                    PCsel <= "10"; -- PC <- 0
+                    next_state <= Fetch;
+                end if;
+
             when Fetch =>
                 Mem_wr <= '0';
                 Mem_out <= '0';
@@ -94,21 +99,44 @@ begin
                 -- 00 for R-Type, 01 for J-Type, 10 for I-Type
                 if (RType = '1') then
                     PCsel <= "00"; -- PC + 1
+
                 elsif (JType = '1') then
-                    PCsel <= "01"; -- pc + 1 + imm
+                    if (Cflag = '1' and jc = '1') then 
+                        PCsel <= "01"; -- pc + 1 + imm
+                    elsif (Cflag = '0' and jnc = '1') then
+                        PCsel <= "01"; -- pc + 1 + imm
+                    elsif (jmp = '1') then
+                        PCsel <= "01"; -- pc + 1 + imm
+                    else
+                        PCsel <= "00"; -- PC + 1
+                    end if;
+
                 elsif (IType = '1') then
-                    PCsel <= "10"; -- pc + 1 + imm
+                    Imm1_in <= '1';
+                    PCsel <= "00"; -- pc + 1
                 end if;
 
-                if (add or sub) then
+                if (add = '1' or sub = '1') then
                     Ain <= '1'; -- rc to ALU
                     RFout <= '1'; -- rc to fabric
                 end if;
 
                 if RType = '1' then
                     next_state <= Execute;
+
                 elsif IType = '1' then
-                    next_state <= Memory;
+                    if (mov = '1') then
+                        next_state <= WriteBack;
+                    elsif (ld = '1' or st = '1') then
+                        Ain <= '1'; -- imm to ALU
+                        RFout <= '1'; -- imm to fabric
+                        next_state <= Execute;
+                    elsif (done = '1') then
+                        PCin <= '1';
+                        done_FSM <= '1';
+                        next_state <= Reset;
+                    end if;
+
                 elsif JType = '1' then
                     next_state <= Fetch;
                 end if;
@@ -127,35 +155,54 @@ begin
                 Imm1_in <= '0';
                 Imm2_in <= '0';
                 Rfaddr <= "01"; -- rb
-                OPC <= "0000" when add='1' else
-                       "0001" when sub='1' else
-                       "0010" when andf='1' else
-                       "0011" when orf='1' else
-                       "0100" when xorf='1' else
-                       "0000" when others;
+
+                if (add = '1' or ld = '1') then
+                    OPC <= "0000";
+                elsif (sub = '1') then
+                    OPC <= "0001";
+                elsif (andf = '1') then
+                    OPC <= "0010";
+                elsif (orf = '1') then
+                    OPC <= "0011";
+                elsif (xorf = '1') then
+                    OPC <= "0100";
+                end if;
+
                 -- 00 for R-Type, 01 for J-Type, 10 for I-Type
                 if (RType = '1') then
                     PCsel <= "00"; -- PC + 1
                 elsif (JType = '1') then
                     PCsel <= "01"; -- pc + 1 + imm
                 elsif (IType = '1') then
-                    PCsel <= "10"; -- pc + 1 + imm
+                    PCsel <= "00"; -- pc + 1
+                    next_state <= Memory;
                 end if;
                 next_state <= WriteBack;
 
             when Memory =>
-                case Status is
-                    when "0010" => -- LOAD instruction
-                        Mem_out <= '1';
-                        Mem_in <= '1';
-                        RFout <= '1';
-                        next_state <= WriteBack;
-                    when "0011" => -- STORE instruction
-                        Mem_wr <= '1';
-                        next_state <= Fetch;
-                    when others =>
-                        next_state <= Fetch;
-                end case;
+                    Cout <= '1';
+                    Cin <= '0';
+                    Ain <= '0';
+                    RFin <= '0';
+                    RFout <= '0';
+                    IRin <= '0';
+                    PCin <= '0';
+                    Imm1_in <= '0';
+                    Imm2_in <= '0';
+                    Rfaddr <= "11";
+                    OPC <= "0000";
+                    PCsel <= "00"; -- PC + 1 
+                if (ld='1') then -- LOAD instruction
+                    Mem_wr <= '0';
+                    Mem_out <= '0'; -- Mem read
+                    Mem_in <= '0';
+                    next_state <= WriteBack;
+                elsif (st='1') then -- STORE instruction
+                    Mem_wr <= '0';
+                    Mem_out <= '0';
+                    Mem_in <= '1';
+                    next_state <= WriteBack;
+                end if;
 
             when WriteBack =>
                 Mem_wr <= '0';
@@ -173,6 +220,15 @@ begin
                 Rfaddr <= "10"; -- ra
                 OPC <= "0000";
                 PCsel <= "00"; -- PC + 1
+                -- sudo WB ()
+                if (ld = '1') then
+                    Mem_out <= '1';
+                elsif (st = '1') then
+                    Mem_wr <= '1';
+                    Mem_out <= '0';
+                    RFout <= '1';
+                    RFin <= '0';
+                end if;
                 next_state <= Fetch;
 
             when others =>

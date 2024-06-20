@@ -6,9 +6,9 @@ USE work.aux_package.all;
 
 ENTITY ALU IS
   GENERIC (
-    Dwidth : INTEGER := 16;
-    k : integer := 4;   -- k=log2(n)
-    m : integer := 8    -- m=2^(k-1)
+    Dwidth : INTEGER := 16
+    -- k : integer := 4;   -- k=log2(n)
+    -- m : integer := 8    -- m=2^(k-1)
   );
   PORT (
     Y_i, X_i : IN STD_LOGIC_VECTOR (Dwidth-1 DOWNTO 0);
