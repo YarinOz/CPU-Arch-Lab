@@ -16,7 +16,7 @@ entity top is
         progDataIn: in std_logic_vector(Dwidth-1 downto 0);
         progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
         -- -- data memory signals
-        dataMemEn: in std_logic;
+        dataMemEn, TBactive: in std_logic;
         dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
         dataWriteAddr, dataReadAddr: in std_logic_vector(Awidth-1 downto 0);
         dataDataOut: out std_logic_vector(Dwidth-1 downto 0)
@@ -41,7 +41,7 @@ CONTROLUNIT: Control port map(
     Mem_wr, Mem_out, Mem_in, Cout, Cin, Ain, RFin, RFout, IRin, PCin, Imm1_in, Imm2_in,
     PCsel, Rfaddr, OPC, done_FSM
 );
-DATAPATHUNIT: Datapath generic map(Dwidth) port map(clk, rst, Mem_wr,Mem_out,Mem_in,
+DATAPATHUNIT: Datapath generic map(Dwidth) port map(TBactive, clk, rst, Mem_wr,Mem_out,Mem_in,
     Cout,Cin,Ain,RFin,RFout,IRin,PCin,Imm1_in,Imm2_in,
     PCsel, Rfaddr, OPC, st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
     orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4, 

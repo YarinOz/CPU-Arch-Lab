@@ -11,9 +11,9 @@ generic(
     dept: integer := 64
 );
 port(
-    clk, rst: in std_logic;
+    TBactive, clk, rst: in std_logic;
     -- control signals
-    Mem_wr,Mem_out,Men_in,Cout,Cin,Ain,RFin,RFout,IRin,PCin,Imm1_in,Imm2_in :in std_logic;
+    Mem_wr,Mem_out,Mem_in,Cout,Cin,Ain,RFin,RFout,IRin,PCin,Imm1_in,Imm2_in :in std_logic;
     PCsel, Rfaddr: in std_logic_vector(1 downto 0);
     OPC: in std_logic_vector(3 downto 0);
     -- status signals
@@ -52,10 +52,15 @@ architecture behav of Datapath is
     -- Memory signals
     signal progDataOut: std_logic_vector(Dwidth-1 downto 0);
 
+    -- Datamem signals
+    signal DataIn, DataOut, RMUX, WMUX: std_logic_vector(Dwidth-1 downto 0);
+    signal WAddr, RAddr: std_logic_vector(Awidth-1 downto 0);
+    signal EnData: std_logic;
+
 begin 
 -------------------- port mapping ---------------------------------------------------------------
 U1: progMem generic map (Dwidth, Awidth, dept) port map (clk, progMemEn, progDataIn, progWriteAddr, PCout, progDataOut);
-U2: dataMem generic map (Dwidth, Awidth, dept) port map (clk, dataMemEn, dataDataIn, dataWriteAddr, dataReadAddr, dataDataOut);
+U2: dataMem generic map (Dwidth, Awidth, dept) port map (clk, EnData, DataIn, WAddr, RAddr, DataOut);
 U3: RF generic map (Dwidth, Awidth) port map (clk, rst, RFin, RFWData, RWAddr, RWAddr, RFRData);
 U4: ALU generic map (Dwidth) port map (REGA, Bin, OPC, C, Nflag, Cflag, Zflag); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
@@ -71,25 +76,6 @@ Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
              "000000000000" & IR(3 downto 0) when Imm2_in = '1' else
              (others => 'Z');
 -----------------------------------------------------------------------------------------------
-
-    -- Process to read data from prog_memory_file and write to program memory
-    -- process(clk)
-    -- begin
-    --     if rising_edge(clk) then
-    --         if not endfile(prog_memory_file) then
-    --             readline(prog_memory_file, file_line);
-    --             read(file_line, read_addr);
-    --             read(file_line, read_data);
-
-    --             progwriteAddr <= std_logic_vector(to_unsigned(read_addr, Awidth));
-    --             progdataIn <= read_data;
-    --             progMemEn <= '1';
-    --         else
-    --             progMemEn <= '0';
-    --         end if;
-    --     end if;
-    -- end process;
-
     -- Program counter process
     process(clk, PCin, PCsel)
     -- offset address in J-Type instructions
@@ -231,5 +217,22 @@ Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
             end if;
         end if;
     end process;
+
+    -- Data Memory Write 
+    DataMem_Write: process(clk) 
+    begin
+	if rising_edge(clk) then
+		if (Mem_in = '1') then
+			WAddr <= fabric(Awidth-1 downto 0);
+		end if;
+	end if;
+			
+    end process;
+    -- TB connectivity
+    EnData <= dataMemEn	when TBactive = '1' else Mem_wr;
+    DataIn <= dataDataIn	when TBactive = '1' else fabric;
+    WMUX <= dataWriteAddr when TBactive = '1' 	else WAddr;
+    RMUX <= dataReadAddr when TBactive = '1' 	else RAddr(Awidth-1 downto 0);
+    dataDataOut <= DataOut;
     
 end behav;

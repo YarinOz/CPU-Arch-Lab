@@ -16,7 +16,7 @@ package aux_package is
         progDataIn: in std_logic_vector(Dwidth-1 downto 0);
         progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
         -- -- data memory signals
-        dataMemEn: in std_logic;
+        dataMemEn, TBactive: in std_logic;
         dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
         dataWriteAddr, dataReadAddr: in std_logic_vector(Awidth-1 downto 0);
         dataDataOut: out std_logic_vector(Dwidth-1 downto 0)
@@ -88,7 +88,7 @@ package aux_package is
 			dept: integer := 64
 		);
 	port(	
-		clk, rst: in std_logic;
+		TBactive, clk, rst: in std_logic;
 		-- control signals
 		Mem_wr,Mem_out,Men_in,Cout,Cin,Ain,RFin,RFout,IRin,PCin,Imm1_in,Imm2_in :in std_logic;
 		PCsel, Rfaddr: in std_logic_vector(1 downto 0);
