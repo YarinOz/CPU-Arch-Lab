@@ -5,6 +5,7 @@ use work.aux_package.all;
 entity top is
     generic(Dwidth: integer := 16;
             Awidth: integer := 6;
+            Regwidth: integer := 4;
             dept: integer := 64
     );
 
@@ -35,7 +36,7 @@ architecture behav of top is
 
 begin
 
-CONTROLUNIT: Control port map(
+CONTROLUNITEN: ControlUnit port map(
     clk, rst, st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
     orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4, 
     Mem_wr, Mem_out, Mem_in, Cout, Cin, Ain, RFin, RFout, IRin, PCin, Imm1_in, Imm2_in,

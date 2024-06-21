@@ -112,7 +112,11 @@ begin
                     end if;
 
                 elsif (IType = '1') then
-                    Imm1_in <= '1';
+                    if (mov = '1') then
+                        Imm1_in <= '1';
+                    elsif (ld = '1' or st = '1') then
+                        Imm2_in <= '1';
+                    end if;
                     PCsel <= "00"; -- pc + 1
                 end if;
 

@@ -8,6 +8,7 @@ entity Datapath is
 generic(
     Dwidth: integer := 16;
     Awidth: integer := 6;
+    Regwidth: integer := 4;
     dept: integer := 64
 );
 port(
@@ -34,34 +35,35 @@ end Datapath;
  
 architecture behav of Datapath is
     -- Program counter
-    signal PCout, CurrPC, NextPC: std_logic_vector(Dwidth-1 downto 0);
-
+    -- signal PCout, CurrPC, NextPC: std_logic_vector(Awidth-1 downto 0);
+    signal CurrPC, NextPC: std_logic_vector(7 downto 0):=(others =>'0'); -- temporary
+    signal PCout : std_logic_vector(Awidth-1 downto 0):="000000";
     -- IR register
     signal IR: std_logic_vector(Dwidth-1 downto 0);
 
     -- RF signals
-    signal RWAddr: std_logic_vector(3 downto 0);           -- RF write address
+    signal RWAddr: std_logic_vector(Regwidth-1 downto 0);           -- RF write address
     signal RFRData, RFWData: std_logic_vector(Dwidth-1 downto 0); -- RF read and write data
 
     -- ALU signals  
     signal REGA, REGC, Bin, C: std_logic_vector(Dwidth-1 downto 0);
 
     -- Bi directional bus
-    signal fabric, Immediate: std_logic_vector(Dwidth-1 downto 0);
+    signal fabric, offset_addr: std_logic_vector(Dwidth-1 downto 0);
 
     -- Memory signals
     signal progDataOut: std_logic_vector(Dwidth-1 downto 0);
 
     -- Datamem signals
-    signal DataIn, DataOut, RMUX, WMUX: std_logic_vector(Dwidth-1 downto 0);
-    signal WAddr, RAddr: std_logic_vector(Awidth-1 downto 0);
+    signal DataIn, DataOut: std_logic_vector(Dwidth-1 downto 0);
+    signal WAddr, RAddr, RMUX, WMUX: std_logic_vector(Awidth-1 downto 0);
     signal EnData: std_logic;
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
 U1: progMem generic map (Dwidth, Awidth, dept) port map (clk, progMemEn, progDataIn, progWriteAddr, PCout, progDataOut);
 U2: dataMem generic map (Dwidth, Awidth, dept) port map (clk, EnData, DataIn, WAddr, RAddr, DataOut);
-U3: RF generic map (Dwidth, Awidth) port map (clk, rst, RFin, RFWData, RWAddr, RWAddr, RFRData);
+U3: RF generic map (Dwidth,Regwidth) port map (clk, rst, RFin, RFWData, RWAddr, RWAddr, RFRData);
 U4: ALU generic map (Dwidth) port map (REGA, Bin, OPC, C, Nflag, Cflag, Zflag); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
 
@@ -69,19 +71,17 @@ U4: ALU generic map (Dwidth) port map (REGA, Bin, OPC, C, Nflag, Cflag, Zflag); 
 -- DatamemOut: BidirPin generic map (Dwidth) port map (datadataOut, Mem_out, datareadAddr, fabric);
 ALUout: BidirPin generic map (Dwidth) port map (REGC, Cout, Bin, fabric);
 RegFout: BidirPin generic map (Dwidth) port map (RFRData, RFout, RFWData, fabric);
-IMM1out: BidirPin generic map (Dwidth) port map (Immediate, Imm1_in, RFWData, fabric);
-IMM2out: BidirPin generic map (Dwidth) port map (Immediate, Imm2_in, RFWData, fabric);
+IMM1out: BidirPin generic map (Dwidth) port map (offset_addr, Imm1_in, RFWData, fabric);
+IMM2out: BidirPin generic map (Dwidth) port map (offset_addr, Imm2_in, RFWData, fabric);
 
-Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
-             "000000000000" & IR(3 downto 0) when Imm2_in = '1' else
+offset_addr <= SXT(IR(7 downto 0), Dwidth) when Imm1_in = '1' else --mov
+             SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
              (others => 'Z');
 -----------------------------------------------------------------------------------------------
     -- Program counter process
     process(clk, PCin, PCsel)
     -- offset address in J-Type instructions
-    variable offset_addr: std_logic_vector(7 downto 0);
     begin
-        offset_addr := IR(7 downto 0);
         if rising_edge(clk) then
             if PCin = '1' then
                 CurrPC <= NextPC;
@@ -89,20 +89,20 @@ Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
         end if;
         case PCsel is
             when "00" =>
-                NextPC <= CurrPC + 1;
+                NextPC <= (CurrPC + 1);
             when "01" =>
-                NextPC <= CurrPC + 1 + offset_addr;
+                NextPC <= (CurrPC + 1 + offset_addr(7 downto 0));
             when "10" =>
                 NextPC <= (others => '0');
             when others =>
-                NextPC <= PCout;
+                NextPC <= NextPC;  -- Unaffected
         end case;
-        PCout <= CurrPC(Awidth-1 downto 0); -- 6-bit PC addressing functionality
+        PCout <= CurrPC(Awidth-1 downto 0);
     end process;
 
     -- IR register process
     process(clk)
-    variable ra, rb, rc: std_logic_vector(3 downto 0);
+    variable ra, rb, rc: std_logic_vector(Regwidth-1 downto 0);
     begin
         ra := IR(11 downto 8);
         rb := IR(7 downto 4);
@@ -232,7 +232,7 @@ Immediate <= "00000000" & IR(7 downto 0) when Imm1_in = '1' else
     EnData <= dataMemEn	when TBactive = '1' else Mem_wr;
     DataIn <= dataDataIn	when TBactive = '1' else fabric;
     WMUX <= dataWriteAddr when TBactive = '1' 	else WAddr;
-    RMUX <= dataReadAddr when TBactive = '1' 	else RAddr(Awidth-1 downto 0);
+    RMUX <= dataReadAddr when TBactive = '1' 	else RAddr;
     dataDataOut <= DataOut;
     
 end behav;

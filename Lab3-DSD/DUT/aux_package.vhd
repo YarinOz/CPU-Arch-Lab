@@ -6,6 +6,7 @@ package aux_package is
 	component top is
 	generic(Dwidth: integer := 16;
 			Awidth: integer := 6;
+			Regwidth: integer := 4;
 			dept: integer := 64
 	);
     port(clk,rst,ena: in std_logic;
@@ -69,7 +70,7 @@ package aux_package is
 			res : OUT std_logic_vector(n-1 DOWNTO 0));
 	END COMPONENT;
 ---------------------------------------------------------	
-	component Control IS
+	component ControlUnit IS
 		PORT(
 			clk, rst: in std_logic;
 			st, ld, mov, done, add, sub, jmp, jc, jnc, Cflag, Zflag, Nflag, andf,
@@ -85,12 +86,13 @@ package aux_package is
 		generic(
 			Dwidth: integer := 16;
 			Awidth: integer := 6;
+			Regwidth: integer := 4;
 			dept: integer := 64
 		);
 	port(	
 		TBactive, clk, rst: in std_logic;
 		-- control signals
-		Mem_wr,Mem_out,Men_in,Cout,Cin,Ain,RFin,RFout,IRin,PCin,Imm1_in,Imm2_in :in std_logic;
+		Mem_wr,Mem_out,Mem_in,Cout,Cin,Ain,RFin,RFout,IRin,PCin,Imm1_in,Imm2_in :in std_logic;
 		PCsel, Rfaddr: in std_logic_vector(1 downto 0);
 		OPC: in std_logic_vector(3 downto 0);
 		-- status signals
@@ -121,9 +123,9 @@ package aux_package is
 ---------------------------------------------------------
 	component ALU is
 	generic (
-		Dwidth : INTEGER := 16;
-		k : integer := 4;   -- k=log2(n)
-		m : integer := 8    -- m=2^(k-1)
+		Dwidth : INTEGER := 16
+		-- k : integer := 4;   -- k=log2(n)
+		-- m : integer := 8    -- m=2^(k-1)
 		);
 		PORT(
 			Y_i, X_i : IN STD_LOGIC_VECTOR (Dwidth-1 DOWNTO 0);
