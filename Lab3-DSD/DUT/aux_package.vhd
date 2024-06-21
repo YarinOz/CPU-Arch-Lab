@@ -47,18 +47,18 @@ package aux_package is
 	end component;
 ---------------------------------------------------------	
 	COMPONENT AdderSub IS
-	GENERIC (n: INTEGER := 8);
-	PORT (x, y: IN std_logic_vector(n-1 DOWNTO 0);
+	GENERIC (Dwidth: integer := 16);
+	PORT (x, y: IN std_logic_vector(Dwidth-1 DOWNTO 0);
 			sub_c : IN std_logic;
-			s: OUT std_logic_vector(n-1 DOWNTO 0);
+			s: OUT std_logic_vector(Dwidth-1 DOWNTO 0);
 			cout: OUT std_logic);
 	END COMPONENT;
 ---------------------------------------------------------	
 	COMPONENT LOGIC IS
-	GENERIC (n: INTEGER := 8);
-	PORT (x, y: IN std_logic_vector(n-1 DOWNTO 0);
+	GENERIC (Dwidth: integer := 16);
+	PORT (x, y: IN std_logic_vector(Dwidth-1 DOWNTO 0);
 				mode: IN std_logic_vector(3 DOWNTO 0);
-				s: OUT std_logic_vector(n-1 DOWNTO 0));
+				s: OUT std_logic_vector(Dwidth-1 DOWNTO 0));
 	END COMPONENT;
 ---------------------------------------------------------	
 	COMPONENT Shifter IS

@@ -3,7 +3,8 @@
 -- remove delta in TB: configure list -delta collapse
 
 ## to do:
-1. create bi-directional bus and connect the modules
-2. fix ALU- opcode FSM 
-3. fix control FSM logic
-4. data memory- all
+- The code seems to work overall, need to check why done_FSM is not being toggled. 
+(after done_FSM=1 we get the memory write)
+
+- the program gets stuck in instruction 2223 (and ra rb rc)
+therefor not proceeding to F000 (done)

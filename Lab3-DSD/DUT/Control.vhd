@@ -46,11 +46,6 @@ begin
         JType := (jmp='1' or (jc='1' and Cflag='1') or (jnc='1' and Cflag='0'));
         IType := (mov='1' or ld='1' or st='1' or done='1');
 
-        -- debug type
-        report "time = " & to_string(now)
-        & LF & "RType =       " & to_string(RType)
-        & LF & "JType =       " & to_string(JType) 
-        & LF & "IType =       " & to_string(IType) ;
         case current_state is
             when Reset =>
                 if (done='0') then 
@@ -111,7 +106,6 @@ begin
                 -- 00 for R-Type, 01 for J-Type, 10 for I-Type
                 if RType then
                     PCsel <= "00"; -- PC + 1
-
                     if (add = '1' or sub = '1') then
                         Ain <= '1'; -- rc to ALU
                         RFout <= '1'; -- rc to fabric
@@ -130,7 +124,6 @@ begin
                     elsif (ld = '1' or st = '1') then
                         Imm2_in <= '1';
                         Ain <= '1'; -- imm to ALU
-                        RFout <= '1'; -- imm to fabric
                         next_state <= Execute;
                     elsif (done = '1') then
                         PCin <= '1';
@@ -155,6 +148,7 @@ begin
                 Imm1_in <= '0';
                 Imm2_in <= '0';
                 Rfaddr <= "01"; -- rb
+                PCsel <= "00";
                 done_FSM <= '0';
 
                 if (add = '1' or ld = '1') then
@@ -169,15 +163,14 @@ begin
                     OPC <= "0100";
                 end if;
 
-                -- 00 for R-Type, 01 for J-Type, 10 for I-Type
-                if (RType) then
-                    PCsel <= "00"; -- PC + 1
-                elsif (JType) then
+                if JType then
                     PCsel <= "01"; -- pc + 1 + imm
-                elsif (IType) then
-                    PCsel <= "00"; -- pc + 1
+                end if;
+
+                if IType then
                     next_state <= Memory;
                 end if;
+
                 next_state <= WriteBack;
 
             when Memory =>
@@ -198,13 +191,12 @@ begin
                     Mem_wr <= '0';
                     Mem_out <= '0'; -- Mem read
                     Mem_in <= '0';
-                    next_state <= WriteBack;
                 elsif (st='1') then -- STORE instruction
                     Mem_wr <= '0';
                     Mem_out <= '0';
                     Mem_in <= '1';
-                    next_state <= WriteBack;
                 end if;
+                next_state <= WriteBack;
 
             when WriteBack =>
                 Mem_wr <= '0';
@@ -216,7 +208,7 @@ begin
                 RFin <= '1'; -- RF write
                 RFout <= '0'; 
                 IRin <= '0';
-                PCin <= '0'; 
+                PCin <= '1'; 
                 Imm1_in <= '0';
                 Imm2_in <= '0';
                 Rfaddr <= "10"; -- ra

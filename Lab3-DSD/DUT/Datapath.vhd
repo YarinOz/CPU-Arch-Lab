@@ -155,6 +155,27 @@ offset_addr <= SXT(IR(7 downto 0), Dwidth) when Imm1_in = '1' else --mov
         end if;
         -- synchronous decoding
         if rising_edge(clk) then
+            report "IR = " & to_string(IR);
+            report "opcode = " & to_string(opcode);
+            add <= '0';
+            sub <= '0';
+            andf <= '0';
+            orf <= '0';
+            xorf <= '0';
+            un1 <= '0';
+            un2 <= '0';
+            jmp <= '0';
+            jc <= '0';
+            jnc <= '0';
+            un3 <= '0';
+            un4 <= '0';
+            mov <= '0';
+            ld <= '0';
+            st <= '0';
+            Cflag <= '0';
+            Zflag <= '0';
+            Nflag <= '0';
+            done <= '0';
             case opcode is
                 when "0000" =>
                     add <= '1';
@@ -189,21 +210,6 @@ offset_addr <= SXT(IR(7 downto 0), Dwidth) when Imm1_in = '1' else --mov
                 when "1111" =>
                     done <= '1';
                 when others =>
-                    add <= '0';
-                    sub <= '0';
-                    andf <= '0';
-                    orf <= '0';
-                    xorf <= '0';
-                    un1 <= '0';
-                    un2 <= '0';
-                    jmp <= '0';
-                    jc <= '0';
-                    jnc <= '0';
-                    un3 <= '0';
-                    un4 <= '0';
-                    mov <= '0';
-                    ld <= '0';
-                    st <= '0';
                     done <= '0';
             end case;
         end if;
