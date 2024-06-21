@@ -18,13 +18,14 @@ entity top_tb is
 end top_tb;
 
 architecture rtb of top_tb is
-    SIGNAL done_FSM:             STD_LOGIC := '0';
+    SIGNAL done_FSM: STD_LOGIC := '0';
     SIGNAL rst, ena, clk, TBactive, dataMemEn, progMemEn: STD_LOGIC;    
     SIGNAL progDataIn, dataDataIn, dataDataOut: STD_LOGIC_VECTOR (Dwidth-1 downto 0);
     SIGNAL progWriteAddr, dataWriteAddr, dataReadAddr: STD_LOGIC_VECTOR (Awidth-1 DOWNTO 0);
     SIGNAL donePmemIn, doneDmemIn: BOOLEAN;
 
 begin
+    -- Instantiate the DUT
     TopUnit: entity work.top
         generic map (Dwidth => Dwidth, Awidth => Awidth, dept => dept)
         port map (
@@ -43,15 +44,14 @@ begin
             dataDataOut => dataDataOut
         );
 
-    --------- start of stimulus section ------------------    
-    --------- Rst
+    -- Reset generation
     gen_rst : process
     begin
         rst <= '1', '0' after 100 ns;
         wait;
     end process;
     
-    ------------ Clock
+    -- Clock generation
     gen_clk : process
     begin
         clk <= '0';
@@ -60,7 +60,7 @@ begin
         wait for 50 ns;
     end process;
     
-    ---------  TB
+    -- Testbench control
     gen_TB : process
     begin
         TBactive <= '1';
@@ -70,7 +70,7 @@ begin
         TBactive <= '1';    
     end process;    
 
-    --------- Reading from text file and initializing the data memory data --------
+    -- Data memory initialization
     LoadDataMem: process 
         file inDmemfile : text open read_mode is dataMemLocation;
         variable linetomem: std_logic_vector(Dwidth-1 downto 0);
@@ -96,7 +96,7 @@ begin
         wait;
     end process;
 
-    --------- Reading from text file and initializing the program memory instructions ------
+    -- Program memory initialization
     LoadProgramMem: process 
         file inPmemfile : text open read_mode is progMemLocation;
         variable linetomem: std_logic_vector(Dwidth-1 downto 0); 
@@ -122,9 +122,10 @@ begin
         wait;
     end process;
 
+    -- Enable signal control
     ena <= '1' when (doneDmemIn and donePmemIn) else '0';
 
-    --------- Writing from Data memory to external text file, after the program ends (done_FSM = 1). -----
+    -- Writing data memory results to file
     WriteToDataMem: process 
         file outDmemfile : text open write_mode is dataMemResult;
         variable linetomem: std_logic_vector(Dwidth-1 downto 0);
@@ -139,7 +140,7 @@ begin
         while counter < 16 loop --15 lines in file
             dataReadAddr <= TempAddresses;
             wait until rising_edge(clk);
-            wait until rising_edge(clk); -- added now 12/5/2023 14:48
+            wait until rising_edge(clk); -- Ensure data is stable
             hwrite(L, dataDataOut);
             writeline(outDmemfile, L);
             TempAddresses := TempAddresses + 1;

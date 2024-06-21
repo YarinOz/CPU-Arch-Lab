@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
+use work.aux_package.all;
 
 entity ControlUnit is
     port(
@@ -13,6 +14,7 @@ entity ControlUnit is
         Mem_wr, Mem_out, Mem_in, Cout, Cin, Ain, RFin, RFout, IRin, PCin, Imm1_in, Imm2_in : out std_logic;
         PCsel, Rfaddr: out std_logic_vector(1 downto 0);
         OPC: out std_logic_vector(3 downto 0);
+        ena: in std_logic;
         done_FSM: out std_logic
     );
 end ControlUnit;
@@ -28,23 +30,30 @@ begin
     begin
         if rst = '1' then
             current_state <= Reset;
-        elsif rising_edge(clk) then
+        elsif (rising_edge(clk) and ena='1') then
             current_state <= next_state;
+            report "curr state = " & to_string(current_state)
+			& LF & "time =       " & to_string(now) ;
         end if;
     end process;
 
     process(current_state, st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
     orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4) -- Moore machine
-    variable RType, JtYPE, IType : std_logic; 
+    variable RType, JtYPE, IType : BOOLEAN; 
 
     begin
-        RType := add or sub or andf or orf or xorf;
-        JType := jmp or (jc and Cflag) or (jnc and not Cflag);
-        IType := mov or ld or st or done;
+        RType := (add='1' or sub='1' or andf='1' or orf='1' or xorf='1');
+        JType := (jmp='1' or (jc='1' and Cflag='1') or (jnc='1' and Cflag='0'));
+        IType := (mov='1' or ld='1' or st='1' or done='1');
 
+        -- debug type
+        report "time = " & to_string(now)
+        & LF & "RType =       " & to_string(RType)
+        & LF & "JType =       " & to_string(JType) 
+        & LF & "IType =       " & to_string(IType) ;
         case current_state is
             when Reset =>
-                if (done='1') then 
+                if (done='0') then 
                     Mem_wr <= '0';
                     Mem_out <= '0';
                     Mem_in <= '0';
@@ -60,6 +69,7 @@ begin
                     Rfaddr <= "11";
                     OPC <= "0000";
                     PCsel <= "10"; -- PC <- 0
+                    done_FSM <= '0';
                     next_state <= Fetch;
                 end if;
 
@@ -79,6 +89,7 @@ begin
                 Rfaddr <= "11"; 
                 OPC <= "0000";
                 PCsel <= "00"; -- PC + 1
+                done_FSM <= '0';
                 next_state <= Decode;
 
             when Decode =>
@@ -96,42 +107,28 @@ begin
                 Imm2_in <= '0';
                 Rfaddr <= "00"; -- rc
                 OPC <= "0000";
+                done_FSM <= '0';
                 -- 00 for R-Type, 01 for J-Type, 10 for I-Type
-                if (RType = '1') then
+                if RType then
                     PCsel <= "00"; -- PC + 1
 
-                elsif (JType = '1') then
-                    if (Cflag = '1' and jc = '1') then 
-                        PCsel <= "01"; -- pc + 1 + imm
-                    elsif (Cflag = '0' and jnc = '1') then
-                        PCsel <= "01"; -- pc + 1 + imm
-                    elsif (jmp = '1') then
-                        PCsel <= "01"; -- pc + 1 + imm
-                    else
-                        PCsel <= "00"; -- PC + 1
+                    if (add = '1' or sub = '1') then
+                        Ain <= '1'; -- rc to ALU
+                        RFout <= '1'; -- rc to fabric
+                        next_state <= Execute;
                     end if;
 
-                elsif (IType = '1') then
+                elsif JType then
+                    PCsel <= "01"; -- pc + 1 + imm
+                    PCin <= '1';
+                    next_state <= Fetch;
+                    
+                elsif IType then
                     if (mov = '1') then
                         Imm1_in <= '1';
-                    elsif (ld = '1' or st = '1') then
-                        Imm2_in <= '1';
-                    end if;
-                    PCsel <= "00"; -- pc + 1
-                end if;
-
-                if (add = '1' or sub = '1') then
-                    Ain <= '1'; -- rc to ALU
-                    RFout <= '1'; -- rc to fabric
-                end if;
-
-                if RType = '1' then
-                    next_state <= Execute;
-
-                elsif IType = '1' then
-                    if (mov = '1') then
                         next_state <= WriteBack;
                     elsif (ld = '1' or st = '1') then
+                        Imm2_in <= '1';
                         Ain <= '1'; -- imm to ALU
                         RFout <= '1'; -- imm to fabric
                         next_state <= Execute;
@@ -139,10 +136,9 @@ begin
                         PCin <= '1';
                         done_FSM <= '1';
                         next_state <= Reset;
+                    else
+                        next_state <= Fetch;
                     end if;
-
-                elsif JType = '1' then
-                    next_state <= Fetch;
                 end if;
 
             when Execute =>
@@ -159,6 +155,7 @@ begin
                 Imm1_in <= '0';
                 Imm2_in <= '0';
                 Rfaddr <= "01"; -- rb
+                done_FSM <= '0';
 
                 if (add = '1' or ld = '1') then
                     OPC <= "0000";
@@ -173,11 +170,11 @@ begin
                 end if;
 
                 -- 00 for R-Type, 01 for J-Type, 10 for I-Type
-                if (RType = '1') then
+                if (RType) then
                     PCsel <= "00"; -- PC + 1
-                elsif (JType = '1') then
+                elsif (JType) then
                     PCsel <= "01"; -- pc + 1 + imm
-                elsif (IType = '1') then
+                elsif (IType) then
                     PCsel <= "00"; -- pc + 1
                     next_state <= Memory;
                 end if;
@@ -196,6 +193,7 @@ begin
                     Rfaddr <= "11";
                     OPC <= "0000";
                     PCsel <= "00"; -- PC + 1 
+                    done_FSM <= '0';
                 if (ld='1') then -- LOAD instruction
                     Mem_wr <= '0';
                     Mem_out <= '0'; -- Mem read
@@ -224,6 +222,10 @@ begin
                 Rfaddr <= "10"; -- ra
                 OPC <= "0000";
                 PCsel <= "00"; -- PC + 1
+                done_FSM <= '0';
+                if RType or IType then
+                    PCin <= '1';
+                end if;
                 -- sudo WB ()
                 if (ld = '1') then
                     Mem_out <= '1';

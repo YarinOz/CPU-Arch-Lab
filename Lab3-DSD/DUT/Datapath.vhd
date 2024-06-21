@@ -62,7 +62,7 @@ architecture behav of Datapath is
 begin 
 -------------------- port mapping ---------------------------------------------------------------
 U1: progMem generic map (Dwidth, Awidth, dept) port map (clk, progMemEn, progDataIn, progWriteAddr, PCout, progDataOut);
-U2: dataMem generic map (Dwidth, Awidth, dept) port map (clk, EnData, DataIn, WAddr, RAddr, DataOut);
+U2: dataMem generic map (Dwidth, Awidth, dept) port map (clk, EnData, DataIn, WMUX, RMUX, DataOut);
 U3: RF generic map (Dwidth,Regwidth) port map (clk, rst, RFin, RFWData, RWAddr, RWAddr, RFRData);
 U4: ALU generic map (Dwidth) port map (REGA, Bin, OPC, C, Nflag, Cflag, Zflag); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ IMM2out: BidirPin generic map (Dwidth) port map (offset_addr, Imm2_in, RFWData, 
 
 offset_addr <= SXT(IR(7 downto 0), Dwidth) when Imm1_in = '1' else --mov
              SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
-             (others => 'Z');
+             (others => '0');
 -----------------------------------------------------------------------------------------------
     -- Program counter process
     process(clk, PCin, PCsel)
@@ -85,6 +85,7 @@ offset_addr <= SXT(IR(7 downto 0), Dwidth) when Imm1_in = '1' else --mov
         if rising_edge(clk) then
             if PCin = '1' then
                 CurrPC <= NextPC;
+                report "NextPC = " & to_string(NextPC);
             end if;
         end if;
         case PCsel is
@@ -147,6 +148,9 @@ offset_addr <= SXT(IR(7 downto 0), Dwidth) when Imm1_in = '1' else --mov
             mov <= '0';
             ld <= '0';
             st <= '0';
+            Cflag <= '0';
+            Zflag <= '0';
+            Nflag <= '0';
             done <= '0';
         end if;
         -- synchronous decoding
@@ -224,6 +228,8 @@ offset_addr <= SXT(IR(7 downto 0), Dwidth) when Imm1_in = '1' else --mov
 	if rising_edge(clk) then
 		if (Mem_in = '1') then
 			WAddr <= fabric(Awidth-1 downto 0);
+            report "fabric = " & to_string(fabric)
+			& LF & "time =       " & to_string(now) ;
 		end if;
 	end if;
 			

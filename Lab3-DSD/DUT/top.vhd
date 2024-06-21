@@ -40,7 +40,7 @@ CONTROLUNITEN: ControlUnit port map(
     clk, rst, st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
     orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4, 
     Mem_wr, Mem_out, Mem_in, Cout, Cin, Ain, RFin, RFout, IRin, PCin, Imm1_in, Imm2_in,
-    PCsel, Rfaddr, OPC, done_FSM
+    PCsel, Rfaddr, OPC, ena, done_FSM
 );
 DATAPATHUNIT: Datapath generic map(Dwidth) port map(TBactive, clk, rst, Mem_wr,Mem_out,Mem_in,
     Cout,Cin,Ain,RFin,RFout,IRin,PCin,Imm1_in,Imm2_in,

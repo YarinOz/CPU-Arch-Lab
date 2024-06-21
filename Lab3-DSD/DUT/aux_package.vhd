@@ -78,6 +78,7 @@ package aux_package is
 			Mem_wr, Mem_out, Mem_in, Cout, Cin, Ain, RFin, RFout, IRin, PCin, Imm1_in, Imm2_in : out std_logic;
 			PCsel, Rfaddr: out std_logic_vector(1 downto 0);
 			OPC: out std_logic_vector(3 downto 0);
+			ena: in std_logic;
 			done_FSM : out std_logic
 		);
 	END component;

@@ -27,11 +27,11 @@ ARCHITECTURE struct OF ALU IS
   SIGNAL subtract : std_logic;
 BEGIN
   -- input assignment (zero input if not used)
-  AddX <= X_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'Z');
-  AddY <= Y_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'Z');
+  AddX <= X_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'0');
+  AddY <= Y_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'0');
 
-  LOGX <= X_i WHEN (ALUFN_i="0010" or ALUFN_i="0011" or ALUFN_i="0100") ELSE (OTHERS=>'Z');
-  LOGY <= Y_i WHEN (ALUFN_i="0010" or ALUFN_i="0011" or ALUFN_i="0100") ELSE (OTHERS=>'Z');
+  LOGX <= X_i WHEN (ALUFN_i="0010" or ALUFN_i="0011" or ALUFN_i="0100") ELSE (OTHERS=>'0');
+  LOGY <= Y_i WHEN (ALUFN_i="0010" or ALUFN_i="0011" or ALUFN_i="0100") ELSE (OTHERS=>'0');
 
   -- SHX <= X_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'Z');
   -- SHY <= Y_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'Z');
