@@ -3,8 +3,4 @@
 -- remove delta in TB: configure list -delta collapse
 
 ## to do:
-- The code seems to work overall, need to check why done_FSM is not being toggled. 
-(after done_FSM=1 we get the memory write)
-
-- the program gets stuck in instruction 2223 (and ra rb rc)
-therefor not proceeding to F000 (done)
+- The code produces the correct output but the Cflag, Nflag are not responding well, they get uneffected or not defined.
