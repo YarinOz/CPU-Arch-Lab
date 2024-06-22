@@ -15,10 +15,10 @@ ARCHITECTURE AdderSubt OF AdderSub IS
     SIGNAL c: std_logic_vector(Dwidth-1 DOWNTO 0);
 BEGIN
     -- x_temp <= x XOR sub_c;
-    x_loop: FOR i IN 0 TO Dwidth-1 GENERATE
-        x_temp(i) <= (x(i) XOR sub_c);
-    END GENERATE;
-    -- x_temp <= (x XOR (Dwidth => sub_c));
+    -- x_loop: FOR i IN 0 TO Dwidth-1 GENERATE
+    --     x_temp(i) <= (x(i) XOR sub_c);
+    -- END GENERATE;
+    x_temp <= (x XOR (Dwidth => sub_c));
 
     first: FA PORT MAP(
                 xi=>x_temp(0),
