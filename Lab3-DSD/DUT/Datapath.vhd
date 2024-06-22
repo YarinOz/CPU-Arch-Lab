@@ -101,7 +101,7 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
     end process;
 
     -- IR register process
-    process(clk)
+    process(clk , IRin, progDataOut, RFaddr, IR)
     variable ra, rb, rc: std_logic_vector(Regwidth-1 downto 0);
     begin
         ra := IR(11 downto 8);
@@ -125,94 +125,30 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
         end case;
     end process;
 
-    -- OPC decoder process
-    process(clk)
+    -- OPC decoder 
+    OPC_DECODER: process(IR)
     variable opcode: std_logic_vector(3 downto 0);
     begin
         opcode := IR(Dwidth-1 downto Dwidth-4);
-        -- asynchronous reset
-        if rst = '1' then
-            add <= '0';
-            sub <= '0';
-            andf <= '0';
-            orf <= '0';
-            xorf <= '0';
-            un1 <= '0';
-            un2 <= '0';
-            jmp <= '0';
-            jc <= '0';
-            jnc <= '0';
-            un3 <= '0';
-            un4 <= '0';
-            mov <= '0';
-            ld <= '0';
-            st <= '0';
-            Cflag <= '0';
-            Zflag <= '0';
-            Nflag <= '0';
-            done <= '0';
-        end if;
-        -- synchronous decoding
-        if rising_edge(clk) then
-            report "IR = " & to_string(IR);
-            report "opcode = " & to_string(opcode);
-            add <= '0';
-            sub <= '0';
-            andf <= '0';
-            orf <= '0';
-            xorf <= '0';
-            un1 <= '0';
-            un2 <= '0';
-            jmp <= '0';
-            jc <= '0';
-            jnc <= '0';
-            un3 <= '0';
-            un4 <= '0';
-            mov <= '0';
-            ld <= '0';
-            st <= '0';
-            Cflag <= '0';
-            Zflag <= '0';
-            Nflag <= '0';
-            done <= '0';
-            case opcode is
-                when "0000" =>
-                    add <= '1';
-                when "0001" =>
-                    sub <= '1';
-                when "0010" =>
-                    andf <= '1';
-                when "0011" =>
-                    orf <= '1';
-                when "0100" =>
-                    xorf <= '1';
-                when "0101" =>
-                    un1 <= '1';
-                when "0110" =>
-                    un2 <= '1';
-                when "0111" =>
-                    jmp <= '1';
-                when "1000" =>
-                    jc <= '1';
-                when "1001" =>
-                    jnc <= '1';
-                when "1010" =>
-                    un3 <= '1';
-                when "1011" =>
-                    un4 <= '1';
-                when "1100" =>
-                    mov <= '1';
-                when "1101" =>
-                    ld <= '1';
-                when "1110" =>
-                    st <= '1';
-                when "1111" =>
-                    done <= '1';
-                when others =>
-                    done <= '0';
-            end case;
-        end if;
-    end process;
+        report "IR = " & to_string(IR);
+        report "opcode = " & to_string(opcode);
+        add <= '1' when opcode = "0000" else '0';
+        sub <= '1' when opcode = "0001" else '0';
+        andf <= '1' when opcode = "0010" else '0';
+        orf <= '1' when opcode = "0011" else '0';
+        xorf <= '1' when opcode = "0100" else '0';
+        un1 <= '1' when opcode = "0101" else '0';
+        un2 <= '1' when opcode = "0110" else '0';
+        jmp <= '1' when opcode = "0111" else '0';
+        jc <= '1' when opcode = "1000" else '0';
+        jnc <= '1' when opcode = "1001" else '0';
+        un3 <= '1' when opcode = "1010" else '0';
+        un4 <= '1' when opcode = "1011" else '0';
+        mov <= '1' when opcode = "1100" else '0';
+        ld <= '1' when opcode = "1101" else '0';
+        st <= '1' when opcode = "1110" else '0';
+        done <= '1' when opcode = "1111" else '0';
+    end process OPC_DECODER;
 
     -- ALU process 
     process(clk)

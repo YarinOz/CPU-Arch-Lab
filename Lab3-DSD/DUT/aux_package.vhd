@@ -54,13 +54,6 @@ package aux_package is
 			cout: OUT std_logic);
 	END COMPONENT;
 ---------------------------------------------------------	
-	COMPONENT LOGIC IS
-	GENERIC (Dwidth: integer := 16);
-	PORT (x, y: IN std_logic_vector(Dwidth-1 DOWNTO 0);
-				mode: IN std_logic_vector(3 DOWNTO 0);
-				s: OUT std_logic_vector(Dwidth-1 DOWNTO 0));
-	END COMPONENT;
----------------------------------------------------------	
 	COMPONENT Shifter IS
     GENERIC (n: INTEGER := 8; 
 			 k: INTEGER := 3); 

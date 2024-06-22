@@ -62,7 +62,7 @@ begin
                     Imm1_in <= '0';
                     Imm2_in <= '0';
                     Rfaddr <= "11";
-                    OPC <= "0000";
+                    OPC <= "1111";
                     PCsel <= "10"; -- PC <- 0
                     done_FSM <= '0';
                     next_state <= Fetch;
@@ -82,7 +82,7 @@ begin
                 Imm1_in <= '0';
                 Imm2_in <= '0';
                 Rfaddr <= "11"; 
-                OPC <= "0000";
+                OPC <= "1111";
                 PCsel <= "00"; -- PC + 1
                 done_FSM <= '0';
                 next_state <= Decode;
@@ -101,7 +101,7 @@ begin
                 Imm1_in <= '0';
                 Imm2_in <= '0';
                 Rfaddr <= "00"; -- rc
-                OPC <= "0000";
+                OPC <= "1111";
                 PCsel <= "00"; -- PC + 1
                 done_FSM <= '0';
                 -- 00 for R-Type, 01 for J-Type, 10 for I-Type
@@ -129,6 +129,7 @@ begin
                         next_state <= Reset;
                     end if;
                 else
+                    PCin <= '1';
                     next_state <= Fetch;
                 end if;
 
@@ -149,7 +150,7 @@ begin
                 PCsel <= "00";
                 done_FSM <= '0';
 
-                if (add = '1' or ld = '1') then
+                if (add = '1') then
                     OPC <= "0000";
                 elsif (sub = '1') then
                     OPC <= "0001";
@@ -159,13 +160,17 @@ begin
                     OPC <= "0011";
                 elsif (xorf = '1') then
                     OPC <= "0100";
+                elsif (ld = '1') then
+                    OPC <= "1101";
+                elsif (st = '1') then
+                    OPC <= "1110";
                 end if;
 
                 if IType then
                     next_state <= Memory;
+                elsif RType then
+                    next_state <= WriteBack;
                 end if;
-
-                next_state <= WriteBack;
 
             when Memory =>
                     Cout <= '1';
@@ -178,7 +183,7 @@ begin
                     Imm1_in <= '0';
                     Imm2_in <= '0';
                     Rfaddr <= "11";
-                    OPC <= "0000";
+                    OPC <= "1111";
                     PCsel <= "00"; -- PC + 1 
                     done_FSM <= '0';
                 if (ld='1') then -- LOAD instruction
@@ -206,7 +211,7 @@ begin
                 Imm1_in <= '0';
                 Imm2_in <= '0';
                 Rfaddr <= "10"; -- ra
-                OPC <= "0000";
+                OPC <= "1111";
                 PCsel <= "00"; -- PC + 1
                 done_FSM <= '0';
                 if (mov = '1') then
@@ -216,11 +221,13 @@ begin
                 -- sudo WB ()
                 if (ld = '1') then
                     Mem_out <= '1';
+                    Cout <= '0';
                 elsif (st = '1') then
                     Mem_wr <= '1';
                     Mem_out <= '0';
                     RFout <= '1';
                     RFin <= '0';
+                    Cout <= '0';
                 end if;
                 next_state <= Fetch;
 

@@ -18,6 +18,7 @@ BEGIN
     x_loop: FOR i IN 0 TO Dwidth-1 GENERATE
         x_temp(i) <= (x(i) XOR sub_c);
     END GENERATE;
+    -- x_temp <= (x XOR (Dwidth => sub_c));
 
     first: FA PORT MAP(
                 xi=>x_temp(0),

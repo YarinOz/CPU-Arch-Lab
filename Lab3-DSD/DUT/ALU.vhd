@@ -20,21 +20,22 @@ END ALU;
 
 ARCHITECTURE struct OF ALU IS
   -- signal declaration
-  SIGNAL AddX, AddY, LOGX, LOGY, SHX, SHY, Addout,
+  SIGNAL AddX, AddY, SHX, SHY, LOGX, LOGY, Addout,
    Shiftout, Logicout, ALUout: STD_LOGIC_VECTOR(Dwidth-1 DOWNTO 0);
   SIGNAL zeroes : std_logic_vector(Dwidth-1 DOWNTO 0) := (OTHERS => '0'); 
   SIGNAL cout_vec :std_logic_vector(1 DOWNTO 0);-- carry vector for the adder[0] and shifter[1]
   SIGNAL subtract : std_logic;
 BEGIN
+
   -- input assignment (zero input if not used)
-  AddX <= X_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'0');
-  AddY <= Y_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'0');
+  AddX <= X_i WHEN (ALUFN_i="0000" or ALUFN_i="0001" or ALUFN_i="1110" or ALUFN_i="1101") ELSE (OTHERS=>'0');
+  AddY <= Y_i WHEN (ALUFN_i="0000" or ALUFN_i="0001" or ALUFN_i="1110" or ALUFN_i="1101") ELSE (OTHERS=>'0');
 
   LOGX <= X_i WHEN (ALUFN_i="0010" or ALUFN_i="0011" or ALUFN_i="0100") ELSE (OTHERS=>'0');
   LOGY <= Y_i WHEN (ALUFN_i="0010" or ALUFN_i="0011" or ALUFN_i="0100") ELSE (OTHERS=>'0');
 
-  -- SHX <= X_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'Z');
-  -- SHY <= Y_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'Z');
+  -- SHX <= X_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'0');
+  -- SHY <= Y_i WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE (OTHERS=>'0');
 
   subtract <= '1' WHEN ALUFN_i="0001" ELSE '0'; -- subtract when OPC="0001"
 
@@ -49,14 +50,11 @@ BEGIN
     cout => cout_vec(0)
   );
   
-  LogicUnit : LOGIC 
-  GENERIC MAP(Dwidth) 
-  PORT MAP (
-    x => LOGX,
-    y => LOGY,
-    mode => ALUFN_i,
-    s => Logicout
-  );
+  Logicout <= LOGX AND LOGY WHEN ALUFN_i="0010" ELSE
+              LOGX OR LOGY WHEN ALUFN_i="0011" ELSE
+              LOGX XOR LOGY WHEN ALUFN_i="0100" ELSE
+              LOGX XNOR LOGY WHEN ALUFN_i="0101" ELSE
+              (OTHERS => '0');
   
   -- AUX DATA: 01 ADDER, 10 SHIFTER, 11 LOGIC 
   -- ShifterUnit : Shifter 
@@ -69,16 +67,15 @@ BEGIN
   --   res => Shiftout
   -- );
   -- output assignment
-  ALUout <=  Addout WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE
+  ALUout <=  Addout WHEN (ALUFN_i="0000" or ALUFN_i="0001" or ALUFN_i="1101" or ALUFN_i="1110") ELSE
               Logicout WHEN (ALUFN_i="0010" or ALUFN_i="0011" or ALUFN_i="0100") ELSE
               -- Shiftout WHEN ALUFN_i(4 DOWNTO 3)="10" ELSE
               (OTHERS => '0');
 
-  Nflag_o <= ALUout(Dwidth-1);
-  Zflag_o <= '1' WHEN ALUout = zeroes ELSE '0';
-  Cflag_o <= cout_vec(0) WHEN (ALUFN_i="0000" or ALUFN_i="0001") ELSE
-            --  cout_vec(1) WHEN ALUFN_i(4 DOWNTO 3)="10" ELSE 
-             '0';
+  Nflag_o <= ALUout(Dwidth-1) when (ALUFN_i="0000" or ALUFN_i="0001" or ALUFN_i="0010" or ALUFN_i="0011" or ALUFN_i="0100" or ALUFN_i="0101" or ALUFN_i="0110") else unaffected when (ALUFN_i="1110" or ALUFN_i="1101" or ALUFN_i="1111") else '0';
+  Zflag_o <= '1' WHEN (ALUout = zeroes and (ALUFN_i="0000" or ALUFN_i="0001" or ALUFN_i="0010" or ALUFN_i="0011" or ALUFN_i="0100" or ALUFN_i="0101" or ALUFN_i="0110")) else unaffected when (ALUFN_i="1110" or ALUFN_i="1101" or ALUFN_i="1111") ELSE '0';
+  Cflag_o <= cout_vec(0) WHEN (ALUFN_i="0000" or ALUFN_i="0001") else unaffected when (ALUFN_i="1110" or ALUFN_i="1101" or ALUFN_i="1111") ELSE '0';
+
   ALUout_o <= ALUout;
              
 END struct;
