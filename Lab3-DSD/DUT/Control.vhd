@@ -102,15 +102,13 @@ begin
                 Imm2_in <= '0';
                 Rfaddr <= "00"; -- rc
                 OPC <= "0000";
+                PCsel <= "00"; -- PC + 1
                 done_FSM <= '0';
                 -- 00 for R-Type, 01 for J-Type, 10 for I-Type
                 if RType then
-                    PCsel <= "00"; -- PC + 1
-                    if (add = '1' or sub = '1') then
-                        Ain <= '1'; -- rc to ALU
-                        RFout <= '1'; -- rc to fabric
-                        next_state <= Execute;
-                    end if;
+                    Ain <= '1'; -- rc to ALU
+                    RFout <= '1'; -- rc to fabric
+                    next_state <= Execute;
 
                 elsif JType then
                     PCsel <= "01"; -- pc + 1 + imm
@@ -118,8 +116,8 @@ begin
                     next_state <= Fetch;
                     
                 elsif IType then
+                    PCsel <= "00"; -- PC + 1
                     if (mov = '1') then
-                        Imm1_in <= '1';
                         next_state <= WriteBack;
                     elsif (ld = '1' or st = '1') then
                         Imm2_in <= '1';
@@ -129,9 +127,9 @@ begin
                         PCin <= '1';
                         done_FSM <= '1';
                         next_state <= Reset;
-                    else
-                        next_state <= Fetch;
                     end if;
+                else
+                    next_state <= Fetch;
                 end if;
 
             when Execute =>
@@ -161,10 +159,6 @@ begin
                     OPC <= "0011";
                 elsif (xorf = '1') then
                     OPC <= "0100";
-                end if;
-
-                if JType then
-                    PCsel <= "01"; -- pc + 1 + imm
                 end if;
 
                 if IType then
@@ -215,8 +209,9 @@ begin
                 OPC <= "0000";
                 PCsel <= "00"; -- PC + 1
                 done_FSM <= '0';
-                if RType or IType then
-                    PCin <= '1';
+                if (mov = '1') then
+                    Imm1_in <= '1';
+                    Cout <= '0';
                 end if;
                 -- sudo WB ()
                 if (ld = '1') then

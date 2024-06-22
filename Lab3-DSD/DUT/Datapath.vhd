@@ -74,9 +74,8 @@ RegFout: BidirPin generic map (Dwidth) port map (RFRData, RFout, RFWData, fabric
 IMM1out: BidirPin generic map (Dwidth) port map (offset_addr, Imm1_in, RFWData, fabric);
 IMM2out: BidirPin generic map (Dwidth) port map (offset_addr, Imm2_in, RFWData, fabric);
 
-offset_addr <= SXT(IR(7 downto 0), Dwidth) when Imm1_in = '1' else --mov
-             SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
-             (others => '0');
+offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
+               SXT(IR(7 downto 0), Dwidth); -- jmp/jc/jnc/mov
 -----------------------------------------------------------------------------------------------
     -- Program counter process
     process(clk, PCin, PCsel)
