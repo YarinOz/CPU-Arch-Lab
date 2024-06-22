@@ -9,6 +9,6 @@ END FA;
 ARCHITECTURE dataflow OF FA IS
 BEGIN
 	s <= xi XOR yi XOR cin;
-	cout <= (xi AND yi) OR (xi AND cin) OR(yi AND cin);
+	cout <= (xi AND yi) OR (xi AND cin) OR (yi AND cin);
 END dataflow;
 
