@@ -13,10 +13,13 @@ entity OURTB is
 	);
 	constant dept      : integer:=64;
 	
-    constant dataMemResult:      string(1 to 78) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/DTCMcontent.txt";
-    constant dataMemLocation:    string(1 to 75) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/DTCMinit.txt";
-    constant progMemLocation:    string(1 to 75) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/ITCMinit.txt";
-
+    -- constant dataMemResult:      string(1 to 78) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/DTCMcontent.txt";
+    -- constant dataMemLocation:    string(1 to 75) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/DTCMinit.txt";
+    -- constant progMemLocation:    string(1 to 75) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/ITCMinit.txt";
+    constant dataMemResult:      string(1 to 61) := "/home/lehamim/BGU/F/CPU-Arch/Lab3-DSD/program/DTCMcontent.txt";
+    constant dataMemLocation:    string(1 to 58) := "/home/lehamim/BGU/F/CPU-Arch/Lab3-DSD/program/DTCMinit.txt";
+    constant progMemLocation:    string(1 to 58) := "/home/lehamim/BGU/F/CPU-Arch/Lab3-DSD/program/ITCMinit.txt";
+	
 end OURTB;
 ----------
 architecture tb_101 of OURTB is
