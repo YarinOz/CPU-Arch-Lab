@@ -32,8 +32,8 @@ begin
             current_state <= Reset;
         elsif (rising_edge(clk) and ena='1') then
             current_state <= next_state;
-            report "curr state = " & to_string(current_state)
-			& LF & "time =       " & to_string(now) ;
+            -- report "curr state = " & to_string(current_state)
+			-- & LF & "time =       " & to_string(now) ;
         end if;
     end process;
 
@@ -201,7 +201,7 @@ begin
                 Mem_wr <= '0';
                 Mem_out <= '0';
                 Mem_in <= '0';
-                Cout <= '1';
+                Cout <= '0';
                 Cin <= '0';
                 Ain <= '0'; 
                 RFin <= '1'; -- RF write
@@ -214,14 +214,15 @@ begin
                 OPC <= "1111";
                 PCsel <= "00"; -- PC + 1
                 done_FSM <= '0';
+                if RType then
+                    Cout <= '1';
+                end if;
                 if (mov = '1') then
                     Imm1_in <= '1';
-                    Cout <= '0';
                 end if;
                 -- sudo WB ()
                 if (ld = '1') then
                     Mem_out <= '1';
-                    Cout <= '0';
                 elsif (st = '1') then
                     Mem_wr <= '1';
                     Mem_out <= '0';

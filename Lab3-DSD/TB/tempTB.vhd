@@ -57,6 +57,11 @@ BEGIN
         Y_i <= "0000000000001010";  -- 10
         ALUFN_i <= "0010";  -- AND
         WAIT FOR 10 ns;
+        -- Test 2: Subtraction operation
+        X_i <= "0000000000000110";  -- 0x06
+        Y_i <= "0000000000010111";  -- 0x17
+        ALUFN_i <= "0001";  -- Subtraction
+        WAIT FOR 10 ns;
 
         -- Test 4: Logic OR operation
         X_i <= "0000000000001100";  -- 12

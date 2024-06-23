@@ -64,7 +64,7 @@ begin
 U1: progMem generic map (Dwidth, Awidth, dept) port map (clk, progMemEn, progDataIn, progWriteAddr, PCout, progDataOut);
 U2: dataMem generic map (Dwidth, Awidth, dept) port map (clk, EnData, DataIn, WMUX, RMUX, DataOut);
 U3: RF generic map (Dwidth,Regwidth) port map (clk, rst, RFin, RFWData, RWAddr, RWAddr, RFRData);
-U4: ALU generic map (Dwidth) port map (REGA, Bin, OPC, C, Nflag, Cflag, Zflag); -- B-A, B+A
+U4: ALU generic map (Dwidth) port map (Bin,REGA, OPC, C, Nflag, Cflag, Zflag); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
 
 ------------------- Bi-directional bus ---------------------------------------------------------
@@ -84,7 +84,7 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
         if rising_edge(clk) then
             if PCin = '1' then
                 CurrPC <= NextPC;
-                report "NextPC = " & to_string(NextPC);
+                -- report "NextPC = " & to_string(NextPC);
             end if;
         end if;
         case PCsel is
@@ -130,8 +130,8 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
     variable opcode: std_logic_vector(3 downto 0);
     begin
         opcode := IR(Dwidth-1 downto Dwidth-4);
-        report "IR = " & to_string(IR);
-        report "opcode = " & to_string(opcode);
+        -- report "IR = " & to_string(IR);
+        -- report "opcode = " & to_string(opcode);
         add <= '1' when opcode = "0000" else '0';
         sub <= '1' when opcode = "0001" else '0';
         andf <= '1' when opcode = "0010" else '0';
@@ -169,8 +169,8 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
 	if rising_edge(clk) then
 		if (Mem_in = '1') then
 			WAddr <= fabric(Awidth-1 downto 0);
-            report "fabric = " & to_string(fabric)
-			& LF & "time =       " & to_string(now) ;
+            -- report "fabric = " & to_string(fabric)
+			-- & LF & "time =       " & to_string(now) ;
 		end if;
 	end if;
 			
