@@ -2,8 +2,8 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 --------------------------------------------------------
 ENTITY Shifter IS
-    GENERIC (n: INTEGER := 8; -- number of bits
-			 k: INTEGER := 3); -- log2(n)
+    GENERIC (n: INTEGER := 16; -- number of bits
+			 k: INTEGER := 4); -- log2(n)
 	PORT (x, y : IN std_logic_vector(n-1 DOWNTO 0); -- shift y x times
           dir: IN std_logic_vector(2 DOWNTO 0);	-- 0: left, 1: right
 		  cout: OUT std_logic;

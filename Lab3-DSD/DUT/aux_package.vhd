@@ -55,12 +55,12 @@ package aux_package is
 	END COMPONENT;
 ---------------------------------------------------------	
 	COMPONENT Shifter IS
-    GENERIC (n: INTEGER := 8; 
-			 k: INTEGER := 3); 
-	PORT (x, y : IN std_logic_vector(n-1 DOWNTO 0);
+    GENERIC (Dwidth: INTEGER := 16; 
+			 k: INTEGER := 4); 
+	PORT (x, y : IN std_logic_vector(Dwidth-1 DOWNTO 0);
 			dir: IN std_logic_vector(2 DOWNTO 0);
 			cout: OUT std_logic;
-			res : OUT std_logic_vector(n-1 DOWNTO 0));
+			res : OUT std_logic_vector(Dwidth-1 DOWNTO 0));
 	END COMPONENT;
 ---------------------------------------------------------	
 	component ControlUnit IS
