@@ -12,12 +12,16 @@ entity top_tb is
     constant RegSize: integer := 4;
     constant dept   : integer := 64;
 
-    constant dataMemResult:      string(1 to 78) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/DTCMcontent.txt";
-    constant dataMemLocation:    string(1 to 75) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/DTCMinit.txt";
-    constant progMemLocation:    string(1 to 75) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/ITCMinit.txt";
-end top_tb;
+    -- constant dataMemResult:      string(1 to 78) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/DTCMcontent.txt";
+    -- constant dataMemLocation:    string(1 to 75) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/DTCMinit.txt";
+    -- constant progMemLocation:    string(1 to 75) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/ITCMinit.txt";
+    constant dataMemResult:      string(1 to 61) := "/home/lehamim/BGU/F/CPU-Arch/Lab3-DSD/program/DTCMcontent.txt";
+    constant dataMemLocation:    string(1 to 58) := "/home/lehamim/BGU/F/CPU-Arch/Lab3-DSD/program/DTCMinit.txt";
+    constant progMemLocation:    string(1 to 58) := "/home/lehamim/BGU/F/CPU-Arch/Lab3-DSD/program/ITCMinit.txt";
 
-architecture rtb of top_tb is
+    end top_tb;
+
+architecture multiMIPS of top_tb is
     SIGNAL done_FSM: STD_LOGIC := '0';
     SIGNAL rst, ena, clk, TBactive, dataMemEn, progMemEn: STD_LOGIC;    
     SIGNAL progDataIn, dataDataIn, dataDataOut: STD_LOGIC_VECTOR (Dwidth-1 downto 0);
@@ -150,4 +154,4 @@ begin
         wait;
     end process;
 
-end architecture rtb;
+end architecture multiMIPS;
