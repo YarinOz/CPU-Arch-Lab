@@ -101,7 +101,7 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
     end process;
 
     -- IR register process
-    process(clk , IRin, progDataOut, RFaddr, IR)
+    process(clk , IRin, progDataOut, Rfaddr, IR)
     variable ra, rb, rc: std_logic_vector(Regwidth-1 downto 0);
     begin
         ra := IR(11 downto 8);
@@ -113,7 +113,7 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
             end if;
         end if;
         -- R/W ra.rb.rc to RF process
-        case RFaddr is
+        case Rfaddr is
             when "00" => 
                 RWAddr <= rc;
             when "01" => 

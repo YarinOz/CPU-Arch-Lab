@@ -129,7 +129,7 @@ begin
                         next_state <= Reset;
                     end if;
                 else
-                    PCin <= '1';
+                    PCin <= '1';    
                     next_state <= Fetch;
                 end if;
 
