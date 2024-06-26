@@ -9,7 +9,7 @@ entity ControlUnit is
         clk: in std_logic;
         rst: in std_logic;
         st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
-        orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4: in std_logic;
+        orf, xorf, Cflag, Zflag, Nflag, un1, un2, jn, un4: in std_logic;
         -- Control signals for the datapath
         Mem_wr, Mem_out, Mem_in, Cout, Cin, Ain, RFin, RFout, IRin, PCin, Imm1_in, Imm2_in : out std_logic;
         PCsel, Rfaddr: out std_logic_vector(1 downto 0);
@@ -38,12 +38,12 @@ begin
     end process;
 
     process(current_state, st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
-    orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4) -- Moore machine
+    orf, xorf, Cflag, Zflag, Nflag, un1, un2, jn, un4) -- Moore machine
     variable RType, JtYPE, IType : BOOLEAN; 
 
     begin
         RType := (add='1' or sub='1' or andf='1' or orf='1' or xorf='1');
-        JType := (jmp='1' or (jc='1' and Cflag='1') or (jnc='1' and Cflag='0'));
+        JType := (jmp='1' or (jc='1' and Cflag='1') or (jnc='1' and Cflag='0') or (jn='1' and Nflag='1'));
         IType := (mov='1' or ld='1' or st='1' or done='1');
 
         case current_state is

@@ -19,7 +19,7 @@ port(
     OPC: in std_logic_vector(3 downto 0);
     -- status signals
     st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
-    orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4: out std_logic;
+    orf, xorf, Cflag, Zflag, Nflag, un1, un2, jn, un4: out std_logic;
     -- test bench signals
     -- program memory signals
     progMemEn: in std_logic;
@@ -59,6 +59,9 @@ architecture behav of Datapath is
     signal WAddr, RAddr, RMUX, WMUX: std_logic_vector(Awidth-1 downto 0);
     signal EnData: std_logic;
 
+    -- temp signals
+    signal temp1, temp2: std_logic_vector(Dwidth-1 downto 0);
+
 begin 
 -------------------- port mapping ---------------------------------------------------------------
 U1: progMem generic map (Dwidth, Awidth, dept) port map (clk, progMemEn, progDataIn, progWriteAddr, PCout, progDataOut);
@@ -71,8 +74,9 @@ U4: ALU generic map (Dwidth) port map (Bin,REGA, OPC, C, Nflag, Cflag, Zflag); -
 -- DatamemOut: BidirPin generic map (Dwidth) port map (datadataOut, Mem_out, datareadAddr, fabric);
 ALUout: BidirPin generic map (Dwidth) port map (REGC, Cout, Bin, fabric);
 RegFout: BidirPin generic map (Dwidth) port map (RFRData, RFout, RFWData, fabric);
-IMM1out: BidirPin generic map (Dwidth) port map (offset_addr, Imm1_in, RFWData, fabric);
-IMM2out: BidirPin generic map (Dwidth) port map (offset_addr, Imm2_in, RFWData, fabric);
+DataMemOut: BidirPin generic map (Dwidth) port map (DataOut, Mem_out, temp1, fabric);
+IMM1out: BidirPin generic map (Dwidth) port map (offset_addr, Imm1_in, temp1, fabric);
+IMM2out: BidirPin generic map (Dwidth) port map (offset_addr, Imm2_in, temp2, fabric);
 
 offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
                SXT(IR(7 downto 0), Dwidth); -- jmp/jc/jnc/mov
@@ -121,7 +125,7 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
             when "10" => 
                 RWAddr <= ra;
             when others => 
-                RWAddr <= RWAddr;  -- Unaffected
+                RWAddr <= rc;  -- Unaffected
         end case;
     end process;
 
@@ -142,7 +146,7 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
         jmp <= '1' when opcode = "0111" else '0';
         jc <= '1' when opcode = "1000" else '0';
         jnc <= '1' when opcode = "1001" else '0';
-        un3 <= '1' when opcode = "1010" else '0';
+        jn <= '1' when opcode = "1010" else '0';
         un4 <= '1' when opcode = "1011" else '0';
         mov <= '1' when opcode = "1100" else '0';
         ld <= '1' when opcode = "1101" else '0';
@@ -164,9 +168,11 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
     end process;
 
     -- Data Memory Write 
-    DataMem_Write: process(clk) 
+    DataMem_Write: process(clk, rst) 
     begin
-	if rising_edge(clk) then
+    if rst = '1' then
+        WAddr <= (others => '0');
+	elsif rising_edge(clk) then
 		if (Mem_in = '1') then
 			WAddr <= fabric(Awidth-1 downto 0);
             -- report "fabric = " & to_string(fabric)
@@ -175,6 +181,7 @@ offset_addr <= SXT(IR(3 downto 0), Dwidth) when Imm2_in = '1' else -- ld/st
 	end if;
 			
     end process;
+    RAddr <= fabric(Awidth-1 downto 0);
     -- TB connectivity
     EnData <= dataMemEn	when TBactive = '1' else Mem_wr;
     DataIn <= dataDataIn	when TBactive = '1' else fabric;

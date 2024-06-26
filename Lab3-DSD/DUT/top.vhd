@@ -28,7 +28,7 @@ end top;
 architecture behav of top is
     -- status signals
     signal st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
-    orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4: std_logic;
+    orf, xorf, Cflag, Zflag, Nflag, un1, un2, jn, un4: std_logic;
     -- control signals
     signal Mem_wr,Mem_out,Mem_in,Cout,Cin,Ain,RFin,RFout,IRin,PCin,Imm1_in,Imm2_in: std_logic;
     signal PCsel, Rfaddr: std_logic_vector(1 downto 0);
@@ -56,7 +56,7 @@ CONTROLUNITEN: ControlUnit port map(
     Nflag => Nflag,
     un1 => un1,
     un2 => un2,
-    un3 => un3,
+    jn => jn,
     un4 => un4,
     Mem_wr => Mem_wr,
     Mem_out => Mem_out,
@@ -113,7 +113,7 @@ DATAPATHUNIT: Datapath generic map(Dwidth) port map(
     Nflag => Nflag,
     un1 => un1,
     un2 => un2,
-    un3 => un3,
+    jn => jn,
     un4 => un4,
     progMemEn => progMemEn,
     progDataIn => progDataIn,

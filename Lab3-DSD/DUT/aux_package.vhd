@@ -67,7 +67,7 @@ package aux_package is
 		PORT(
 			clk, rst: in std_logic;
 			st, ld, mov, done, add, sub, jmp, jc, jnc, Cflag, Zflag, Nflag, andf,
-			orf, xorf, un1, un2, un3, un4: in std_logic;
+			orf, xorf, un1, un2, jn, un4: in std_logic;
 			Mem_wr, Mem_out, Mem_in, Cout, Cin, Ain, RFin, RFout, IRin, PCin, Imm1_in, Imm2_in : out std_logic;
 			PCsel, Rfaddr: out std_logic_vector(1 downto 0);
 			OPC: out std_logic_vector(3 downto 0);
@@ -91,7 +91,7 @@ package aux_package is
 		OPC: in std_logic_vector(3 downto 0);
 		-- status signals
 		st, ld, mov, done, add, sub, jmp, jc, jnc, andf,
-		orf, xorf, Cflag, Zflag, Nflag, un1, un2, un3, un4: out std_logic;
+		orf, xorf, Cflag, Zflag, Nflag, un1, un2, jn, un4: out std_logic;
 		-- program memory signals
 		progMemEn: in std_logic;
 		progDataIn: in std_logic_vector(Dwidth-1 downto 0);

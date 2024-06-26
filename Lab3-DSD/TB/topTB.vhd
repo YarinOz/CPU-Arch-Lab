@@ -15,10 +15,14 @@ entity top_tb is
     -- constant dataMemResult:      string(1 to 78) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/DTCMcontent.txt";
     -- constant dataMemLocation:    string(1 to 75) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/DTCMinit.txt";
     -- constant progMemLocation:    string(1 to 75) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/Lab3-DSD/program/ITCMinit.txt";
-    constant dataMemResult:      string(1 to 61) := "/home/lehamim/BGU/F/CPU-Arch/Lab3-DSD/program/DTCMcontent.txt";
-    constant dataMemLocation:    string(1 to 58) := "/home/lehamim/BGU/F/CPU-Arch/Lab3-DSD/program/DTCMinit.txt";
-    constant progMemLocation:    string(1 to 58) := "/home/lehamim/BGU/F/CPU-Arch/Lab3-DSD/program/ITCMinit.txt";
+    -- constant dataMemResult:      string(1 to 52) := "/home/lehamim/BGU/F/lab3 RT/program1/DTCMcontent.txt";
+    -- constant dataMemLocation:    string(1 to 50) := "/home/lehamim/BGU/F/lab3 RT/program1/basicdata.txt";
+    -- constant progMemLocation:    string(1 to 50) := "/home/lehamim/BGU/F/lab3 RT/program1/basicprog.txt";
+    -- constant progMemLocation:    string(1 to 55) := "/home/lehamim/BGU/F/lab3 RT/program1/basicprog copy.txt";
 
+    constant dataMemResult:      string(1 to 52) := "/home/lehamim/BGU/F/lab3 RT/program2/DTCMcontent.txt";
+    constant dataMemLocation:    string(1 to 47) := "/home/lehamim/BGU/F/lab3 RT/program2/rtdata.txt";
+    constant progMemLocation:    string(1 to 47) := "/home/lehamim/BGU/F/lab3 RT/program2/rtprog.txt";
     end top_tb;
 
 architecture multiMIPS of top_tb is
@@ -141,7 +145,7 @@ begin
         wait until done_FSM = '1';  
         TempAddresses := (others => '0');
         counter := 1;
-        while counter < 16 loop --15 lines in file
+        while counter < 43 loop --28 lines in file
             dataReadAddr <= TempAddresses;
             wait until rising_edge(clk);
             wait until rising_edge(clk); -- Ensure data is stable
