@@ -18,10 +18,49 @@ package aux_package is
 		Nflag_o, Cflag_o, Zflag_o, OF_flag_o, PWMout : OUT STD_LOGIC 
 	);
 	end component;
+	---------------------------------------------------------
+	component TOP_IO_Interface is
+	GENERIC (HEX_num : integer := 7;
+			n : INTEGER := 8);
+	PORT (
+		clk, rst, ena : IN std_logic; -- for single tap
+		SW_i : IN std_logic_vector(n-1 downto 0);
+		KEY0, KEY1, KEY2 : IN std_logic;
+		HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: OUT std_logic_vector(HEX_num-1 downto 0);
+		LEDs : OUT std_logic_vector(9 downto 0)  
+	);
+	end component;
+	---------------------------------------------------------
+	component SegmentDecoder is
+	GENERIC (n : INTEGER := 4;
+			SegmentSize : integer := 7);
+	PORT (data : IN STD_LOGIC_VECTOR (n-1 DOWNTO 0);
+			seg : OUT STD_LOGIC_VECTOR (SegmentSize-1 downto 0));
+	end component;
+	---------------------------------------------------------
+	component Fmax is
+	GENERIC (
+		n : INTEGER := 8;
+		k : integer := 3;   -- k=log2(n)
+		m : integer := 4    -- m=2^(k-1)
+	);
+	PORT (
+		clk : IN STD_LOGIC;
+		Y_i, X_i : IN STD_LOGIC_VECTOR (n-1 DOWNTO 0);
+		ALUFN_i : IN STD_LOGIC_VECTOR (4 DOWNTO 0);
+		ALUout_o : OUT STD_LOGIC_VECTOR(n-1 downto 0);
+		Nflag_o, Cflag_o, Zflag_o, OF_flag_o : OUT STD_LOGIC 
+	); -- Zflag, Cflag, Nflag, Vflag
+	end component;
 ---------------------------------------------------------
 	component counter is
 	PORT (clk,enable : IN std_logic;
 		  q : OUT std_logic_vector (7 DOWNTO 0));
+	end component;
+---------------------------------------------------------
+	component counterEnvelope is
+	PORT (Clk,En : IN std_logic;
+		  Qout : OUT std_logic_vector (7 DOWNTO 0));
 	end component;
 ---------------------------------------------------------
 	component PWM is

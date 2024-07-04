@@ -10,7 +10,6 @@ end counter;
 
 architecture rtl of counter is
     signal q_int : std_logic_vector (31 downto 0):=x"00000000";
-    -- signal q_int : std_logic_vector (7 downto 0):=x"00";
 begin
     process (clk)
     begin
@@ -21,5 +20,4 @@ begin
 	     end if;
     end process;
     q <= q_int(31 downto 24); -- Output only 8MSB
-    -- q <= q_int(7 downto 0); -- Output only 8LSB
 end rtl;
