@@ -3,13 +3,14 @@ use ieee.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all; 
 USE work.aux_package.all;
  
+-- frequency divider
 entity counter is port (
 	clk,enable : in std_logic;	
-	q          : out std_logic_vector (7 downto 0)); 
+	q          : out std_logic); 
 end counter;
 
 architecture rtl of counter is
-    signal q_int : std_logic_vector (31 downto 0):=x"00000000";
+    signal q_int : std_logic_vector (5 downto 0):="000000";
 begin
     process (clk)
     begin
@@ -19,5 +20,5 @@ begin
            end if;
 	     end if;
     end process;
-    q <= q_int(31 downto 24); -- Output only 8MSB
+    q <= '1' when q_int = "111111" else '0';
 end rtl;

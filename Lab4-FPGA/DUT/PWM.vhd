@@ -21,15 +21,20 @@ ARCHITECTURE struct OF PWM IS
   SIGNAL CounterValue : std_logic_vector (7 DOWNTO 0):=x"00";
   SIGNAL PWMmode, PWMsignal : std_logic;
 BEGIN
-    -- component declaration
-    count : counter
-    PORT MAP (
-        clk => CLK,
-        enable => ENA,
-        q => CounterValue
-    );
+
     -- set/rest or reset/set mode
     PWMmode <= ALUFN_i(0);
+
+    -- counter process
+    process (CLK, RST, ENA)
+    begin
+        -- asynchronous reset
+        if (RST = '1') then
+            CounterValue <= x"00";
+        elsif (rising_edge(CLK) and ENA = '1') then
+            CounterValue <= CounterValue + 1;
+        end if;
+    end process;
 
     -- compare the counter value with the input value
     process (CLK, RST, ENA)

@@ -20,8 +20,15 @@ ENTITY TopEntity IS
 END TopEntity;
 
 ARCHITECTURE behavior OF TopEntity IS
-
+  signal CLK_PLL : std_logic;
 BEGIN
+
+  PLL_inst: counterEnvelope
+    PORT MAP (
+      Clk => CLK,
+      En => ENA,
+      Qout => CLK_PLL
+    );
 
   ALU_inst : ALU
     GENERIC MAP (
@@ -48,10 +55,11 @@ BEGIN
       Y_i => Y_i,
       X_i => X_i,
       ALUFN_i => ALUFN_i,
-      CLK => CLK,
+      CLK => CLK_PLL,
       ENA => ENA,
       RST => RST,
       PWMout => PWMout
     );
+
 
 END behavior;

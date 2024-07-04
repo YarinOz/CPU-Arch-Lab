@@ -55,12 +55,12 @@ package aux_package is
 ---------------------------------------------------------
 	component counter is
 	PORT (clk,enable : IN std_logic;
-		  q : OUT std_logic_vector (7 DOWNTO 0));
+		  q : OUT std_logic);
 	end component;
 ---------------------------------------------------------
 	component counterEnvelope is
 	PORT (Clk,En : IN std_logic;
-		  Qout : OUT std_logic_vector (7 DOWNTO 0));
+		  Qout : OUT std_logic);
 	end component;
 ---------------------------------------------------------
 	component PWM is
