@@ -42,7 +42,7 @@ BEGIN
 	-------------------top Module -----------------------------
     TOPModule: TopEntity port map (
         ENA => ena,
-        RST => rst,
+        RST => not rst,
         CLK => clk,
         Y_i => Y,
         X_i => X,
@@ -68,6 +68,7 @@ BEGIN
 	LEDs(0) <= Nflag;
 	LEDs(1) <= Cflag;
 	LEDs(2) <= Zflag;
+	LEDs(3) <= OFflag;
 	LEDs(9 downto 5) <= ALUFN;
 	-------------------Keys Binding--------------------------
 	process(KEY0, KEY1, KEY2) 
