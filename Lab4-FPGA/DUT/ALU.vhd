@@ -27,16 +27,16 @@ ARCHITECTURE struct OF ALU IS
   SIGNAL subtract, OVF : std_logic;
 BEGIN
   -- input assignment (zero input if not used)
-  AddX <= X_i WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE (OTHERS=>'0');
-  AddY <= Y_i WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE (OTHERS=>'0');
+  AddX <= X_i WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE zeroes;
+  AddY <= Y_i WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE zeroes;
 
-  LOGX <= X_i WHEN ALUFN_i(4 DOWNTO 3)="11" ELSE (OTHERS=>'0');
-  LOGY <= Y_i WHEN ALUFN_i(4 DOWNTO 3)="11" ELSE (OTHERS=>'0');
+  LOGX <= X_i WHEN ALUFN_i(4 DOWNTO 3)="11" ELSE zeroes;
+  LOGY <= Y_i WHEN ALUFN_i(4 DOWNTO 3)="11" ELSE zeroes;
 
-  SHX <= X_i WHEN ALUFN_i(4 DOWNTO 3)="10" ELSE (OTHERS=>'0');
-  SHY <= Y_i WHEN ALUFN_i(4 DOWNTO 3)="10" ELSE (OTHERS=>'0');
+  SHX <= X_i WHEN ALUFN_i(4 DOWNTO 3)="10" ELSE zeroes;
+  SHY <= Y_i WHEN ALUFN_i(4 DOWNTO 3)="10" ELSE zeroes;
 
-  minus <= AddY WHEN ALUFN_i(1)='0' ELSE (OTHERS=>'0'); -- for neg(x)
+  minus <= AddY WHEN ALUFN_i(1)='0' ELSE zeroes; -- for neg(x)
   subtract <= ALUFN_i(0) OR ALUFN_i(1); -- subtract when ALUFN_i(0) OR ALUFN_i(1) = 1
   OVF <= (NOT (ALUFN_i(0) OR ALUFN_i(1)) AND ((X_i(n-1) AND Y_i(n-1) AND NOT Addout(n-1)) OR
           (NOT X_i(n-1) AND NOT Y_i(n-1) AND Addout(n-1)))) OR 
@@ -73,18 +73,19 @@ BEGIN
     res => Shiftout
   );
   -- output assignment
-  ALUout <=  Addout WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE
-              Logicout WHEN ALUFN_i(4 DOWNTO 3)="11" ELSE
-              Shiftout WHEN ALUFN_i(4 DOWNTO 3)="10" ELSE
-              (OTHERS => '0');
+  WITH ALUFN_i(4 DOWNTO 3) SELECT
+    ALUout <=  Addout WHEN "01",
+                Logicout WHEN "11",
+                Shiftout WHEN "10",
+                zeroes WHEN OTHERS;
 
-  OF_flag_o <= OVF WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE
-               '0';
+  OF_flag_o <= OVF WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE '0';
   Nflag_o <= ALUout(n-1);
   Zflag_o <= '1' WHEN ALUout = zeroes ELSE '0';
-  Cflag_o <= cout_vec(0) WHEN ALUFN_i(4 DOWNTO 3)="01" ELSE
-             cout_vec(1) WHEN ALUFN_i(4 DOWNTO 3)="10" ELSE 
-             '0';
+  WITH ALUFN_i(4 DOWNTO 3) SELECT
+    Cflag_o <= cout_vec(0) WHEN "01",
+              cout_vec(1) WHEN "10",
+              '0' WHEN OTHERS;
   ALUout_o <= ALUout;
              
 END struct;
