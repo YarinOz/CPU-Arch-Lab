@@ -37,13 +37,20 @@ ARCHITECTURE struct OF TOP_IO_Interface IS
 	signal ALUout, X, Y : 	std_logic_vector(n-1 downto 0);
 	signal Nflag, Cflag, Zflag, OFflag, PWMout: STD_LOGIC;
 	signal ALUFN: std_logic_vector(4 downto 0);
+	signal CLK_PLL : std_logic;
 BEGIN
-
+	-------------------Clock PLL---------------------------
+	PLL_inst: counterEnvelope
+	PORT MAP (
+	Clk => clk,
+	En => ena,
+	Qout => CLK_PLL
+	);
 	-------------------top Module -----------------------------
     TOPModule: TopEntity port map (
         ENA => ena,
         RST => not rst,
-        CLK => clk,
+        CLK => CLK_PLL,
         Y_i => Y,
         X_i => X,
         ALUFN_i => ALUFN,
@@ -73,7 +80,7 @@ BEGIN
 	-------------------Keys Binding--------------------------
 	process(KEY0, KEY1, KEY2) 
 	begin
-	--	if rising_edge(clk) then
+		if rising_edge(clk) then
 			if KEY0 = '0' then
 				Y     <= SW_i;
 			elsif KEY1 = '0' then
@@ -81,10 +88,9 @@ BEGIN
 			elsif KEY2 = '0' then
 				X	  <= SW_i;	
 			end if;
---		end if;
+		end if;
 	end process;
     ------------------GPIO Binding---------------------------
     GPIO9 <= PWMout;
 	 
 END struct;
-
