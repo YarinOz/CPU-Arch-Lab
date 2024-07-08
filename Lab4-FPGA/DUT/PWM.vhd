@@ -19,11 +19,13 @@ END PWM;
 ARCHITECTURE struct OF PWM IS
   -- signal declaration
   SIGNAL CounterValue : std_logic_vector (7 DOWNTO 0);
-  SIGNAL PWMmode, PWMsignal : std_logic;
+  SIGNAL CounterRT : std_logic_vector (8 DOWNTO 0);
+  SIGNAL PWMmode : std_logic_vector (1 DOWNTO 0);
+  SIGNAL PWMsignal, RTsignal : std_logic;
 BEGIN
 
     -- set/rest or reset/set mode
-    PWMmode <= ALUFN_i(0);
+    PWMmode <= ALUFN_i(1 downto 0);
 
     -- counter process
     process (CLK, RST, ENA)
@@ -40,14 +42,36 @@ BEGIN
         end if;
     end process;
 
+    -- counter process RT
+    process (CLK, RST, ENA)
+    variable temp : STD_LOGIC := '0';
+    begin
+        -- asynchronous reset
+        if (RST = '1') then
+            CounterRT <= (others => '0');
+        elsif (rising_edge(CLK) and ENA = '1') then
+	    if (CounterRT = X_i-1) then
+		temp := not temp;
+		CounterRT <= CounterRT + 1;
+	    elsif (CounterRT >= Y_i-1) then
+		CounterRT <= (others => '0');
+	    else
+            	CounterRT <= CounterRT + 1;
+	    end if;
+        end if;
+	RTsignal <= temp;
+    end process;
+
    
     PWMsignal <= '0' when CounterValue < X_i else
 		 '1' when CounterValue >= X_i and CounterValue < Y_i else
 		 '0' when CounterValue >= Y_i;
 
     -- output assignment
-    PWMout <=  PWMsignal WHEN PWMmode='0' ELSE
-               (NOT PWMsignal) WHEN PWMmode='1' ELSE
-               '0';
+   with PWMmode select 
+    PWMout <=  PWMsignal WHEN "00", 
+               (NOT PWMsignal) WHEN "01", 
+		RTsignal WHEN "10", 
+               '0' WHEN OTHERS;
              
 END struct;
