@@ -4,8 +4,8 @@ use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 --------------------------------------------------------------
 entity ProgMem is
-generic( Dwidth: integer:=16;
-		 Awidth: integer:=6;
+generic( Dwidth: integer:=32;
+		 Awidth: integer:=32;
 		 dept:   integer:=64);
 port(  RmemAddr:	in std_logic_vector(Dwidth-1 downto 0);
 	   RmemData: 	out std_logic_vector(Dwidth-1 downto 0)

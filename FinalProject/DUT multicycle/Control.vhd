@@ -16,7 +16,7 @@ entity ControlUnit is
 end ControlUnit;
 
 architecture behavioral of ControlUnit is
-    RType: std_logic;
+    signal RType: std_logic;
 begin
     -- RType: add, addu, sub, and, or, xor, slt, sll, srl, jr
     RType <= '1' when opcode = "000000" else '0';
@@ -31,11 +31,11 @@ begin
     -- MemWrite: sw
     MemWrite <= '1' when opcode = "101011" else '0';
     -- Regwrite: in all but: j, jal, jr, beq, bne, sw
-    RegWrite <= '0' when ((RType='1' and funct="001000") or opcode = "000010" oropcode = "000011" or opcode = "000100" or opcode = "000101" or opcode = "101011") else '1';
+    RegWrite <= '0' when ((RType='1' and funct="001000") or opcode = "000010" or opcode = "000011" or opcode = "000100" or opcode = "000101" or opcode = "101011") else '1';
     -- jump: j, jal, jr
     jump <= '1' when (opcode="000010" or opcode="000011" or (RType='1' and funct="001000")) else '0';
     -- ALUsrc: addi,slti,andi,ori,xori,sll,srl : 1, add,addu,sub,and,or,xor,slt : 0
-    ALUsrc <= '1' when (opcode = "001000" or opcode = "001010" oropcode = "001100" or opcode = "001101" oropcode = "001110" or (RType='1' and (funct = "000000" or funct = "000010"))) else '0';
+    ALUsrc <= '1' when (opcode = "001000" or opcode = "001010" or opcode = "001100" or opcode = "001101" or opcode = "001110" or (RType='1' and (funct = "000000" or funct = "000010"))) else '0';
     ALUop <= funct when RType else opcode; -- ALU control signal
 
 end behavioral;

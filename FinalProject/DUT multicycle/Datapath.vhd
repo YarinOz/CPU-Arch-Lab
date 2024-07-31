@@ -15,9 +15,9 @@ port(
     clk, rst: in std_logic;
     -- control signals
     RegDst, MemRead, MemtoReg, MemWrite, RegWrite, Branch, jump, ALUsrc: in std_logic;
-    ALUop: in std_logic_vector(5 downto 0)
+    ALUop: in std_logic_vector(5 downto 0);
     -- status signals
-    opcode, funct: out std_logic_vector(5 downto 0);
+    opcode, funct: out std_logic_vector(5 downto 0)
     -- test bench signals
     -- program memory signals
     -- progMemEn: in std_logic;
@@ -33,7 +33,7 @@ end Datapath;
  
 architecture behav of Datapath is
     -- Program counter
-    signal PCout : std_logic_vector(Awidth-1 downto 0):="000000";
+    signal PCout : std_logic_vector(Awidth-1 downto 0):=(others => '0');
 
     -- RF signals
     signal RWAddr: std_logic_vector(Regwidth-1 downto 0);           -- RF write address
@@ -41,6 +41,20 @@ architecture behav of Datapath is
 
     -- Memory signals
     signal progDataOut: std_logic_vector(Dwidth-1 downto 0);
+
+    -- Instruction signals
+    signal instruction: std_logic_vector(Dwidth-1 downto 0);
+    signal imm, address: std_logic_vector(Dwidth-1 downto 0);
+    signal rs, rt, rd: std_logic_vector(4 downto 0);
+    signal shamt: std_logic_vector(4 downto 0);
+    signal bcond: std_logic;
+    signal ALUMUX: std_logic_vector(Dwidth-1 downto 0);
+    signal RFMUX: std_logic_vector(Regwidth-1 downto 0);
+    signal RFWDataMUX: std_logic_vector(Dwidth-1 downto 0);
+    signal RFData1, RFData2: std_logic_vector(Dwidth-1 downto 0);
+    signal ALUout: std_logic_vector(Dwidth-1 downto 0);
+    signal DataOut: std_logic_vector(Dwidth-1 downto 0);
+    signal Nflag, Cflag, Zflag: std_logic;
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
@@ -60,9 +74,15 @@ imm <= SXT(instruction(15 downto 0), Dwidth);
 address <= SXT(instruction(25 downto 0), Dwidth);
 
 -- Branch condition
-bcond <= (rs = rt) when opcode = "000100" else -- beq
-         (rs /= rt) when opcode = "000101" else -- bne
-         '0';
+process(opcode, rs, rt)
+begin
+    if ((opcode = "000100" and rs = rt) or (opcode = "000101" and rs /= rt)) then
+        bcond <= '1';
+    else
+        bcond <= '0';
+    end if;
+end process;    
+
 -- RF connectivity
 RFMUX <= rt when (RegDst = '0') else rd;
 RFWDataMUX <= ALUout when MemtoReg = '0' else DataOut;
@@ -80,7 +100,7 @@ ALUMUX <= RFData2 when ALUsrc = '0' else imm;
             if jump = '1' then
                 PCout <= address; -- if jr then address <= ra
             elsif (bcond = '1' and branch = '1') then
-                PCout <= (PCout + 4 + imm);
+                PCout <= PCout + 4 + imm;
             else
                 PCout <= PCout + 4;
             end if;
