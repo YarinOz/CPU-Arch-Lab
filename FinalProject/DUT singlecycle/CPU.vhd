@@ -13,7 +13,7 @@ entity CPU is
          ControlBus: inout std_logic_vector(15 downto 0);
          DataBus: inout std_logic_vector(Dwidth-1 downto 0)
          -- Test bench signals
-             -- program memory signals
+        -- -- program memory signals
         -- progMemEn: in std_logic;
         -- progDataIn: in std_logic_vector(Dwidth-1 downto 0);
         -- progWriteAddr: in std_logic_vector(Awidth-1 downto 0);

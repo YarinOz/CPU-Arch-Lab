@@ -32,28 +32,6 @@ package aux_package is
 			bidirPin: inout std_logic
 	);
 	end component;	
----------------------------------------------------------  
-	component FA is
-		PORT (xi, yi, cin: IN std_logic;
-			      s, cout: OUT std_logic);
-	end component;
----------------------------------------------------------	
-	COMPONENT AdderSub IS
-	GENERIC (Dwidth: integer := 32);
-	PORT (x, y: IN std_logic_vector(Dwidth-1 DOWNTO 0);
-			sub_c : IN std_logic;
-			s: OUT std_logic_vector(Dwidth-1 DOWNTO 0);
-			cout: OUT std_logic);
-	END COMPONENT;
----------------------------------------------------------	
-	COMPONENT Shifter IS
-    GENERIC (Dwidth: INTEGER := 32; 
-			 k: INTEGER := 4); 
-	PORT (x, y : IN std_logic_vector(Dwidth-1 DOWNTO 0);
-			dir: IN std_logic;
-			cout: OUT std_logic;
-			res : OUT std_logic_vector(Dwidth-1 DOWNTO 0));
-	END COMPONENT;
 ---------------------------------------------------------	
 	component ControlUnit IS
 		PORT(
@@ -96,15 +74,13 @@ package aux_package is
 ---------------------------------------------------------
 	component ALU is
 	generic (
-		Dwidth : INTEGER := 32;
-		k : integer := 5;   -- k=log2(n)
-		m : integer := 8    -- m=2^(k-1)
+		Dwidth : INTEGER := 32
 		);
 		PORT(
-			Y_i, X_i : IN STD_LOGIC_VECTOR (Dwidth-1 DOWNTO 0);
-			ALUFN_i : IN STD_LOGIC_VECTOR (5 DOWNTO 0);
-			ALUout_o : OUT STD_LOGIC_VECTOR(Dwidth-1 downto 0);
-			Nflag_o, Cflag_o, Zflag_o: OUT STD_LOGIC 
+			A, B : in std_logic_vector(Dwidth-1 downto 0);
+			ALUop : in std_logic_vector(5 downto 0);
+			Result : out std_logic_vector(Dwidth-1 downto 0);
+			Zero : out std_logic
 		);
 	end component;
 ---------------------------------------------------------

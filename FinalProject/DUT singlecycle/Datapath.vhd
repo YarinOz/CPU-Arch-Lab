@@ -47,21 +47,20 @@ architecture behav of Datapath is
     signal imm, address: std_logic_vector(Dwidth-1 downto 0);
     signal rs, rt, rd: std_logic_vector(4 downto 0);
     signal shamt: std_logic_vector(4 downto 0);
-    signal bcond: std_logic;
+    signal bcond,zero: std_logic;
     signal ALUMUX: std_logic_vector(Dwidth-1 downto 0);
     signal RFMUX: std_logic_vector(Regwidth-1 downto 0);
     signal RFWDataMUX: std_logic_vector(Dwidth-1 downto 0);
     signal RFData1, RFData2: std_logic_vector(Dwidth-1 downto 0);
     signal ALUout: std_logic_vector(Dwidth-1 downto 0);
     signal DataOut: std_logic_vector(Dwidth-1 downto 0);
-    signal Nflag, Cflag, Zflag: std_logic;
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
 U1: progMem generic map (Dwidth, Awidth, dept) port map (PCout, instruction);
 U2: dataMem generic map (Dwidth, Awidth, dept) port map (clk, MemWrite, RFData2, ALUout, DataOut);
 U3: RF generic map (Dwidth,Regwidth) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
-U4: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout, Nflag, Cflag, Zflag); -- B-A, B+A
+U4: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout, zero); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
 -- Instruction signals
 opcode <= instruction(31 downto 26);

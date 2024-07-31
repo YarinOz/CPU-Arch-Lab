@@ -21,7 +21,7 @@ END ALU;
 ARCHITECTURE struct OF ALU IS
   -- signal declaration
   SIGNAL AddX, AddY, SHX, SHY, LOGX, LOGY, Addout,
-   Shiftout, Logicout, ALUout: STD_LOGIC_VECTOR(Dwidth-1 DOWNTO 0);
+   Shiftout, Logicout,Mulout, ALUout: STD_LOGIC_VECTOR(Dwidth-1 DOWNTO 0);
   SIGNAL zeroes : std_logic_vector(Dwidth-1 DOWNTO 0) := (OTHERS => '0'); 
   SIGNAL cout_vec :std_logic_vector(1 DOWNTO 0);-- carry vector for the adder[0] and shifter[1]
   SIGNAL subtract : std_logic;
@@ -39,6 +39,9 @@ BEGIN
   SHX <= X_i WHEN (ALUFN_i="000000" or ALUFN_i="000010") ELSE (OTHERS=>'0');
   SHY <= Y_i WHEN (ALUFN_i="000000" or ALUFN_i="000010") ELSE (OTHERS=>'0');
 
+  -- multiply
+  Mulout <= X_i * Y_i WHEN (ALUFN_i="011100") ELSE (OTHERS => '0');
+  
   subtract <= '1' WHEN ALUFN_i="100010" ELSE '0'; -- subtract
 
   -- component instantiation
@@ -71,6 +74,7 @@ BEGIN
   ALUout <=  Addout WHEN (ALUFN_i="100000" or ALUFN_i="100001" or ALUFN_i="100010" or ALUFN_i="001000" or ALUFN_i="100011" or ALUFN_i="101011" or ALUFN_i="101010" or ALUFN_i="001010") ELSE
               Logicout WHEN (ALUFN_i="100100" or ALUFN_i="100101" or ALUFN_i="100110" or ALUFN_i="001100" or ALUFN_i="001101" or ALUFN_i="001110") ELSE
               Shiftout WHEN (ALUFN_i="000000" or ALUFN_i="000010") ELSE
+              Mulout WHEN (ALUFN_i="011100") ELSE
               (OTHERS => '0');
 
   -- flags not affected by lw,sw
