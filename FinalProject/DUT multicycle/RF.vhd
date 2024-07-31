@@ -4,13 +4,13 @@ use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 --------------------------------------------------------------
 entity RF is
-generic( Dwidth: integer:=16;
-		 Awidth: integer:=4);
+generic( Dwidth: integer:=32;
+		 Awidth: integer:=5);
 port(	clk,rst,WregEn: in std_logic;	
 		WregData:	in std_logic_vector(Dwidth-1 downto 0);
-		WregAddr,RregAddr:	
+		WregAddr,RregAddr1, RregAddr2:	
 					in std_logic_vector(Awidth-1 downto 0);
-		RregData: 	out std_logic_vector(Dwidth-1 downto 0)
+		RregData1, RregData2: out std_logic_vector(Dwidth-1 downto 0)
 );
 end RF;
 --------------------------------------------------------------
@@ -35,6 +35,7 @@ begin
 	end if;
   end process;
 	
-  RregData <= sysRF(conv_integer(RregAddr));
+  RregData1 <= sysRF(conv_integer(RregAddr1));
+  RregData2 <= sysRF(conv_integer(RregAddr2));
 
 end behav;

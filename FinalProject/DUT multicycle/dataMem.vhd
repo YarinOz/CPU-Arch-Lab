@@ -9,8 +9,7 @@ generic( Dwidth: integer:=16;
 		 dept:   integer:=64);
 port(	clk,memEn: in std_logic;	
 		WmemData:	in std_logic_vector(Dwidth-1 downto 0);
-		WmemAddr,RmemAddr:	
-					in std_logic_vector(Awidth-1 downto 0);
+		WmemAddr:	in std_logic_vector(Awidth-1 downto 0);
 		RmemData: 	out std_logic_vector(Dwidth-1 downto 0)
 );
 end dataMem;
@@ -25,7 +24,7 @@ begin
   process(clk)
   begin
 	if (clk'event and clk='1') then
-		RmemData <= sysRAM(conv_integer(RmemAddr));
+		RmemData <= sysRAM(conv_integer(WmemAddr));
 	    if (memEn='1') then
 		    -- index is type of integer so we need to use 
 			-- buildin function conv_integer in order to change the type
