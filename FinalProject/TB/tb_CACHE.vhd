@@ -78,7 +78,7 @@ begin
         wait for clk_period;
         progMemEn <= '0';
 
-        progWriteAddr <= b"00100";           -- Address 4
+        progWriteAddr <= b"00001";           -- Address 4
         progDataIn <= x"9ABCDEF0";       -- Another instruction or data
         progMemEn <= '1';
         wait for clk_period;
@@ -88,15 +88,15 @@ begin
 
         -- Apply test vectors
         -- Set control signals for a specific test case
-        RegDst <= '0';
-        MemRead <= '0';
-        MemtoReg <= '0';
-        MemWrite <= '0';
-        RegWrite <= '1';
-        Branch <= '0';
-        jump <= '0';
-        ALUsrc <= '0';
-        ALUop <= b"000000"; -- Example ALU operation code
+        -- RegDst <= '0';
+        -- MemRead <= '0';
+        -- MemtoReg <= '0';
+        -- MemWrite <= '0';
+        -- RegWrite <= '1';
+        -- Branch <= '0';
+        -- jump <= '0';
+        -- ALUsrc <= '0';
+        -- ALUop <= b"000000"; -- Example ALU operation code
 
         -- Wait for a few clock cycles
         wait for 10 * clk_period;

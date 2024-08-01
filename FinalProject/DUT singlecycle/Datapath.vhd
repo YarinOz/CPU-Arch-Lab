@@ -41,7 +41,8 @@ architecture behav of Datapath is
 
     -- Instruction signals
     signal instruction: std_logic_vector(Dwidth-1 downto 0);
-    signal imm, address: std_logic_vector(Dwidth-1 downto 0);
+    signal imm : std_logic_vector(Dwidth-1 downto 0);
+    signal address : std_logic_vector(27 downto 0);
     signal rs, rt, rd: std_logic_vector(Awidth-1 downto 0);
     signal shamt: std_logic_vector(4 downto 0);
     signal bcond,zero: std_logic;
@@ -56,10 +57,10 @@ architecture behav of Datapath is
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
-U1: progMem generic map (Dwidth, Awidth, dept) port map (clk, PCprogAddress, instruction, progMemEn, progWriteAddr, progDataIn);
-U2: dataMem generic map (Dwidth, Awidth, dept) port map (clk, MemWrite, RFData2, ALUmemWrite, DataOut);
-U3: RF generic map (Dwidth,Awidth) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
-U4: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout, zero); -- B-A, B+A
+flash: progMem generic map (Dwidth, Awidth, dept) port map (clk, PCprogAddress, instruction, progMemEn, progWriteAddr, progDataIn);
+ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, MemWrite, RFData2, ALUmemWrite, DataOut);
+registerfile: RF generic map (Dwidth,Awidth) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
+ALUnit: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout, zero); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
 -- Instruction signals
 opcode <= instruction(31 downto 26);
@@ -69,8 +70,9 @@ rd <= instruction(15 downto 11);
 shamt <= instruction(10 downto 6);
 funct <= instruction(5 downto 0);
 -- Immediate and address signals (sign extension and shift left 2 for address alignment) 
-imm <= SXT(instruction(15 downto 0), Dwidth) sll 2;
-address <= SXT(instruction(25 downto 0), 28) sll 2;
+imm <= SXT(instruction(15 downto 0), Dwidth);
+-- 28 bits address after shifting left 2
+address <= instruction(25 downto 0) & "00";
 
 -- Program counter address to program memory
 PCprogAddress <= PCout(Awidth-1 downto 0);
