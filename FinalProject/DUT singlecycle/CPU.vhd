@@ -4,7 +4,7 @@ use work.aux_package.all;
 
 entity CPU is
     generic(Dwidth: integer := 32;
-            Awidth: integer := 32;
+            Awidth: integer := 5;
             Regwidth: integer := 4;
             dept: integer := 64
     );

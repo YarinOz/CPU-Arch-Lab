@@ -5,7 +5,7 @@ package aux_package is
 --------------------------------------------------------
 	component CPU is
 	generic(Dwidth: integer := 32;
-			Awidth: integer := 32;
+			Awidth: integer := 5;
 			Regwidth: integer := 4;
 			dept: integer := 64
 	);
@@ -47,7 +47,7 @@ package aux_package is
 	component Datapath is
 		generic(
 			Dwidth: integer := 32;
-			Awidth: integer := 32;
+			Awidth: integer := 5;
 			Regwidth: integer := 4;
 			dept: integer := 64
 		);
@@ -63,7 +63,7 @@ package aux_package is
 ---------------------------------------------------------	
 	component RF IS
 	generic( Dwidth: integer:=32;
-			Awidth: integer:=32);
+			Awidth: integer:=5);
 		PORT(
 			clk,rst,WregEn: in std_logic;	
 			WregData:	in std_logic_vector(Dwidth-1 downto 0);
@@ -87,7 +87,7 @@ package aux_package is
 	component dataMem is
 	generic(
 		Dwidth: integer := 32;
-		Awidth: integer := 32;
+		Awidth: integer := 5;
 		dept: integer := 64
 	);
 	port(clk,memEn: in std_logic;	
@@ -99,12 +99,18 @@ package aux_package is
 ---------------------------------------------------------
 	component progMem is
 	generic(
-		Dwidth: integer := 16;
-		Awidth: integer := 6;
+		Dwidth: integer := 32;
+		Awidth: integer := 5;
 		dept: integer := 64
 	);
-	port(RmemAddr:	in std_logic_vector(Dwidth-1 downto 0);
-		memData: 	out std_logic_vector(Dwidth-1 downto 0)
+	port(clk : in std_logic;
+		-- Read program memory
+		RmemAddr:	in std_logic_vector(Awidth-1 downto 0);
+		RmemData: 	out std_logic_vector(Dwidth-1 downto 0);
+		-- Write program memory
+		WmemEn:   in std_logic;
+		WmemAddr: in std_logic_vector(Awidth-1 downto 0);
+		WmemData: in std_logic_vector(Dwidth-1 downto 0)
 	);
 	end component;
 	

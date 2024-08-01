@@ -4,8 +4,8 @@ use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 --------------------------------------------------------------
 entity dataMem is
-generic( Dwidth: integer:=16;
-		 Awidth: integer:=6;
+generic( Dwidth: integer:=32;
+		 Awidth: integer:=5;
 		 dept:   integer:=64);
 port(	clk,memEn: in std_logic;	
 		WmemData:	in std_logic_vector(Dwidth-1 downto 0);
