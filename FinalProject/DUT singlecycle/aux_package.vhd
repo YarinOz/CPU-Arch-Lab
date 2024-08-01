@@ -12,7 +12,14 @@ package aux_package is
     port(clk,rst,ena: in std_logic;
 		AddressBus: in std_logic_vector(Dwidth-1 downto 0);
 		ControlBus: inout std_logic_vector(15 downto 0);
-		DataBus: inout std_logic_vector(Dwidth-1 downto 0)
+		DataBus: inout std_logic_vector(Dwidth-1 downto 0);
+		-- memory init signals
+		progMemEn: in std_logic;
+		progDataIn: in std_logic_vector(Dwidth-1 downto 0);
+		progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
+		-- -- -- data memory signals
+		dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
+		dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
     );
 	end component;
 
@@ -52,12 +59,20 @@ package aux_package is
 			dept: integer := 64
 		);
 	port(	
-		clk, rst: in std_logic;
+		clk, rst, init: in std_logic;
 		-- control signals
 		RegDst, MemRead, MemtoReg, MemWrite, RegWrite, Branch, jump, ALUsrc: in std_logic;
 		ALUop: in std_logic_vector(5 downto 0);
 		-- status signals
-		opcode, funct: out std_logic_vector(5 downto 0)
+		opcode, funct: out std_logic_vector(5 downto 0);
+		-- for initial program memory
+		-- program memory signals
+		progMemEn: in std_logic;
+		progDataIn: in std_logic_vector(Dwidth-1 downto 0);
+		progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
+		-- -- -- data memory signals
+		dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
+		dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
 	);
 	end component;	
 ---------------------------------------------------------	
@@ -92,7 +107,7 @@ package aux_package is
 	);
 	port(clk,memEn: in std_logic;	
 		WmemData:	in std_logic_vector(Dwidth-1 downto 0);
-		WmemAddr:	in std_logic_vector(Awidth-1 downto 0);
+		WmemAddr, RmemAddr:	in std_logic_vector(Awidth-1 downto 0);
 		RmemData: 	out std_logic_vector(Dwidth-1 downto 0)
 	);
 	end component;

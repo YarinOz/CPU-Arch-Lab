@@ -8,20 +8,18 @@ entity CPU is
             Regwidth: integer := 4;
             dept: integer := 64
     );
-    port(clk,rst,ena: in std_logic;
+    port(clk,rst,ena, init: in std_logic;
          AddressBus: in std_logic_vector(Dwidth-1 downto 0);
          ControlBus: inout std_logic_vector(15 downto 0);
-         DataBus: inout std_logic_vector(Dwidth-1 downto 0)
+         DataBus: inout std_logic_vector(Dwidth-1 downto 0);
          -- Test bench signals
         -- -- program memory signals
-        -- progMemEn: in std_logic;
-        -- progDataIn: in std_logic_vector(Dwidth-1 downto 0);
-        -- progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
+        progMemEn: in std_logic;
+        progDataIn: in std_logic_vector(Dwidth-1 downto 0);
+        progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
         -- -- -- data memory signals
-        -- dataMemEn, TBactive: in std_logic;
-        -- dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
-        -- dataWriteAddr, dataReadAddr: in std_logic_vector(Awidth-1 downto 0);
-        -- dataDataOut: out std_logic_vector(Dwidth-1 downto 0)
+        dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
+        dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
     );
 
 end CPU;
@@ -65,6 +63,7 @@ DATAPATHUNIT: Datapath
     port map(
         clk => clk,
         rst => rst,
+        init => init,
         RegDst => RegDst,
         MemRead => MemRead,
         MemtoReg => MemtoReg,
@@ -75,7 +74,12 @@ DATAPATHUNIT: Datapath
         ALUsrc => ALUsrc,
         ALUop => ALUop,
         opcode => opcode,
-        funct => funct
+        funct => funct,
+        progMemEn => progMemEn,
+        progDataIn => progDataIn,
+        progWriteAddr => progWriteAddr,
+        dataDataIn => dataDataIn,
+        dataWriteAddr => dataWriteAddr
 );
 
 end behav;

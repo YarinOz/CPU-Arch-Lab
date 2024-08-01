@@ -14,13 +14,15 @@ architecture testbench of tb_Datapath is
     constant dept: integer := 64;
 
     -- Signals
-    signal clk, rst: std_logic := '0';
+    signal clk, rst, init: std_logic := '0';
     signal RegDst, MemRead, MemtoReg, MemWrite, RegWrite, Branch, jump, ALUsrc: std_logic := '0';
     signal ALUop: std_logic_vector(5 downto 0) := (others => '0');
     signal opcode, funct: std_logic_vector(5 downto 0);
     signal progMemEn: std_logic := '0';
     signal progDataIn: std_logic_vector(Dwidth-1 downto 0) := (others => '0');
     signal progWriteAddr: std_logic_vector(Awidth-1 downto 0) := (others => '0');
+    signal dataDataIn: std_logic_vector(Dwidth-1 downto 0);
+    signal dataWriteAddr: std_logic_vector(Awidth-1 downto 0);
 
     -- Clock period
     constant clk_period: time := 10 ns;
@@ -46,6 +48,7 @@ begin
         port map (
             clk => clk,
             rst => rst,
+            init => init,
             RegDst => RegDst,
             MemRead => MemRead,
             MemtoReg => MemtoReg,
@@ -59,7 +62,9 @@ begin
             funct => funct,
             progMemEn => progMemEn,
             progDataIn => progDataIn,
-            progWriteAddr => progWriteAddr
+            progWriteAddr => progWriteAddr,
+            dataDataIn => dataDataIn,
+            dataWriteAddr => dataWriteAddr
         );
 
     -- Test process
@@ -71,21 +76,36 @@ begin
         rst <= '0';
         wait for clk_period;
 
+        init <= '1'; 
+
         -- Initialize program memory with some instructions
         progWriteAddr <= b"00000";           -- Address 0
-        progDataIn <= x"12345678";       -- Instruction or data
+        progDataIn <= x"12345678";           -- Instruction or data
         progMemEn <= '1';
         wait for clk_period;
         progMemEn <= '0';
 
-        progWriteAddr <= b"00001";           -- Address 4
-        progDataIn <= x"9ABCDEF0";       -- Another instruction or data
+        progWriteAddr <= b"00001";           -- Address 1
+        progDataIn <= x"9ABCDEF0";           -- Another instruction or data
         progMemEn <= '1';
         wait for clk_period;
         progMemEn <= '0';
 
+        -- Initialize data memory with some data
+        dataWriteAddr <= b"00000";           -- Address 0
+        dataDataIn <= x"11223344";           -- Data to be written
+        MemWrite <= '1';                        -- Enable initialization
+        wait for clk_period;
+        MemWrite <= '0';                        -- Disable initialization
+
+        dataWriteAddr <= b"00001";           -- Address 1
+        dataDataIn <= x"55667788";           -- Another data
+        MemWrite <= '1';                        -- Enable initialization
+        wait for clk_period;
+        MemWrite <= '0';                        -- Disable initialization
         -- Add additional memory initialization as needed...
 
+        init <= '0';
         -- Apply test vectors
         -- Set control signals for a specific test case
         -- RegDst <= '0';

@@ -12,22 +12,22 @@ generic(
     dept: integer := 64
 );
 port(
-    clk, rst: in std_logic;
+    clk, rst, init: in std_logic;
     -- control signals
     RegDst, MemRead, MemtoReg, MemWrite, RegWrite, Branch, jump, ALUsrc: in std_logic;
     ALUop: in std_logic_vector(5 downto 0);
     -- status signals
     opcode, funct: out std_logic_vector(5 downto 0);
     -- test bench signals
+    -- for initial program memory
     -- program memory signals
     progMemEn: in std_logic;
     progDataIn: in std_logic_vector(Dwidth-1 downto 0);
-    progWriteAddr: in std_logic_vector(Awidth-1 downto 0)
+    progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
+    -- data memory init, en=MemWrite, datawrite=RamWrite, dataWriteAddr=dataWriteAddr readaddress=ALUmemWrite, dataout=DataOut
     -- -- -- data memory signals
-    -- dataMemEn: in std_logic;
-    -- dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
-    -- dataWriteAddr, dataReadAddr: in std_logic_vector(Awidth-1 downto 0);
-    -- dataDataOut: out std_logic_vector(Dwidth-1 downto 0)
+    dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
+    dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
 );
 end Datapath;
  
@@ -38,6 +38,7 @@ architecture behav of Datapath is
 
     -- Memory signals
     signal progDataOut: std_logic_vector(Dwidth-1 downto 0);
+    signal RamWrite: std_logic_vector(Dwidth-1 downto 0);
 
     -- Instruction signals
     signal instruction: std_logic_vector(Dwidth-1 downto 0);
@@ -58,7 +59,7 @@ architecture behav of Datapath is
 begin 
 -------------------- port mapping ---------------------------------------------------------------
 flash: progMem generic map (Dwidth, Awidth, dept) port map (clk, PCprogAddress, instruction, progMemEn, progWriteAddr, progDataIn);
-ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, MemWrite, RFData2, ALUmemWrite, DataOut);
+ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, MemWrite, RamWrite, dataWriteAddr, ALUmemWrite, DataOut);
 registerfile: RF generic map (Dwidth,Awidth) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
 ALUnit: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout, zero); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
@@ -79,6 +80,9 @@ PCprogAddress <= PCout(Awidth-1 downto 0);
 
 -- ALU to memory address
 ALUmemWrite <= ALUout(Awidth-1 downto 0);
+
+-- Memory initialization
+RamWrite <= dataDataIn when init='1' else RFData2;
 
 -- Branch condition
 process(opcode, rs, rt)
