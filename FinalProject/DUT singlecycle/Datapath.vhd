@@ -26,6 +26,7 @@ port(
     progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
     -- data memory init, en=MemWrite, datawrite=RamWrite, dataWriteAddr=dataWriteAddr readaddress=ALUmemWrite, dataout=DataOut
     -- -- -- data memory signals
+    dataMemEn: in std_logic;
     dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
     dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
 );
@@ -39,6 +40,8 @@ architecture behav of Datapath is
     -- Memory signals
     signal progDataOut: std_logic_vector(Dwidth-1 downto 0);
     signal RamWrite: std_logic_vector(Dwidth-1 downto 0);
+    signal WMUX: std_logic_vector(Awidth-1 downto 0);
+    signal RamEN: std_logic;
 
     -- Instruction signals
     signal instruction: std_logic_vector(Dwidth-1 downto 0);
@@ -46,7 +49,7 @@ architecture behav of Datapath is
     signal address : std_logic_vector(27 downto 0);
     signal rs, rt, rd: std_logic_vector(Awidth-1 downto 0);
     signal shamt: std_logic_vector(4 downto 0);
-    signal bcond,zero: std_logic;
+    signal bcond: std_logic;
     signal ALUMUX: std_logic_vector(Dwidth-1 downto 0);
     signal RFMUX: std_logic_vector(Awidth-1 downto 0);
     signal RFWDataMUX: std_logic_vector(Dwidth-1 downto 0);
@@ -59,17 +62,17 @@ architecture behav of Datapath is
 begin 
 -------------------- port mapping ---------------------------------------------------------------
 flash: progMem generic map (Dwidth, Awidth, dept) port map (clk, PCprogAddress, instruction, progMemEn, progWriteAddr, progDataIn);
-ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, MemWrite, RamWrite, dataWriteAddr, ALUmemWrite, DataOut);
+ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, RamEN, RamWrite, WMUX, ALUmemWrite, DataOut);
 registerfile: RF generic map (Dwidth,Awidth) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
 ALUnit: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
 -- Instruction signals
-opcode <= instruction(31 downto 26);
+opcode <= instruction(31 downto 26) when init='0' else (others => '0');
 rs <= instruction(25 downto 21);
 rt <= instruction(20 downto 16);
 rd <= instruction(15 downto 11);
 shamt <= instruction(10 downto 6);
-funct <= instruction(5 downto 0);
+funct <= instruction(5 downto 0) when init='0' else (others => '0');
 -- Immediate and address signals (sign extension and shift left 2 for address alignment) 
 imm <= SXT(instruction(15 downto 0), Dwidth);
 -- 28 bits address after shifting left 2
@@ -83,6 +86,8 @@ ALUmemWrite <= ALUout(Awidth-1 downto 0);
 
 -- Memory initialization
 RamWrite <= dataDataIn when init='1' else RFData2;
+WMUX <= dataWriteAddr when init='1' else ALUmemWrite;
+RamEN <= dataMemEn when init='1' else MemWrite;
 
 -- Branch condition
 process(opcode, rs, rt)
@@ -107,14 +112,16 @@ ALUMUX <= RFData2 when ALUsrc = '0' else imm;
     begin  
         if rst = '1' then
             PCout <= (others => '0');
-        elsif rising_edge(clk) then
+        elsif (rising_edge(clk) and init='0') then
             if jump = '1' then
                 PCout <= PCout(Dwidth-1 downto 28) & address; -- if jr then address <= ra
             elsif (bcond = '1' and branch = '1') then
-                PCout <= PCout + 4 + imm;
+                PCout <= PCout + 1 + imm;
             else
-                PCout <= PCout + 4;
+                PCout <= PCout + 1;  -- "PC+4"
             end if;
+        elsif init='1' then
+            PCout <= PCout; -- Unaffected
         end if;
     end process;
     

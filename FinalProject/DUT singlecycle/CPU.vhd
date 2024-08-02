@@ -8,7 +8,7 @@ entity CPU is
             Regwidth: integer := 4;
             dept: integer := 64
     );
-    port(clk,rst,ena, init: in std_logic;
+    port(clk,rst, init: in std_logic;
          AddressBus: in std_logic_vector(Dwidth-1 downto 0);
          ControlBus: inout std_logic_vector(15 downto 0);
          DataBus: inout std_logic_vector(Dwidth-1 downto 0);
@@ -18,6 +18,7 @@ entity CPU is
         progDataIn: in std_logic_vector(Dwidth-1 downto 0);
         progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
         -- -- -- data memory signals
+        dataMemEn: in std_logic;
         dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
         dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
     );
@@ -78,6 +79,7 @@ DATAPATHUNIT: Datapath
         progMemEn => progMemEn,
         progDataIn => progDataIn,
         progWriteAddr => progWriteAddr,
+        dataMemEn => dataMemEn,
         dataDataIn => dataDataIn,
         dataWriteAddr => dataWriteAddr
 );

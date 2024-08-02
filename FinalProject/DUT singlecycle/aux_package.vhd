@@ -9,7 +9,7 @@ package aux_package is
 			Regwidth: integer := 4;
 			dept: integer := 64
 	);
-    port(clk,rst,ena: in std_logic;
+    port(clk,rst,init: in std_logic;
 		AddressBus: in std_logic_vector(Dwidth-1 downto 0);
 		ControlBus: inout std_logic_vector(15 downto 0);
 		DataBus: inout std_logic_vector(Dwidth-1 downto 0);
@@ -18,6 +18,7 @@ package aux_package is
 		progDataIn: in std_logic_vector(Dwidth-1 downto 0);
 		progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
 		-- -- -- data memory signals
+		dataMemEn: in std_logic;
 		dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
 		dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
     );
@@ -71,6 +72,7 @@ package aux_package is
 		progDataIn: in std_logic_vector(Dwidth-1 downto 0);
 		progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
 		-- -- -- data memory signals
+		dataMemEn: in std_logic;
 		dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
 		dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
 	);
