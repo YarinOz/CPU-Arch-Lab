@@ -27,7 +27,7 @@ begin
     Branch <= '1' when (opcode="000100" or opcode="000101") else '0';
     -- MemRead: lw
     MemRead <= '1' when opcode = "100011" else '0';
-    MemtoReg <= '1' when opcode = "100011" else '0';
+    MemtoReg <= MemRead;
     -- MemWrite: sw
     MemWrite <= '1' when opcode = "101011" else '0';
     -- Regwrite: in all but: j, jal, jr, beq, bne, sw

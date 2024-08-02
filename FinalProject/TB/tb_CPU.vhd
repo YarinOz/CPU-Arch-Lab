@@ -97,7 +97,7 @@ begin
         progMemEn <= '0';
 
         progWriteAddr <= b"00001";           -- Address 1
-        progDataIn <= x"20850003";           -- addi $r5, $r4, 3
+        progDataIn <= x"20850007";           -- addi $r5, $r4, 7
         progMemEn <= '1';
         wait for clk_period;
         progMemEn <= '0';
