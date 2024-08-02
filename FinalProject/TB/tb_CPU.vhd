@@ -102,6 +102,12 @@ begin
         wait for clk_period;
         progMemEn <= '0';
 
+        progWriteAddr <= b"00010";           -- Address 1
+        progDataIn <= x"AC050002";           -- sw $r5, 3($r0)
+        progMemEn <= '1';
+        wait for clk_period;
+        progMemEn <= '0';
+
         init <= '0';
 
         -- Wait for a few clock cycles to let the CPU run the program

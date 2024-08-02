@@ -31,6 +31,12 @@ architecture Behavioral of ALU is
                 when "100000" =>  -- add
                     Result_int := A_int + B_int;
                     Result <= std_logic_vector(Result_int);
+                when "101011" => -- sw
+                    Result_int := A_int + B_int;
+                    Result <= std_logic_vector(Result_int);
+                when "100011" => -- lw
+                    Result_int := A_int + B_int;
+                    Result <= std_logic_vector(Result_int);
                 when "100001" =>  -- addu
                     Result_uint := A_uint + B_uint;
                     Result <= std_logic_vector(Result_uint);

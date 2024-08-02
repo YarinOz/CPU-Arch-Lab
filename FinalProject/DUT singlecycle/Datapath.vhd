@@ -67,12 +67,12 @@ registerfile: RF generic map (Dwidth,Awidth) port map (clk, rst, RegWrite, RFWDa
 ALUnit: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
 -- Instruction signals
-opcode <= instruction(31 downto 26) when init='0' else (others => '0');
+opcode <= instruction(31 downto 26) when init='0' else (others => '1');
 rs <= instruction(25 downto 21);
 rt <= instruction(20 downto 16);
 rd <= instruction(15 downto 11);
 shamt <= instruction(10 downto 6);
-funct <= instruction(5 downto 0) when init='0' else (others => '0');
+funct <= instruction(5 downto 0) when init='0' else (others => '1');
 -- Immediate and address signals (sign extension and shift left 2 for address alignment) 
 imm <= SXT(instruction(15 downto 0), Dwidth);
 -- 28 bits address after shifting left 2
