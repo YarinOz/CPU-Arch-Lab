@@ -61,7 +61,7 @@ begin
 flash: progMem generic map (Dwidth, Awidth, dept) port map (clk, PCprogAddress, instruction, progMemEn, progWriteAddr, progDataIn);
 ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, MemWrite, RamWrite, dataWriteAddr, ALUmemWrite, DataOut);
 registerfile: RF generic map (Dwidth,Awidth) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
-ALUnit: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout, zero); -- B-A, B+A
+ALUnit: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
 -- Instruction signals
 opcode <= instruction(31 downto 26);

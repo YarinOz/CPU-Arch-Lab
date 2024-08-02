@@ -94,8 +94,7 @@ package aux_package is
 		PORT(
 			A, B : in std_logic_vector(Dwidth-1 downto 0);
 			ALUop : in std_logic_vector(5 downto 0);
-			Result : out std_logic_vector(Dwidth-1 downto 0);
-			Zero : out std_logic
+			Result : out std_logic_vector(Dwidth-1 downto 0)
 		);
 	end component;
 ---------------------------------------------------------
