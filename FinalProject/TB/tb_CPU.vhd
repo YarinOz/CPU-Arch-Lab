@@ -2,8 +2,13 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
+use std.textio.all;
+use ieee.std_logic_textio.all;
 
 entity tb_CPU is
+    constant dataMemResult:      string(1 to 82) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/DTCMcontent.txt";
+    constant dataMemLocation:    string(1 to 79) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/DTCMinit.txt";
+    constant progMemLocation:    string(1 to 79) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/ITCMinit.txt";
 end tb_CPU;
 
 architecture testbench of tb_CPU is
@@ -67,6 +72,14 @@ begin
 
     -- Test process
     test_process: process
+    -- File variables for reading instructions and data
+    file instruction_file : text open read_mode is progMemLocation;
+    file data_file : text open read_mode is dataMemLocation;
+    variable instruction_line : line;
+    variable data_line : line;
+    variable addr : integer;
+    variable data_value : std_logic_vector(Dwidth-1 downto 0);
+    variable instruction_value : std_logic_vector(Dwidth-1 downto 0);
     begin
         -- Memory initialization
         init <= '1';
@@ -76,37 +89,30 @@ begin
         rst <= '0';
         wait for clk_period;
         
-        -- Initialize data memory with some data
-        dataWriteAddr <= b"00000";           -- Address 0
-        dataDataIn <= x"00000002";           -- Data to be written
-        dataMemEn <= '1';                        -- Enable initialization
-        wait for clk_period;
-        dataMemEn <= '0';                        -- Disable initialization
+        -- Read and initialize data memory from file
+        while not endfile(data_file) loop
+            readline(data_file, data_line);
+            hread(data_line, data_value); -- Read hex value
+            dataWriteAddr <= conv_std_logic_vector(addr, Awidth);
+            dataDataIn <= data_value;
+            dataMemEn <= '1';
+            wait for clk_period;
+            dataMemEn <= '0';
+            addr := addr + 1;
+        end loop;
 
-        dataWriteAddr <= b"00001";           -- Address 1
-        dataDataIn <= x"00000005";           -- Another data
-        dataMemEn <= '1';                        -- Enable initialization
-        wait for clk_period;
-        dataMemEn <= '0';                        -- Disable initialization
-
-        -- Initialize program memory with some instructions
-        progWriteAddr <= b"00000";           -- Address 0
-        progDataIn <= x"8C040001";           -- lw $r4, 1($r0)
-        progMemEn <= '1';
-        wait for clk_period;
-        progMemEn <= '0';
-
-        progWriteAddr <= b"00001";           -- Address 1
-        progDataIn <= x"20850007";           -- addi $r5, $r4, 7
-        progMemEn <= '1';
-        wait for clk_period;
-        progMemEn <= '0';
-
-        progWriteAddr <= b"00010";           -- Address 1
-        progDataIn <= x"AC050002";           -- sw $r5, 3($r0)
-        progMemEn <= '1';
-        wait for clk_period;
-        progMemEn <= '0';
+        -- Read and initialize program memory from file
+        addr := 0;
+        while not endfile(instruction_file) loop
+            readline(instruction_file, instruction_line);
+            hread(instruction_line, instruction_value); -- Read hex value
+            progWriteAddr <= conv_std_logic_vector(addr, Awidth);
+            progDataIn <= instruction_value;
+            progMemEn <= '1';
+            wait for clk_period;
+            progMemEn <= '0';
+            addr := addr + 1;
+        end loop;
 
         init <= '0';
 
