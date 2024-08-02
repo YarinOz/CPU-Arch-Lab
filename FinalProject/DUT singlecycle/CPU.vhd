@@ -20,7 +20,8 @@ entity CPU is
         -- -- -- data memory signals
         dataMemEn: in std_logic;
         dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
-        dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
+        dataWriteAddr: in std_logic_vector(Awidth-1 downto 0);
+        dataDataOut: out std_logic_vector(Dwidth-1 downto 0)
     );
 
 end CPU;
@@ -35,6 +36,7 @@ architecture behav of CPU is
     signal DataOut: std_logic_vector(Dwidth-1 downto 0);
     signal Instruction: std_logic_vector(Dwidth-1 downto 0);
     signal Address: std_logic_vector(Awidth-1 downto 0);
+
 begin
 
 CONTROLUNITEN: ControlUnit 
@@ -81,7 +83,10 @@ DATAPATHUNIT: Datapath
         progWriteAddr => progWriteAddr,
         dataMemEn => dataMemEn,
         dataDataIn => dataDataIn,
-        dataWriteAddr => dataWriteAddr
+        dataWriteAddr => dataWriteAddr,
+        dataDataOut => DataOut
 );
+-- for writing the data to the output port
+dataDataOut <= DataOut;
 
 end behav;

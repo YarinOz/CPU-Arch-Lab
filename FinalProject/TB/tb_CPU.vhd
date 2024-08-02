@@ -33,6 +33,7 @@ architecture testbench of tb_CPU is
     signal dataMemEn: std_logic := '0';
     signal dataDataIn: std_logic_vector(Dwidth-1 downto 0);
     signal dataWriteAddr: std_logic_vector(Awidth-1 downto 0);
+    signal dataDataOut: std_logic_vector(Dwidth-1 downto 0);
 
     -- Clock period
     constant clk_period: time := 10 ns;
@@ -67,7 +68,8 @@ begin
             progWriteAddr => progWriteAddr,
             dataMemEn => dataMemEn,
             dataDataIn => dataDataIn,
-            dataWriteAddr => dataWriteAddr
+            dataWriteAddr => dataWriteAddr,
+            dataDataOut => dataDataOut
         );
 
     -- Test process
@@ -77,7 +79,7 @@ begin
     file data_file : text open read_mode is dataMemLocation;
     variable instruction_line : line;
     variable data_line : line;
-    variable addr : integer;
+    variable addr : integer:= 0;
     variable data_value : std_logic_vector(Dwidth-1 downto 0);
     variable instruction_value : std_logic_vector(Dwidth-1 downto 0);
     begin
@@ -113,14 +115,10 @@ begin
             progMemEn <= '0';
             addr := addr + 1;
         end loop;
-
         init <= '0';
 
-        -- Wait for a few clock cycles to let the CPU run the program
-        wait for 100 * clk_period;
-
-        -- Finish simulation
         wait;
     end process;
+
 
 end testbench;

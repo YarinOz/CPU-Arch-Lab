@@ -28,7 +28,8 @@ port(
     -- -- -- data memory signals
     dataMemEn: in std_logic;
     dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
-    dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
+    dataWriteAddr: in std_logic_vector(Awidth-1 downto 0);
+    dataDataOut: out std_logic_vector(Dwidth-1 downto 0)
 );
 end Datapath;
  
@@ -62,7 +63,7 @@ architecture behav of Datapath is
 begin 
 -------------------- port mapping ---------------------------------------------------------------
 flash: progMem generic map (Dwidth, Awidth, dept) port map (clk, PCprogAddress, instruction, progMemEn, progWriteAddr, progDataIn);
-ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, RamEN, RamWrite, WMUX, ALUmemWrite, DataOut);
+ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, RamEN, RamWrite, WMUX, WMUX, DataOut);
 registerfile: RF generic map (Dwidth,Awidth) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
 ALUnit: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
@@ -88,6 +89,8 @@ ALUmemWrite <= ALUout(Awidth-1 downto 0);
 RamWrite <= dataDataIn when init='1' else RFData2;
 WMUX <= dataWriteAddr when init='1' else ALUmemWrite;
 RamEN <= dataMemEn when init='1' else MemWrite;
+
+dataDataOut <= DataOut;
 
 -- Branch condition
 process(opcode, rs, rt)

@@ -20,7 +20,8 @@ package aux_package is
 		-- -- -- data memory signals
 		dataMemEn: in std_logic;
 		dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
-		dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
+		dataWriteAddr: in std_logic_vector(Awidth-1 downto 0);
+		dataDataOut: out std_logic_vector(Dwidth-1 downto 0)
     );
 	end component;
 
@@ -74,7 +75,8 @@ package aux_package is
 		-- -- -- data memory signals
 		dataMemEn: in std_logic;
 		dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
-		dataWriteAddr: in std_logic_vector(Awidth-1 downto 0)
+		dataWriteAddr: in std_logic_vector(Awidth-1 downto 0);
+		dataDataOut: out std_logic_vector(Dwidth-1 downto 0)
 	);
 	end component;	
 ---------------------------------------------------------	
