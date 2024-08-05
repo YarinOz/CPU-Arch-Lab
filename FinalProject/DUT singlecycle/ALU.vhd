@@ -37,9 +37,6 @@ architecture Behavioral of ALU is
                 when "100011" => -- lw
                     Result_int := A_int + B_int;
                     Result <= std_logic_vector(Result_int);
-                when "100001" =>  -- addu
-                    Result_uint := A_uint + B_uint;
-                    Result <= std_logic_vector(Result_uint);
                 when "001000" =>  -- addi
                     Result_int := A_int + B_int;
                     Result <= std_logic_vector(Result_int);
@@ -65,6 +62,13 @@ architecture Behavioral of ALU is
                     Result_uint := B_uint sll to_integer(unsigned(A(4 downto 0)));
                     Result <= std_logic_vector(Result_uint);
                 when "101010" =>  -- slt
+                    if A_int < B_int then
+                        Result <= (others => '0');
+                        Result(Dwidth-1) <= '1';
+                    else
+                        Result <= (others => '0');
+                    end if;
+                when "001010" =>  -- slti
                     if A_int < B_int then
                         Result <= (others => '0');
                         Result(Dwidth-1) <= '1';

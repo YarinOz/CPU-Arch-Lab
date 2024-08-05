@@ -12,3 +12,37 @@
 
 ## notes to keep:
 1. in order to init the memory manually use tb_CPU.
+
+
+## tb_CPU
+lw $4,0($1)
+addi $
+sw 
+
+-- slt, slti if needed change 1 location
+## ISA supports
+### R-Type
+sll 
+srl
+jr-
+add
+sub
+mul
+and
+or
+xor
+slt
+### I-Type
+beq
+bne
+addi
+slti
+andi
+ori
+xori
+lui-
+lw
+sw
+### J-Type
+j
+jal-
