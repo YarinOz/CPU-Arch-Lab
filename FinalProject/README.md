@@ -10,6 +10,10 @@
 5. add FPGA IO conective layer
 5. add GPIO and basic timer
 
+- IO CONTROLLER
+- make sure sizing in IO controller for OUTPUT is ok
+- add support for keys and find what is their purpose
+
 ## notes to keep:
 1. in order to init the memory manually use tb_CPU.
 
@@ -18,6 +22,8 @@
 lw $4,0($1)
 addi $
 sw 
+
+-- add support for left instruction and make sure they work
 
 -- slt, slti if needed change 1 location
 ## ISA supports

@@ -131,6 +131,29 @@ package aux_package is
 		WmemData: in std_logic_vector(Dwidth-1 downto 0)
 	);
 	end component;
+	---------------------------------------------------------
+	component SegmentDecoder is
+	GENERIC (n : INTEGER := 4;
+			SegmentSize : integer := 7);
+	PORT (data : IN STD_LOGIC_VECTOR (n-1 DOWNTO 0);
+			seg : OUT STD_LOGIC_VECTOR (SegmentSize-1 downto 0));
+	end component;
+	---------------------------------------------------------
+	component InputInterface is
+	generic (DataBusWidth: integer := 32);
+	port (ChipSelect, MemRead: in std_logic;
+			RData: out std_logic_vector(DataBusWidth-1 downto 0);
+			IO_In : IN std_logic_vector(7 downto 0));
+	end component;
+	---------------------------------------------------------
+	component OutputInterface is
+	generic (SevenSegment: boolean := true;
+			SEGSize: integer := 7;
+			LEDSize: integer := 10);
+	port (clk, rst, ChipSelect, MemRead, MemWrite: in std_logic;
+			RWData: inout std_logic_vector(LEDSize-1 downto 0);
+			IO_Out : out std_logic_vector(LEDSize-1 downto 0));
+	end component;
 	
 end aux_package;
 

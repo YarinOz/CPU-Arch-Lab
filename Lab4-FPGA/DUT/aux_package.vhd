@@ -30,13 +30,13 @@ package aux_package is
 		LEDs : OUT std_logic_vector(9 downto 0)  
 	);
 	end component;
-	---------------------------------------------------------
+---------------------------------------------------------
 	component SegmentDecoder is
 	GENERIC (n : INTEGER := 4;
 			SegmentSize : integer := 7);
 	PORT (data : IN STD_LOGIC_VECTOR (n-1 DOWNTO 0);
 			seg : OUT STD_LOGIC_VECTOR (SegmentSize-1 downto 0));
-	end component;
+	end component;	
 	---------------------------------------------------------
 	component Fmax is
 	GENERIC (
