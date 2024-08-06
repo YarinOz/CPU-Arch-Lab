@@ -42,9 +42,9 @@ begin
     -- Clock generation
     clk_process: process
     begin
-        clk <= '0';
-        wait for clk_period / 2;
         clk <= '1';
+        wait for clk_period / 2;
+        clk <= '0';
         wait for clk_period / 2;
     end process;
 
@@ -90,6 +90,8 @@ begin
         wait for clk_period;
         rst <= '0';
         wait for clk_period;
+
+        wait for 2 * clk_period;
         
         -- Read and initialize data memory from file
         while not endfile(data_file) loop
@@ -115,9 +117,9 @@ begin
             progMemEn <= '0';
             addr := addr + 1;
         end loop;
+        wait for 2 * clk_period;
         init <= '0';
 
-        wait for clk_period / 2;
         wait;
     end process;
 
