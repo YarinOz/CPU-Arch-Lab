@@ -49,7 +49,8 @@ package aux_package is
 			opcode, funct: in std_logic_vector(5 downto 0);
 			-- Control signals for the datapath
 			RegDst, MemRead, MemtoReg, MemWrite, RegWrite, Branch, jump, ALUsrc: out std_logic;
-			ALUop: out std_logic_vector(5 downto 0)
+			ALUop: out std_logic_vector(5 downto 0);
+			PCSrc: out std_logic_vector(1 downto 0)
 		);
 	END component;
 ---------------------------------------------------------
@@ -65,6 +66,7 @@ package aux_package is
 		-- control signals
 		RegDst, MemRead, MemtoReg, MemWrite, RegWrite, Branch, jump, ALUsrc: in std_logic;
 		ALUop: in std_logic_vector(5 downto 0);
+		PCSrc: in std_logic_vector(1 downto 0);
 		-- status signals
 		opcode, funct: out std_logic_vector(5 downto 0);
 		-- for initial program memory

@@ -16,6 +16,7 @@ port(
     -- control signals
     RegDst, MemRead, MemtoReg, MemWrite, RegWrite, Branch, jump, ALUsrc: in std_logic;
     ALUop: in std_logic_vector(5 downto 0);
+    PCSrc: in std_logic_vector(1 downto 0);
     -- status signals
     opcode, funct: out std_logic_vector(5 downto 0);
     -- test bench signals
@@ -102,9 +103,9 @@ begin
     end if;
 end process;    
 
--- RF connectivity
-RFMUX <= rt when (RegDst = '0') else rd;
-RFWDataMUX <= ALUout when MemtoReg = '0' else DataOut;
+-- RF connectivity (for jal, r31 <= PCout + 1)
+RFMUX <= rt when (RegDst = '0') else X"1F" when (PCSrc="10") else rd;
+RFWDataMUX <= ALUout when MemtoReg = '0' else (PCout + 1) when (PCSrc="10") else DataOut;
 
 -- ALU connectivity
 ALUMUX <= RFData2 when ALUsrc = '0' else imm;
@@ -117,7 +118,17 @@ ALUMUX <= RFData2 when ALUsrc = '0' else imm;
             PCout <= (others => '0');
         elsif (rising_edge(clk) and init='0') then
             if jump = '1' then
-                PCout <= PCout(Dwidth-1 downto 28) & address; -- if jr then address <= ra
+                case PCSrc is
+                    when "01" =>
+                        PCout <= PCout(Dwidth-1 downto 28) & address; -- j
+                    when "10" =>
+                        -- r31 <= PCout + 1;
+                        PCout <= PCout(Dwidth-1 downto 28) & address; -- jal
+                    when "11" => -- jr
+                        PCout <= RFData1;
+                    when others =>
+                        PCout <= PCout + 1;
+                end case;
             elsif (bcond = '1' and branch = '1') then
                 PCout <= PCout + 1 + imm;
             else

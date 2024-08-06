@@ -18,6 +18,12 @@
 1. in order to init the memory manually use tb_CPU.
 
 
+! ask HANAN: explain IO and how many 
+using only pins 7-0
+ISMC burn ITCM.HEX and DTCM.hex after logical burn
+running QA using endless loop burning hex files to build and running
+Interrupt: loading type and jumping (jal isr_label)
+
 ## tb_CPU
 lw $4,0($1)
 addi $
@@ -30,7 +36,7 @@ sw
 ### R-Type
 sll 
 srl
-jr-
+jr- opc=000000, funct=001000
 add
 sub
 mul
@@ -46,9 +52,9 @@ slti
 andi
 ori
 xori
-lui-
+lui- opc=001111
 lw
 sw
 ### J-Type
 j
-jal-
+jal- opc=000011

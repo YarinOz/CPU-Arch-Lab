@@ -20,11 +20,17 @@ type RAM is array (0 to dept-1) of
 	std_logic_vector(Dwidth-1 downto 0);
 signal sysRAM : RAM;
 
-begin			   
+begin			 
+
+  -- Combinational read process
+  process(RmemAddr)
+  begin
+    	RmemData <= sysRAM(conv_integer(RmemAddr));
+  end process;
+
   process(clk)
   begin
 	if (clk'event and clk='1') then
-		RmemData <= sysRAM(conv_integer(RmemAddr));
 	    if (memEn='1') then
 		    -- index is type of integer so we need to use 
 			-- buildin function conv_integer in order to change the type

@@ -7,8 +7,8 @@ use ieee.std_logic_textio.all;
 
 entity tb_CPU is
     constant dataMemResult:      string(1 to 82) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/DTCMcontent.txt";
-    constant dataMemLocation:    string(1 to 79) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/DTCMinit.txt";
-    constant progMemLocation:    string(1 to 79) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/ITCMinit.txt";
+    constant dataMemLocation:    string(1 to 79) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/DTCMinit.hex";
+    constant progMemLocation:    string(1 to 79) := "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/ITCMinit.hex";
 end tb_CPU;
 
 architecture testbench of tb_CPU is
@@ -117,6 +117,7 @@ begin
         end loop;
         init <= '0';
 
+        wait for clk_period / 2;
         wait;
     end process;
 

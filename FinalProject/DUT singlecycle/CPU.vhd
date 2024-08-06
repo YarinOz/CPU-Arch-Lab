@@ -31,6 +31,7 @@ architecture behav of CPU is
     signal RegDst, MemRead, MemtoReg, MemWrite, RegWrite, Branch, jump, ALUsrc: std_logic;
     signal ALUop: std_logic_vector(5 downto 0);
     signal opcode, funct: std_logic_vector(5 downto 0);
+    signal PCSrc: std_logic_vector(1 downto 0);
     
     -- Signals for the Datapath
     signal DataOut: std_logic_vector(Dwidth-1 downto 0);
@@ -52,6 +53,7 @@ CONTROLUNITEN: ControlUnit
         jump => jump,
         ALUsrc => ALUsrc,
         ALUop => ALUop,
+        PCSrc => PCSrc,
         opcode => opcode,
         funct => funct
 );
@@ -76,6 +78,7 @@ DATAPATHUNIT: Datapath
         jump => jump,
         ALUsrc => ALUsrc,
         ALUop => ALUop,
+        PCSrc => PCSrc,
         opcode => opcode,
         funct => funct,
         progMemEn => progMemEn,

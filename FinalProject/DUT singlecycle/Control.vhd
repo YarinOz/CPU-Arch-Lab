@@ -11,7 +11,8 @@ entity ControlUnit is
         opcode, funct: in std_logic_vector(5 downto 0);
         -- Control signals for the datapath
         RegDst, MemRead, MemtoReg, MemWrite, RegWrite, Branch, jump, ALUsrc: out std_logic;
-        ALUop: out std_logic_vector(5 downto 0)
+        ALUop: out std_logic_vector(5 downto 0);
+        PCSrc: out std_logic_vector(1 downto 0)
     );
 end ControlUnit;
 
@@ -34,8 +35,10 @@ begin
     RegWrite <= '0' when ((RType='1' and funct="001000") or opcode = "000010" or opcode = "000011" or opcode = "000100" or opcode = "000101" or opcode = "101011") else '1';
     -- jump: j, jal, jr
     jump <= '1' when (opcode="000010" or opcode="000011" or (RType='1' and funct="001000")) else '0';
-    -- ALUsrc: sw,addi,slti,andi,ori,xori,sll,srl : 1, add,addu,sub,and,or,xor,slt : 0
-    ALUsrc <= '1' when (opcode = "101011" or opcode = "001000" or opcode = "001010" or opcode = "001100" or opcode = "001101" or opcode = "001110" or (RType='1' and (funct = "000000" or funct = "000010"))) else '0';
+    -- PCSrc: j-01,jal-10,jr-11
+    PCSrc <= "11" when (RType='1' and funct="001000") else "10" when opcode="000011" else "01" when opcode="000010" else "00";
+    -- ALUsrc: sw,lw,addi,slti,andi,ori,xori,sll,srl : 1, add,addu,sub,and,or,xor,slt : 0
+    ALUsrc <= '1' when (opcode = "101011" or opcode = "100011" or opcode = "001000" or opcode = "001010" or opcode = "001100" or opcode = "001101" or opcode = "001110" or (RType='1' and (funct = "000000" or funct = "000010"))) else '0';
     ALUop <= funct when RType='1' else opcode; -- ALU control signal
 
 end behavioral;
