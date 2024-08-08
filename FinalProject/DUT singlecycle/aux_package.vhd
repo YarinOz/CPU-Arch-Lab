@@ -123,7 +123,7 @@ package aux_package is
 		Awidth: integer := 5;
 		dept: integer := 64
 	);
-	port(clk : in std_logic;
+	port(clk, init : in std_logic;
 		-- Read program memory
 		RmemAddr:	in std_logic_vector(Awidth-1 downto 0);
 		RmemData: 	out std_logic_vector(Dwidth-1 downto 0);

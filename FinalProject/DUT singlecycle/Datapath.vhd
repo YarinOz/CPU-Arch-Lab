@@ -62,7 +62,7 @@ architecture behav of Datapath is
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
-flash: progMem generic map (Dwidth, Awidth, dept) port map (clk, PCprogAddress, instruction, progMemEn, progWriteAddr, progDataIn);
+flash: progMem generic map (Dwidth, Awidth, dept) port map (clk, init, PCprogAddress, instruction, progMemEn, progWriteAddr, progDataIn);
 ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, RamEN, RamWrite, WMUX, WMUX, DataOut);
 registerfile: RF generic map (Dwidth,Awidth) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
 ALUnit: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout); -- B-A, B+A
@@ -77,7 +77,7 @@ funct <= instruction(5 downto 0) when init='0' else (others => '1');
 -- Immediate and address signals (sign extension and shift left 2 for address alignment) 
 imm <= SXT(instruction(15 downto 0), Dwidth);
 -- 28 bits address after shifting left 2
-address <= instruction(25 downto 0) & "00";
+address <= "00" & instruction(25 downto 0);
 
 -- Program counter address to program memory
 PCprogAddress <= PCout(Awidth-1 downto 0) when init='0' else (others => 'Z');
