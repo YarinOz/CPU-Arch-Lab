@@ -1,6 +1,7 @@
 # CPU and Hardware Accelerators - Final Project
 
 -- remove delta in TB: configure list -delta collapse
+-- Compiled using VHDL_2008
 
 ## notes to do:
 1. now working with minimal ALU
@@ -30,6 +31,7 @@ addi $
 sw 
 
 -- add support for left instruction and make sure they work
+-- finish working to make all ISA work
 
 -- slt, slti if needed change 1 location
 ## ISA supports

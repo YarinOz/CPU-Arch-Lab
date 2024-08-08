@@ -101,9 +101,12 @@ begin
             dataDataIn <= data_value;
             dataMemEn <= '1';
             wait for clk_period;
-            dataMemEn <= '0';
             addr := addr + 1;
         end loop;
+        dataMemEn <= '0';
+        file_close(data_file);
+
+        wait for 2 * clk_period;
 
         -- Read and initialize program memory from file
         addr := 0;
@@ -114,9 +117,10 @@ begin
             progDataIn <= instruction_value;
             progMemEn <= '1';
             wait for clk_period;
-            progMemEn <= '0';
             addr := addr + 1;
         end loop;
+        progMemEn <= '0';
+        file_close(instruction_file);
         wait for 2 * clk_period;
         init <= '0';
 

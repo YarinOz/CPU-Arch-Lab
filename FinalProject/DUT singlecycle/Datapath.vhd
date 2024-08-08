@@ -40,7 +40,6 @@ architecture behav of Datapath is
     signal PCprogAddress: std_logic_vector(Awidth-1 downto 0);
 
     -- Memory signals
-    signal progDataOut: std_logic_vector(Dwidth-1 downto 0);
     signal RamWrite: std_logic_vector(Dwidth-1 downto 0);
     signal WMUX: std_logic_vector(Awidth-1 downto 0);
     signal RamEN: std_logic;
@@ -81,7 +80,7 @@ imm <= SXT(instruction(15 downto 0), Dwidth);
 address <= instruction(25 downto 0) & "00";
 
 -- Program counter address to program memory
-PCprogAddress <= PCout(Awidth-1 downto 0);
+PCprogAddress <= PCout(Awidth-1 downto 0) when init='0' else (others => 'Z');
 
 -- ALU to memory address
 ALUmemWrite <= ALUout(Awidth-1 downto 0);
