@@ -52,6 +52,7 @@ architecture behav of Datapath is
     signal shamt: std_logic_vector(4 downto 0);
     signal bcond: std_logic;
     signal ALUMUX: std_logic_vector(Dwidth-1 downto 0);
+    signal ALUOPT: std_logic_vector(Dwidth-1 downto 0);
     signal RFMUX: std_logic_vector(Awidth-1 downto 0);
     signal RFWDataMUX: std_logic_vector(Dwidth-1 downto 0);
     signal RFData1, RFData2: std_logic_vector(Dwidth-1 downto 0);
@@ -65,7 +66,7 @@ begin
 flash: progMem generic map (Dwidth, Awidth, dept) port map (clk, init, PCprogAddress, instruction, progMemEn, progWriteAddr, progDataIn);
 ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, RamEN, RamWrite, WMUX, WMUX, DataOut);
 registerfile: RF generic map (Dwidth,Awidth) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
-ALUnit: ALU generic map (Dwidth) port map (RFData1, ALUMUX, ALUop, ALUout); -- B-A, B+A
+ALUnit: ALU generic map (Dwidth) port map (ALUOPT, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -----------------------------------------------------------------------------------------------
 -- Instruction signals
 opcode <= instruction(31 downto 26) when init='0' else (others => '1');
@@ -107,6 +108,8 @@ RFMUX <= rt when (RegDst = '0') else X"1F" when (PCSrc="10") else rd;
 RFWDataMUX <= ALUout when MemtoReg = '0' else (PCout + 1) when (PCSrc="10") else DataOut;
 
 -- ALU connectivity
+-- rs or shamt for shift operations
+ALUOPT <= ("000000000000000000000000000" & shamt) when (opcode="000000" and (funct = "000000" or funct = "000010")) else RFData1;
 ALUMUX <= RFData2 when ALUsrc = '0' else imm;
 -----------------------------------------------------------------------------------------------
     -- Program counter process

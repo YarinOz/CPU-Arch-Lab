@@ -23,7 +23,8 @@ begin
     RType <= '1' when opcode = "000000" else '0';
 
     -- OPC decoder 
-    RegDst <= '1' when RType = '1' else '0';
+    -- RType and mul
+    RegDst <= '1' when (RType = '1' or opcode = "011100") else '0';
     -- branch: beq, bne
     Branch <= '1' when (opcode="000100" or opcode="000101") else '0';
     -- MemRead: lw
@@ -37,8 +38,8 @@ begin
     jump <= '1' when (opcode="000010" or opcode="000011" or (RType='1' and funct="001000")) else '0';
     -- PCSrc: j-01,jal-10,jr-11
     PCSrc <= "11" when (RType='1' and funct="001000") else "10" when opcode="000011" else "01" when opcode="000010" else "00";
-    -- ALUsrc: sw,lw,addi,slti,andi,ori,xori,sll,srl : 1, add,addu,sub,and,or,xor,slt : 0
-    ALUsrc <= '1' when (opcode = "101011" or opcode = "100011" or opcode = "001000" or opcode = "001010" or opcode = "001100" or opcode = "001101" or opcode = "001110" or (RType='1' and (funct = "000000" or funct = "000010"))) else '0';
+    -- ALUsrc: sw,lw,addi,slti,andi,ori,xori : 1, add,addu,sub,and,or,xor,slt,sll,srl : 0
+    ALUsrc <= '1' when (opcode = "101011" or opcode = "100011" or opcode = "001000" or opcode = "001010" or opcode = "001100" or opcode = "001101" or opcode = "001110") else '0';
     ALUop <= funct when RType='1' else opcode; -- ALU control signal
 
 end behavioral;
