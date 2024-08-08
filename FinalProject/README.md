@@ -30,8 +30,8 @@ lw $4,0($1)
 addi $
 sw 
 
--- add support for left instruction and make sure they work
 -- finish working to make all ISA work
+-- FIND IF PC NEEDS PC+4 AND HOW ITS IMPLEMENTED IN TEXT
 
 -- slt, slti if needed change 1 location
 ## ISA supports
