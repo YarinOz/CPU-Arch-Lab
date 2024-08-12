@@ -3,6 +3,8 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 use work.aux_package.all;
+library altera_mf;
+use altera_mf.altera_mf_components.all;
 
 entity Datapath is
 generic(
@@ -67,6 +69,41 @@ flash: progMem generic map (Dwidth, Awidth, dept) port map (clk, init, PCprogAdd
 ram: dataMem generic map (Dwidth, Awidth, dept) port map (clk, RamEN, RamWrite, WMUX, WMUX, DataOut);
 registerfile: RF generic map (Dwidth,Awidth) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
 ALUnit: ALU generic map (Dwidth) port map (ALUOPT, ALUMUX, ALUop, ALUout); -- B-A, B+A
+-----------------------------------------------------------------------------------------------
+-------------------- Data/Program Memory -------------------------------------------------------
+ProgMen: altsyncram
+generic map (
+    operation_mode => "ROM",
+    width_A => Dwidth,
+    widthad_A => Awidth,
+    lpm_type => "altsyncram",
+    outdata_reg_a => "UNREGISTERED",
+    init_file => "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/DUT/program/ITCM.hex",
+    intended_device_family => "Cyclone"
+)
+port map (
+    clock0 => clk,
+    address_a => PCprogAddress,
+    q_a => instruction
+);
+
+DataMem: altsyncram
+generic map (
+    operation_mode => "SINGLE_PORT",
+    width_A => Dwidth,
+    widthad_A => Awidth,
+    lpm_type => "altsyncram",
+    outdata_reg_a => "UNREGISTERED",
+    init_file => "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/DUT/program/DTCM.hex"
+    intended_device_family => "Cyclone"
+)
+port map (
+    clock0 => clk,
+    address_a => WMUX,
+    data_a => RamWrite,
+    wren_a => RamEN,
+    q_a => DataOut
+);
 -----------------------------------------------------------------------------------------------
 -- Instruction signals
 opcode <= instruction(31 downto 26) when init='0' else (others => '1');

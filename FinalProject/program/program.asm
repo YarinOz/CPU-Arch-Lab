@@ -1,8 +1,10 @@
-# Program starts at address 0x00000000
+.data
+    A: .word 10
+
 .text
 main:
     # Load values from data memory into registers
-    lw $a0, 0x0001($zero)    # $a0 = DTCM[0x0001] = 10
+    lw $a0, A    # $a0 = DTCM[0x0001] = 10
     addi $a1, $zero, 15      # $a1 = 15
 
     # R-Type Instructions
