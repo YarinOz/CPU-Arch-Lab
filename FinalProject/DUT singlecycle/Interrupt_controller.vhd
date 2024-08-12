@@ -3,30 +3,34 @@ USE ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 USE work.aux_package.all;
---------- System IO Controller with FPGA ---------------
-ENTITY IO_Controller IS
-  GENERIC (	ControlBusWidth : integer := 8;
-			AddressBusWidth : integer := 32;
-			DataBusWidth : integer := 32); 
+--------- System Interrupt Controller with FPGA ---------------
+ENTITY InterruptController IS
+  GENERIC (AddressBusWidth : integer := 32;
+			DataBusWidth : integer := 32;
+            IRQSize : integer := 7;
+            REGSize : integer := 8); 
   PORT (
 		  -- control signals
 		  clk, rst, MemReadBus, MemWriteBus : in std_logic;
 		  -- Busses
 		  AddressBus : in std_logic_vector(AddressBusWidth-1 downto 0);
 		  DataBus : inout std_logic_vector(DataBusWidth-1 downto 0);
-		  -- Switch Port
-		  SW : in std_logic_vector(9 downto 0);
-		  -- Keys Ports
-		  KEY0, KEY1, KEY2, KEY3 : in std_logic;
-		  -- 7 segment Ports
-		  HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: out std_logic_vector(6 downto 0);
-		  -- Leds Port
-		  LEDs : out std_logic_vector(9 downto 0)
+		  -- Interrupt Source irq0-irq6
+		  IntSRC : in std_logic_vector(IRQSize-1 downto 0);
+		  -- Interrupt Control
+		  ChipSelect: in std_logic;
+          ClrIRQ: in std_logic;
+          GIE: in std_logic;
+          IntActive: out std_logic;
+          -- Interrupt Request and Acknowledge
+          IntReq: out std_logic;
+          IntAck: in std_logic;
   );
-END IO_Controller;
+END InterruptController;
 ------------------------------------------------
-ARCHITECTURE struct OF IO_Controller IS 
-	signal CS_LED, CS_HEX0, CS_HEX1,CS_HEX2,CS_HEX3,CS_HEX4,CS_HEX5, CS_SW, CS_KEY : std_logic;
+ARCHITECTURE struct OF InterruptController IS 
+	signal IE, IFG : std_logic_vector(IRQSize-1 downto 0);
+    signal TypeREG : std_logic_vector(REGSize-1 downto 0);
 BEGIN
 	-------------------Chip Select Decorder---------------------------
 	CS_LED <= '0' when rst = '1' else '1' when AddressBus = X"800" else '0';
