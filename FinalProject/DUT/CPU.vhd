@@ -4,24 +4,13 @@ use work.aux_package.all;
 
 entity CPU is
     generic(Dwidth: integer := 32;
-            Awidth: integer := 5;
-            Regwidth: integer := 4;
-            dept: integer := 64
+            Awidth: integer := 8;
+            Regwidth: integer := 8
     );
-    port(clk,rst, init: in std_logic;
+    port(clk,rst, ena: in std_logic;
          AddressBus: in std_logic_vector(Dwidth-1 downto 0);
          ControlBus: inout std_logic_vector(15 downto 0);
-         DataBus: inout std_logic_vector(Dwidth-1 downto 0);
-         -- Test bench signals
-        -- -- program memory signals
-        progMemEn: in std_logic;
-        progDataIn: in std_logic_vector(Dwidth-1 downto 0);
-        progWriteAddr: in std_logic_vector(Awidth-1 downto 0);
-        -- -- -- data memory signals
-        dataMemEn: in std_logic;
-        dataDataIn: in std_logic_vector(Dwidth-1 downto 0);
-        dataWriteAddr: in std_logic_vector(Awidth-1 downto 0);
-        dataDataOut: out std_logic_vector(Dwidth-1 downto 0)
+         DataBus: inout std_logic_vector(Dwidth-1 downto 0)
     );
 
 end CPU;
@@ -62,13 +51,12 @@ DATAPATHUNIT: Datapath
     generic map (
         Dwidth => Dwidth,
         Awidth => Awidth,
-        Regwidth => Regwidth,
-        dept => dept
+        Regwidth => Regwidth
         )
     port map(
         clk => clk,
         rst => rst,
-        init => init,
+        ena => ena,
         RegDst => RegDst,
         MemRead => MemRead,
         MemtoReg => MemtoReg,
@@ -80,16 +68,7 @@ DATAPATHUNIT: Datapath
         ALUop => ALUop,
         PCSrc => PCSrc,
         opcode => opcode,
-        funct => funct,
-        progMemEn => progMemEn,
-        progDataIn => progDataIn,
-        progWriteAddr => progWriteAddr,
-        dataMemEn => dataMemEn,
-        dataDataIn => dataDataIn,
-        dataWriteAddr => dataWriteAddr,
-        dataDataOut => DataOut
+        funct => funct
 );
--- for writing the data to the output port
-dataDataOut <= DataOut;
 
 end behav;
