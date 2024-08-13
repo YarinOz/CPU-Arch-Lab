@@ -6,7 +6,8 @@ package aux_package is
 	component CPU is
 	generic(Dwidth: integer := 32;
 			Awidth: integer := 8;
-			Regwidth: integer := 8
+			Regwidth: integer := 8;
+			sim: boolean := true
 	);
     port(clk,rst,ena: in std_logic;
 		AddressBus: in std_logic_vector(Dwidth-1 downto 0);
@@ -48,7 +49,8 @@ package aux_package is
 		generic(
 			Dwidth: integer;
 			Awidth: integer;
-			Regwidth: integer
+			Regwidth: integer;
+			sim: boolean
 		);
 	port(	
 		clk, rst, ena: in std_logic;

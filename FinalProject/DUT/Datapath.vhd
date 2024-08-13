@@ -10,7 +10,8 @@ entity Datapath is
 generic(
     Dwidth: integer;
     Awidth: integer;
-    Regwidth: integer
+    Regwidth: integer;
+    sim: boolean
 );
 port(
     clk, rst, ena: in std_logic;
@@ -29,12 +30,12 @@ architecture behav of Datapath is
 
     -- Memory signals
     signal RamWrite: std_logic_vector(Dwidth-1 downto 0);
-    signal WMUX: std_logic_vector(Awidth-1 downto 0);
     signal RamEN: std_logic;
+    signal DmemAddr, ImemAddr: std_logic_vector(Awidth-1 downto 0);
 
     -- Instruction signals
     signal instruction: std_logic_vector(Dwidth-1 downto 0);
-    signal imm, address : std_logic_vector(Dwidth-1 downto 0);
+    signal imm, address, immPC: std_logic_vector(Dwidth-1 downto 0);
     signal rs, rt, rd: std_logic_vector(4 downto 0);
     signal shamt: std_logic_vector(4 downto 0);
     signal bcond: std_logic;
@@ -44,7 +45,6 @@ architecture behav of Datapath is
     signal RFData1, RFData2: std_logic_vector(Dwidth-1 downto 0);
     signal ALUout: std_logic_vector(Dwidth-1 downto 0);
     -- ALU to memory address
-    signal ALUmemAddr: std_logic_vector(Awidth-1 downto 0);
     signal DataOut: std_logic_vector(Dwidth-1 downto 0);
 
 begin 
@@ -64,7 +64,7 @@ generic map (
 )
 port map (
     clock0 => clk,
-    address_a => PC(Awidth-1 downto 0),
+    address_a => ImemAddr,
     q_a => instruction
 );
 
@@ -80,11 +80,23 @@ generic map (
 )
 port map (
     clock0 => clk,
-    address_a => ALUmemAddr,
+    address_a => DmemAddr,
     data_a => RamWrite,
     wren_a => RamEN,
     q_a => DataOut
 );
+--------------------- Simulataion and FPGA -----------------------------------------------------
+-- Memory address
+ModelSim:
+if sim = true generate
+    ImemAddr <= "00" & PC(Awidth-1 downto 2);
+    DmemAddr <= "00" & ALUout(Awidth-1 downto 2);
+end generate;
+FPGA:
+if sim = false generate
+    DmemAddr <= PC(Awidth-1 downto 0);
+    DmemAddr <= ALUout(Awidth-1 downto 0);
+end generate;
 -----------------------------------------------------------------------------------------------
 -- Instruction signals
 opcode <= instruction(31 downto 26) when ena='1' else (others => '1');
@@ -93,13 +105,12 @@ rt <= instruction(20 downto 16);
 rd <= instruction(15 downto 11);
 shamt <= instruction(10 downto 6);
 funct <= instruction(5 downto 0) when ena='1' else (others => '1');
--- Immediate and address signals (sign extension and shift left 2 for address alignment) 
-imm <= SXT(instruction(15 downto 0), Dwidth-2) & "00";
+-- Immediate and address signals (sign extension) 
+imm <= SXT(instruction(15 downto 0), Dwidth);
+-- Immediate for branch and jump instructions
+immPC <= imm(Dwidth-3 downto 0) & "00";
 -- 28 bits address after shifting left 2
 address <= PCplus4(31 downto 28) & instruction(25 downto 0) & "00";
-
--- ALU to memory address
-ALUmemAddr <= ALUout(Awidth-1 downto 0);
 
 -- Memory enaialization
 RamWrite <= RFData2;
@@ -146,7 +157,7 @@ PCplus4 <= PC + 4;
                         PC <= PCplus4;
                 end case;
             elsif (bcond = '1' and branch = '1') then
-                PC <= PCplus4 + imm; -- Branch taken
+                PC <= PCplus4 + immPC; -- Branch taken
             else
                 PC <= PCplus4;  -- Branch not taken
             end if;

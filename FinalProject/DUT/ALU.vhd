@@ -62,14 +62,14 @@ architecture Behavioral of ALU is
                 when "101010" =>  -- slt
                     if A_int < B_int then
                         Result <= (others => '0');
-                        Result(Dwidth-1) <= '1';
+                        Result(0) <= '1';
                     else
                         Result <= (others => '0');
                     end if;
                 when "001010" =>  -- slti
                     if A_int < B_int then
                         Result <= (others => '0');
-                        Result(Dwidth-1) <= '1';
+                        Result(0) <= '1';
                     else
                         Result <= (others => '0');
                     end if;

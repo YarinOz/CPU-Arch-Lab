@@ -16,7 +16,8 @@
 - add support for keys and find what is their purpose
 
 ## notes to keep:
-1. in order to init the memory manually use tb_CPU.
+1. in order to init the memory manually use tb_FILE.
+2. ISA is ready, left to connect HW accelerators
 
 
 ! ask HANAN: explain IO and how many 
@@ -30,10 +31,6 @@ lw $4,0($1)
 addi $
 sw 
 
--- finish working to make all ISA work
--- FIND IF PC NEEDS PC+4 AND HOW ITS IMPLEMENTED IN TEXT
-
--- slt, slti if needed change 1 location
 ## ISA supports
 ### R-Type
 sll 
