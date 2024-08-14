@@ -18,6 +18,7 @@
 ## notes to keep:
 1. in order to init the memory manually use tb_FILE.
 2. ISA is ready, left to connect HW accelerators
+3. ram stores data need to fix addressing to ram exact spot and ram is writing when is not clk need to find out.
 
 
 ! ask HANAN: explain IO and how many 

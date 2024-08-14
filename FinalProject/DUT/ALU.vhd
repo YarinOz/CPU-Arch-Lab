@@ -76,6 +76,8 @@ architecture Behavioral of ALU is
                 when "011100" =>  -- mul
                     mul_result := std_logic_vector(signed(A) * signed(B));
                     Result <= mul_result(Dwidth-1 downto 0);
+                when "001111" =>  -- lui
+                    Result <= B(15 downto 0) & A(15 downto 0);
                 when others =>
                     Result <= (others => '0');
             end case;

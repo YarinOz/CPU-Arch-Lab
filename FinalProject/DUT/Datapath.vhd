@@ -36,7 +36,7 @@ architecture behav of Datapath is
     -- Instruction signals
     signal instruction: std_logic_vector(Dwidth-1 downto 0);
     signal imm, address, immPC: std_logic_vector(Dwidth-1 downto 0);
-    signal rs, rt, rd: std_logic_vector(4 downto 0);
+    signal rs, rt, rd, LUIMUX: std_logic_vector(4 downto 0);
     signal shamt: std_logic_vector(4 downto 0);
     signal bcond: std_logic;
     signal ALUMUX, ALUOPT: std_logic_vector(Dwidth-1 downto 0);
@@ -49,7 +49,7 @@ architecture behav of Datapath is
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
-registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, rs, rt, RFData1, RFData2);
+registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, LUIMUX, rt, RFData1, RFData2);
 ALUnit: ALU generic map (Dwidth) port map (ALUOPT, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -------------------- Data/Program Memory -------------------------------------------------------
 ProgMen: altsyncram
@@ -79,7 +79,7 @@ generic map (
     intended_device_family => "Cyclone"
 )
 port map (
-    clock0 => clk,
+    clock0 => not clk,
     address_a => DmemAddr,
     data_a => RamWrite,
     wren_a => RamEN,
@@ -105,12 +105,14 @@ rt <= instruction(20 downto 16);
 rd <= instruction(15 downto 11);
 shamt <= instruction(10 downto 6);
 funct <= instruction(5 downto 0) when ena='1' else (others => '1');
--- Immediate and address signals (sign extension) 
+-- Immediate and address signals (sign extension)(if lui imm = imm << 16) 
 imm <= SXT(instruction(15 downto 0), Dwidth);
 -- Immediate for branch and jump instructions
 immPC <= imm(Dwidth-3 downto 0) & "00";
 -- 28 bits address after shifting left 2
 address <= PCplus4(31 downto 28) & instruction(25 downto 0) & "00";
+-- RF change RFDATA1 for LUI (imm(31:16)&rt(15:0)->rt)
+LUIMUX <= rt when opcode="001111" else rs;
 
 -- Memory enaialization
 RamWrite <= RFData2;
@@ -127,8 +129,8 @@ begin
 end process;    
 
 -- RF connectivity (for jal, r31 <= PC + 1)
-RFMUX <= rt when (RegDst = '0') else "11111" when (PCSrc="10") else rd;
-RFWDataMUX <= ALUout when MemtoReg = '0' else (PCplus4) when (PCSrc="10") else DataOut;
+RFMUX <= rt when (RegDst = '0' and PCsrc /= "10") else "11111" when (PCSrc="10") else rd;
+RFWDataMUX <= ALUout when ((MemtoReg = '0' or opcode="001111") and PCsrc /= "10") else (PCplus4) when (PCSrc="10") else DataOut;
 
 -- ALU connectivity
 -- rs or shamt for shift operations
