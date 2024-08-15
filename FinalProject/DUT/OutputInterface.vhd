@@ -35,7 +35,7 @@ begin
     -- Generate the output
     SEVSEG: if (SevenSegment = true) generate
                 -- 7-segment display
-                SevenSegmentDisplay: entity SegmentDecoder
+                SevenSegmentDisplay: SegmentDecoder
                     port map (data => AUXREG(3 downto 0), seg => IO_Out); -- 7 bit output (trunked)
             end generate SEVSEG;
 

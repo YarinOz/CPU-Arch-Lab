@@ -3,14 +3,14 @@ use IEEE.STD_LOGIC_1164.all;
 use work.aux_package.all;
 
 entity CPU is
-    generic(Dwidth: integer := 32;
-            Awidth: integer := 8;
-            Regwidth: integer := 8;
-            sim: boolean := true
+    generic(Dwidth: integer;
+            Awidth: integer;
+            Regwidth: integer;
+            sim: boolean
     );
     port(clk,rst, ena: in std_logic;
-         AddressBus: in std_logic_vector(Dwidth-1 downto 0);
-         ControlBus: inout std_logic_vector(15 downto 0);
+         AddressBus: out std_logic_vector(Awidth-1 downto 0);
+         ControlBus: out std_logic_vector(15 downto 0);-- optional
          DataBus: inout std_logic_vector(Dwidth-1 downto 0)
     );
 
@@ -25,7 +25,7 @@ architecture behav of CPU is
     
     -- Signals for the Datapath
     signal DataOut: std_logic_vector(Dwidth-1 downto 0);
-    signal Instruction: std_logic_vector(Dwidth-1 downto 0);
+    signal Control: std_logic_vector(Dwidth-1 downto 0);
     signal Address: std_logic_vector(Awidth-1 downto 0);
 
 begin
@@ -70,7 +70,16 @@ DATAPATHUNIT: Datapath
         ALUop => ALUop,
         PCSrc => PCSrc,
         opcode => opcode,
-        funct => funct
+        funct => funct,
+        AddrBus => Address,
+        DataBus => DataOut,
+        ControlBus => Control
 );
+
+-- Data bus write to IO
+DataBus <= DataOut when ((MemWrite='1') and (ena = '1')) else (others => 'Z');
+-- Memory address to address bus when load/store (IO)
+AddressBus <= Address when ((MemWrite='1' or MemRead='1') and (ena = '1')) else (others => '0');
+-- need to add the control bus to the port map (WIP)
 
 end behav;

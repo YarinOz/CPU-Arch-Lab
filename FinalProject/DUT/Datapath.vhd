@@ -20,7 +20,13 @@ port(
     ALUop: in std_logic_vector(5 downto 0);
     PCSrc: in std_logic_vector(1 downto 0);
     -- status signals
-    opcode, funct: out std_logic_vector(5 downto 0)
+    opcode, funct: out std_logic_vector(5 downto 0);
+    -- MEM/IO signals
+    -- Busses
+    AddrBus: out std_logic_vector(Awidth-1 downto 0);
+    DataBus: inout std_logic_vector(Dwidth-1 downto 0);
+    ControlBus: out std_logic_vector(15 downto 0)
+
 );
 end Datapath;
  
@@ -117,6 +123,9 @@ LUIMUX <= rt when opcode="001111" else rs;
 -- Memory enaialization
 RamWrite <= RFData2;
 RamEN <= MemWrite and ena;
+-- Busses
+AddrBus <= DmemAddr;
+DataBus <= RamWrite;
 
 -- Branch condition
 process(opcode, rs, rt)

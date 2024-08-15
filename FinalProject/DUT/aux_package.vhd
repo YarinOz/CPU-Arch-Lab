@@ -2,12 +2,30 @@ library IEEE;
 use ieee.std_logic_1164.all;
 
 package aux_package is
+
 --------------------------------------------------------
-	component CPU is
+	component MCU is
 	generic(Dwidth: integer := 32;
 			Awidth: integer := 8;
+			Cwidth: integer := 16;
 			Regwidth: integer := 8;
+			IRQSize : integer := 7;
 			sim: boolean := true
+	);
+	port(clk,rst, ena: in std_logic;
+		SW : in std_logic_vector(9 downto 0);
+		KEY0, KEY1, KEY2, KEY3 : in std_logic;
+		HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(6 downto 0);
+		LEDs: out std_logic_vector(7 downto 0);
+		BTOUT: out std_logic
+	);
+	end component;
+--------------------------------------------------------
+	component CPU is
+	generic(Dwidth: integer;
+			Awidth: integer;
+			Regwidth: integer;
+			sim: boolean
 	);
     port(clk,rst,ena: in std_logic;
 		AddressBus: in std_logic_vector(Dwidth-1 downto 0);
@@ -59,7 +77,11 @@ package aux_package is
 		ALUop: in std_logic_vector(5 downto 0);
 		PCSrc: in std_logic_vector(1 downto 0);
 		-- status signals
-		opcode, funct: out std_logic_vector(5 downto 0)
+		opcode, funct: out std_logic_vector(5 downto 0);
+		-- Busses
+		AddrBus: out std_logic_vector(Awidth-1 downto 0);
+		DataBus: inout std_logic_vector(Dwidth-1 downto 0);
+		ControlBus: out std_logic_vector(15 downto 0)
 	);
 	end component;	
 ---------------------------------------------------------	
