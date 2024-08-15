@@ -1,5 +1,9 @@
 .data
     A: .word 10
+    B: .word 15
+    C: .word 25
+    D: .word 8
+    E: .word 5
 
 .text
 main:
@@ -24,7 +28,11 @@ main:
     xori $t7, $a0, 0xFF      # $t7 = $a0 ^ 0xFF
     lui $t4, 0x1234          # $t8 = 0x12340000
     lw $t9, 0x0006($a0)      # Load word from memory address ($a0 + 4)
-    sw $t4, 0x000A($a0)      # Store word to memory address ($a0 + 8)
+    sw $t4, E      # Store word to memory address ($a0 + 8)
+    sw $t5, 0x20
+    sw $t0, 0x14
+    sw $t1, 0x18
+    sw $t2, 0x1C
     jal label_subroutine      # Jump and link to label_subroutine
     j label_end               # Jump to label_end
 
