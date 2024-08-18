@@ -4,15 +4,15 @@ use IEEE.STD_LOGIC_ARITH.all;
 use work.aux_package.all;
 
 entity OutputInterface is
-    generic (SevenSegment: boolean := true;
-             Size: integer := 7); 
+    generic (SevenSegment: boolean;
+             Size: integer); 
     port (clk, rst, ChipSelect, MemRead, MemWrite: in std_logic;
-            RWData: inout std_logic_vector(7 downto 0);
-            IO_Out : out std_logic_vector(Size-1 downto 0)); -- 7 for 7-segment display, 10 for LEDs
+            RWData: inout std_logic_vector(Size-1 downto 0);
+            IO_Out : out std_logic_vector(Size-1 downto 0)); -- 8 for 7-segment display, 10 for LEDs
 end OutputInterface;
 -- Architecture
 architecture struct of OutputInterface is
-    signal AUXREG: std_logic_vector(7 downto 0);
+    signal AUXREG: std_logic_vector(Size-1 downto 0);
 begin
 
     process(clk, rst)
@@ -36,7 +36,7 @@ begin
     SEVSEG: if (SevenSegment = true) generate
                 -- 7-segment display
                 SevenSegmentDisplay: SegmentDecoder
-                    port map (data => AUXREG(3 downto 0), seg => IO_Out); -- 7 bit output (trunked)
+                    port map (data => AUXREG(3 downto 0), seg => IO_Out(6 downto 0)); -- 7 bit output (trunked)
             end generate SEVSEG;
 
     LEDS: if (SevenSegment = false) generate

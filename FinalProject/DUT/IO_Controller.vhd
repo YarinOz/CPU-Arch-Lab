@@ -5,9 +5,9 @@ use ieee.std_logic_unsigned.all;
 USE work.aux_package.all;
 --------- System IO Controller with FPGA ---------------
 ENTITY IO_Controller IS
-  GENERIC (	ControlBusWidth : integer := 8;
-			AddressBusWidth : integer := 32;
-			DataBusWidth : integer := 32); 
+  GENERIC (	ControlBusWidth : integer;
+			AddressBusWidth : integer;
+			DataBusWidth : integer); 
   PORT (
 		  -- control signals
 		  clk, rst, MemReadBus, MemWriteBus : in std_logic;
@@ -16,10 +16,8 @@ ENTITY IO_Controller IS
 		  DataBus : inout std_logic_vector(DataBusWidth-1 downto 0);
 		  -- Switch Port
 		  SW : in std_logic_vector(9 downto 0);
-		  -- Keys Ports
-		  KEY0, KEY1, KEY2, KEY3 : in std_logic;
 		  -- 7 segment Ports
-		  HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: out std_logic_vector(6 downto 0);
+		  HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: out std_logic_vector(7 downto 0);
 		  -- Leds Port
 		  LEDs : out std_logic_vector(9 downto 0)
   );
@@ -37,10 +35,9 @@ BEGIN
 	CS_HEX4 <= '0' when rst = '1' else '1' when AddressBus = X"80C" else '0';
 	CS_HEX5 <= '0' when rst = '1' else '1' when AddressBus = X"80D" else '0';
 	CS_SW <= '0' when rst = '1' else '1' when AddressBus = X"810" else '0';
-	CS_KEY <= '0' when rst = '1' else '1' when AddressBus = X"814" else '0';
 
-	LEDS: OutputInterface 
-	generic map (SevenSegment => false, LEDSize => 10)
+	LEDIM: OutputInterface 
+	generic map (SevenSegment => false, size => 10)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_LED,
@@ -50,73 +47,73 @@ BEGIN
 			IO_Out => LEDs
 			);
 
-	HEX0: OutputInterface
-	generic map (SevenSegment => true, SEGSize => 7)
+	HEXA0: OutputInterface
+	generic map (SevenSegment => true, size => 8)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX0,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(6 downto 0),
+			RWData => DataBus(7 downto 0),
 			IO_Out => HEX0
 			);
 
-	HEX1: OutputInterface
-	generic map (SevenSegment => true, SEGSize => 7)
+	HEXA1: OutputInterface
+	generic map (SevenSegment => true, size => 8)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX1,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(6 downto 0),
+			RWData => DataBus(7 downto 0),
 			IO_Out => HEX1
 			);
 
-	HEX2: OutputInterface
-	generic map (SevenSegment => true, SEGSize => 7)
+	HEXA2: OutputInterface
+	generic map (SevenSegment => true, size => 8)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX2,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(6 downto 0),
+			RWData => DataBus(7 downto 0),
 			IO_Out => HEX2
 			);
 
-	HEX3: OutputInterface
-	generic map (SevenSegment => true, SEGSize => 7)
+	HEXA3: OutputInterface
+	generic map (SevenSegment => true, size => 8)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX3,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(6 downto 0),
+			RWData => DataBus(7 downto 0),
 			IO_Out => HEX3
 			);
 
-	HEX4: OutputInterface
-	generic map (SevenSegment => true, SEGSize => 7)
+	HEXA4: OutputInterface
+	generic map (SevenSegment => true, size => 8)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX4,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(6 downto 0),
+			RWData => DataBus(7 downto 0),
 			IO_Out => HEX4
 			);
 	
-	HEX5: OutputInterface
-	generic map (SevenSegment => true, SEGSize => 7)
+	HEXA5: OutputInterface
+	generic map (SevenSegment => true, size => 8)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX5,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(6 downto 0),
+			RWData => DataBus(7 downto 0),
 			IO_Out => HEX5
 			);
 	
-	SW: InputInterface
+	SWITCHES: InputInterface
 	port map (ChipSelect => CS_SW,
 			MemRead => MemReadBus,
 			RData => DataBus,

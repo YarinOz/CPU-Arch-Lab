@@ -15,7 +15,7 @@ package aux_package is
 	port(clk,rst, ena: in std_logic;
 		SW : in std_logic_vector(9 downto 0);
 		KEY0, KEY1, KEY2, KEY3 : in std_logic;
-		HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(6 downto 0);
+		HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(7 downto 0);
 		LEDs: out std_logic_vector(7 downto 0);
 		BTOUT: out std_logic
 	);
@@ -28,8 +28,8 @@ package aux_package is
 			sim: boolean
 	);
     port(clk,rst,ena: in std_logic;
-		AddressBus: in std_logic_vector(Dwidth-1 downto 0);
-		ControlBus: inout std_logic_vector(15 downto 0);
+		AddressBus: out std_logic_vector(Awidth-1 downto 0);
+		ControlBus: out std_logic_vector(15 downto 0);
 		DataBus: inout std_logic_vector(Dwidth-1 downto 0)
     );
 	end component;
@@ -98,7 +98,7 @@ package aux_package is
 ---------------------------------------------------------
 	component ALU is
 	generic (
-		Dwidth : INTEGER := 32
+		Dwidth : INTEGER
 		);
 		PORT(
 			A, B : in std_logic_vector(Dwidth-1 downto 0);
@@ -118,17 +118,34 @@ package aux_package is
 	generic (DataBusWidth: integer := 32);
 	port (ChipSelect, MemRead: in std_logic;
 			RData: out std_logic_vector(DataBusWidth-1 downto 0);
-			IO_In : IN std_logic_vector(7 downto 0));
+			IO_In : IN std_logic_vector(9 downto 0));
 	end component;
 	---------------------------------------------------------
 	component OutputInterface is
-	generic (SevenSegment: boolean := true;
-			SEGSize: integer := 7;
-			LEDSize: integer := 10);
+	generic (SevenSegment: boolean;
+			size: integer);
 	port (clk, rst, ChipSelect, MemRead, MemWrite: in std_logic;
-			RWData: inout std_logic_vector(LEDSize-1 downto 0);
-			IO_Out : out std_logic_vector(LEDSize-1 downto 0));
+			RWData: inout std_logic_vector(size-1 downto 0);
+			IO_Out : out std_logic_vector(size-1 downto 0));
 	end component;
-	
+	---------------------------------------------------------
+	component IO_Controller is
+	GENERIC (	ControlBusWidth : integer;
+				AddressBusWidth : integer;
+				DataBusWidth : integer);
+	PORT (-- control signals
+			clk, rst, MemReadBus, MemWriteBus : in std_logic;
+			-- Busses
+			AddressBus : in std_logic_vector(AddressBusWidth-1 downto 0);
+			DataBus : inout std_logic_vector(DataBusWidth-1 downto 0);
+			-- Switch Port
+			SW : in std_logic_vector(9 downto 0);
+			-- 7 segment Ports
+			HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: out std_logic_vector(7 downto 0);
+			-- Leds Port
+			LEDs : out std_logic_vector(9 downto 0)
+	);
+	end component;
+	---------------------------------------------------------
 end aux_package;
 

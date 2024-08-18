@@ -25,10 +25,13 @@ architecture behav of CPU is
     
     -- Signals for the Datapath
     signal DataOut: std_logic_vector(Dwidth-1 downto 0);
-    signal Control: std_logic_vector(Dwidth-1 downto 0);
+    signal Control: std_logic_vector(15 downto 0);
     signal Address: std_logic_vector(Awidth-1 downto 0);
+    signal zeros: std_logic_vector(13 downto 0);
 
 begin
+
+zeros <= (others => '0');
 
 CONTROLUNITEN: ControlUnit 
     port map(
@@ -81,5 +84,6 @@ DataBus <= DataOut when ((MemWrite='1') and (ena = '1')) else (others => 'Z');
 -- Memory address to address bus when load/store (IO)
 AddressBus <= Address when ((MemWrite='1' or MemRead='1') and (ena = '1')) else (others => '0');
 -- need to add the control bus to the port map (WIP)
+ControlBus <= zeros & MemWrite & MemRead;
 
 end behav;

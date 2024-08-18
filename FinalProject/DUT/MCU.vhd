@@ -23,18 +23,17 @@ entity MCU is
     port(clk,rst, ena: in std_logic;
          SW : in std_logic_vector(9 downto 0);
          KEY0, KEY1, KEY2, KEY3 : in std_logic;
-         HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(6 downto 0);
-         LEDs: out std_logic_vector(7 downto 0);
+         HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(7 downto 0);
+         LEDs: out std_logic_vector(9 downto 0);
          BTOUT: out std_logic
     );
 
 end MCU;
 
 architecture behav of MCU is
-    signal Address: std_logic_vector(Dwidth-1 downto 0);
+    signal Address: std_logic_vector(Awidth-1 downto 0);
     signal Control: std_logic_vector(15 downto 0);
-    signal DataOut: std_logic_vector(Dwidth-1 downto 0);
-    signal DataIn: std_logic_vector(Dwidth-1 downto 0);
+    signal Data: std_logic_vector(Dwidth-1 downto 0);
 
 begin
 
@@ -51,7 +50,30 @@ MIPS_CORE: CPU
         ena => ena,
         AddressBus => Address,
         ControlBus => Control,
-        DataBus => DataOut
+        DataBus => Data
+    );
+
+GPIO: IO_Controller
+    generic map(
+        ControlBusWidth => 16,
+        AddressBusWidth => 8,
+        DataBusWidth => 32
+    )
+    port map(
+        clk => clk,
+        rst => rst,
+        MemReadBus => Control(0),
+        MemWriteBus => Control(1),
+        AddressBus => Address,
+        DataBus => Data,
+        SW => SW,
+        HEX0 => HEX0,
+        HEX1 => HEX1,
+        HEX2 => HEX2,
+        HEX3 => HEX3,
+        HEX4 => HEX4,
+        HEX5 => HEX5,
+        LEDs => LEDs
     );
 -- add submodules and HW accelerators here    
 

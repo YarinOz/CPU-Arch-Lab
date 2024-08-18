@@ -85,7 +85,7 @@ generic map (
     intended_device_family => "Cyclone"
 )
 port map (
-    clock0 => not clk,
+    clock0 => not clk, -- falling edge
     address_a => DmemAddr,
     data_a => RamWrite,
     wren_a => RamEN,
