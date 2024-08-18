@@ -17,7 +17,8 @@ package aux_package is
 		KEY0, KEY1, KEY2, KEY3 : in std_logic;
 		HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(7 downto 0);
 		LEDs: out std_logic_vector(7 downto 0);
-		BTOUT: out std_logic
+		BTOUT: out std_logic;
+		DivRES, DivQUO: out std_logic_vector(31 downto 0)
 	);
 	end component;
 --------------------------------------------------------
@@ -147,5 +148,19 @@ package aux_package is
 	);
 	end component;
 	---------------------------------------------------------
+	component Divider is
+	PORT (
+		divclk: in std_logic;
+		enable: in std_logic;
+		rst: in std_logic;
+		dividend: in std_logic_vector(31 downto 0);
+		divisor: in std_logic_vector(31 downto 0);
+		quotient: out std_logic_vector(31 downto 0);
+		residue: out std_logic_vector(31 downto 0);
+		divflg: out std_logic
+	);
+	end component;
+	---------------------------------------------------------
+
 end aux_package;
 
