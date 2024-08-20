@@ -3,21 +3,25 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
-entity CPU_tb is
-end CPU_tb;
+entity MCU_tb is
+end MCU_tb;
 
-architecture sim of CPU_tb is
+architecture sim of MCU_tb is
     -- Constants
     constant CLK_PERIOD : time := 10 ns;
 
-    -- Signals for CPU
+    -- Signals for MCU
     signal clk : std_logic := '0';
     signal rst : std_logic := '0';
     signal ena : std_logic := '0';
-    signal AddressBus : std_logic_vector(31 downto 0) := (others => '0');
-    signal ControlBus : std_logic_vector(15 downto 0) := (others => '0');
-    signal DataBus : std_logic_vector(31 downto 0) := (others => '0');
     
+    signal SW : std_logic_vector(9 downto 0);
+    signal KEY0, KEY1, KEY2, KEY3 : std_logic;
+    signal HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(7 downto 0);
+    signal LEDs : std_logic_vector(9 downto 0);
+    signal BTOUT : std_logic;
+    signal DivRES, DivQUO : std_logic_vector(31 downto 0);
+
 begin
     -- Clock generation process
     clk_process : process
@@ -53,19 +57,34 @@ begin
         wait;
     end process;
     
-    -- Instantiate the CPU
-    uut : entity work.CPU
-        generic map (
+    -- Instantiate the MCU
+
+    uut: entity work.MCU
+        generic map(
             Dwidth => 32,
-            Awidth => 8,
-            Regwidth => 8
+            Awidth => 12,
+            Regwidth => 8,
+            sim => true
         )
-        port map (
+        port map(
             clk => clk,
             rst => rst,
             ena => ena,
-            AddressBus => AddressBus,
-            ControlBus => ControlBus,
-            DataBus => DataBus
+            SW => SW,
+            KEY0 => KEY0,
+            KEY1 => KEY1,
+            KEY2 => KEY2,
+            KEY3 => KEY3,
+            HEX0 => HEX0,
+            HEX1 => HEX1,
+            HEX2 => HEX2,
+            HEX3 => HEX3,
+            HEX4 => HEX4,
+            HEX5 => HEX5,
+            LEDs => LEDs,
+            BTOUT => BTOUT,
+            DivRES => DivRES,
+            DivQUO => DivQUO
         );
+
 end sim;

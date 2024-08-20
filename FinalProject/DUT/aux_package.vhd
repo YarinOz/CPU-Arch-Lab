@@ -6,7 +6,7 @@ package aux_package is
 --------------------------------------------------------
 	component MCU is
 	generic(Dwidth: integer := 32;
-			Awidth: integer := 8;
+			Awidth: integer := 12;
 			Cwidth: integer := 16;
 			Regwidth: integer := 8;
 			IRQSize : integer := 7;

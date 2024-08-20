@@ -14,11 +14,11 @@ use work.aux_package.all;
 ------------------------------------------
 entity MCU is
     generic(Dwidth: integer := 32;
-            Awidth: integer := 8;
+            Awidth: integer := 12;
             Cwidth: integer := 16;
             Regwidth: integer := 8;
             IRQSize : integer := 7;
-            sim: boolean := true
+            sim: boolean := false -- set to true for simulation
     );
     port(clk,rst, ena: in std_logic;
          SW : in std_logic_vector(9 downto 0);
@@ -35,7 +35,7 @@ architecture behav of MCU is
     signal Address: std_logic_vector(Awidth-1 downto 0);
     signal Control: std_logic_vector(15 downto 0);
     signal Data: std_logic_vector(Dwidth-1 downto 0);
-    signal PLL_CLK: std_logic;
+    signal PLL_CLK, MCLK: std_logic;
 
     -- division unit interface
     signal DIVIFG: std_logic;
@@ -52,7 +52,9 @@ architecture behav of MCU is
 
 begin
 
-MCLK: PLL port map(
+MCLK <= clk when sim = true else PLL_CLK;
+
+MASTER_CLK: PLL port map(
     refclk => clk,
     outclk_0 => PLL_CLK
 );
@@ -65,7 +67,7 @@ MIPS_CORE: CPU
         sim => sim
     )
     port map(
-        clk => PLL_CLK,
+        clk => MCLK,
         rst => rst,
         ena => ena,
         AddressBus => Address,
@@ -76,11 +78,11 @@ MIPS_CORE: CPU
 GPIO: IO_Controller
     generic map(
         ControlBusWidth => 16,
-        AddressBusWidth => 8,
+        AddressBusWidth => 12,
         DataBusWidth => 32
     )
     port map(
-        clk => PLL_CLK,
+        clk => MCLK,
         rst => rst,
         MemReadBus => Control(0),
         MemWriteBus => Control(1),
@@ -98,7 +100,7 @@ GPIO: IO_Controller
 
 DIV: divider
     port map(
-        divclk => PLL_CLK,
+        divclk => MCLK,
         enable => ena,
         rst => rst,
         dividend => DivIn1,

@@ -63,11 +63,12 @@ generic map (
     operation_mode => "ROM",
     width_A => Dwidth,
     widthad_A => Awidth,
-	 numwords_a => 256,
+	 numwords_a => 1024,
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=ITCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/ITCM.hex",
+    init_file => "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/ITCM.hex",
+    --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/ITCM.hex",
     intended_device_family => "Cyclone"
 )
 port map (
@@ -81,11 +82,12 @@ generic map (
     operation_mode => "SINGLE_PORT",
     width_A => Dwidth,
     widthad_A => Awidth,
-	 numwords_a => 256,
+	 numwords_a => 4096,
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=DTCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/DTCM.hex",
+    init_file => "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/DTCM.hex",
+    --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/DTCM.hex",
     intended_device_family => "Cyclone"
 )
 port map (
