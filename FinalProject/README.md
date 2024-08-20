@@ -10,6 +10,7 @@
 4. add HW accelerators
 5. add FPGA IO conective layer
 5. add GPIO and basic timer
+!. fix addressing in sim being 201 instead of 804, fix loading and reading data from bus
 
 - IO CONTROLLER
 - make sure sizing in IO controller for OUTPUT is ok
