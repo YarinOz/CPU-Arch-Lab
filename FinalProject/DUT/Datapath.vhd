@@ -74,7 +74,7 @@ generic map (
     intended_device_family => "Cyclone"
 )
 port map (
-    clock0 => clk,
+    clock0 => not clk,
     address_a => ImemAddr,
     q_a => instruction
 );
@@ -140,14 +140,7 @@ AddrBus <= DmemAddr;
 DataBus <= RamWrite when (ALUout(11)='1' and MemWrite='1') else (others => 'Z'); -- Store data to memory/IO from RF
 
 -- Branch condition
-process(opcode, rs, rt)
-begin
-    if ((opcode = "000100" and rs = rt) or (opcode = "000101" and rs /= rt)) then
-        bcond <= '1';
-    else
-        bcond <= '0';
-    end if;
-end process;    
+bcond <= '1' when (opcode = "000100" and rs = rt) or (opcode = "000101" and rs /= rt) else '0';
 
 -- RF connectivity (for jal, r31 <= PC + 1)
 -- Address to RF

@@ -15,7 +15,7 @@ package aux_package is
 	port(clk,rst, ena: in std_logic;
 		SW : in std_logic_vector(9 downto 0);
 		KEY0, KEY1, KEY2, KEY3 : in std_logic;
-		HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(7 downto 0);
+		HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(6 downto 0);
 		LEDs: out std_logic_vector(7 downto 0);
 		BTOUT: out std_logic;
 		DivRES, DivQUO: out std_logic_vector(31 downto 0)
@@ -142,7 +142,7 @@ package aux_package is
 			-- Switch Port
 			SW : in std_logic_vector(9 downto 0);
 			-- 7 segment Ports
-			HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: out std_logic_vector(7 downto 0);
+			HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: out std_logic_vector(6 downto 0);
 			-- Leds Port
 			LEDs : out std_logic_vector(9 downto 0)
 	);

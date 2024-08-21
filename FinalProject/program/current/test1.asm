@@ -36,13 +36,13 @@ Loop:	lw   $t4,0x810 # read the state of PORT_SW[7-0]
 	j    Loop
 	
 Loop1:	add  $t0,$t0,$t5  # $t0=$t0+$t5
-	sw   $t0,0x800 # write to PORT_LEDR[7-0]
-	sw   $t0,0x804 # write to PORT_HEX0[7-0]
-	sw   $t0,0x805 # write to PORT_HEX1[7-0]
-	sw   $t0,0x808 # write to PORT_HEX2[7-0]
-	sw   $t0,0x809 # write to PORT_HEX3[7-0]
-	sw   $t0,0x80C # write to PORT_HEX4[7-0]
-	sw   $t0,0x80D # write to PORT_HEX5[7-0]
+	sw   $t3,0x800 # write to PORT_LEDR[7-0]
+	sw   $t3,0x804 # write to PORT_HEX0[7-0]
+	sw   $t3,0x805 # write to PORT_HEX1[7-0]
+	sw   $t3,0x808 # write to PORT_HEX2[7-0]
+	sw   $t3,0x809 # write to PORT_HEX3[7-0]
+	sw   $t3,0x80C # write to PORT_HEX4[7-0]
+	sw   $t3,0x80D # write to PORT_HEX5[7-0]
 	j    delay
 	
 Loop2:	sub  $t0,$t0,$t5  # $t0=$t0-$t5

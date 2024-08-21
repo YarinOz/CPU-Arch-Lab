@@ -23,7 +23,7 @@ entity MCU is
     port(clk,rst, ena: in std_logic;
          SW : in std_logic_vector(9 downto 0);
          KEY0, KEY1, KEY2, KEY3 : in std_logic;
-         HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(7 downto 0);
+         HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(6 downto 0);
          LEDs: out std_logic_vector(9 downto 0);
          BTOUT: out std_logic;
          DivRES, DivQUO: out std_logic_vector(31 downto 0)
@@ -52,12 +52,14 @@ architecture behav of MCU is
 
 begin
 
-MCLK <= clk when sim = true else PLL_CLK;
+    MCLK <= clk when sim = true else PLL_CLK;
 
+PLL_INST: if sim = false generate
 MASTER_CLK: PLL port map(
     refclk => clk,
     outclk_0 => PLL_CLK
-);
+    );
+end generate PLL_INST;
 
 MIPS_CORE: CPU 
     generic map(

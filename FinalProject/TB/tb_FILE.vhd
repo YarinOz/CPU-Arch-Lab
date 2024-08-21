@@ -17,7 +17,7 @@ architecture sim of MCU_tb is
     
     signal SW : std_logic_vector(9 downto 0);
     signal KEY0, KEY1, KEY2, KEY3 : std_logic;
-    signal HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(7 downto 0);
+    signal HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(6 downto 0);
     signal LEDs : std_logic_vector(9 downto 0);
     signal BTOUT : std_logic;
     signal DivRES, DivQUO : std_logic_vector(31 downto 0);

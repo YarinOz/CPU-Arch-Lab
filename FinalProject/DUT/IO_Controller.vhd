@@ -17,7 +17,7 @@ ENTITY IO_Controller IS
 		  -- Switch Port
 		  SW : in std_logic_vector(9 downto 0);
 		  -- 7 segment Ports
-		  HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: out std_logic_vector(7 downto 0);
+		  HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: out std_logic_vector(6 downto 0);
 		  -- Leds Port
 		  LEDs : out std_logic_vector(9 downto 0)
   );
@@ -48,68 +48,68 @@ BEGIN
 			);
 
 	HEXA0: OutputInterface
-	generic map (SevenSegment => true, size => 8)
+	generic map (SevenSegment => true, size => 7)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX0,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(7 downto 0),
+			RWData => DataBus(6 downto 0),
 			IO_Out => HEX0
 			);
 
 	HEXA1: OutputInterface
-	generic map (SevenSegment => true, size => 8)
+	generic map (SevenSegment => true, size => 7)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX1,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(7 downto 0),
+			RWData => DataBus(6 downto 0),
 			IO_Out => HEX1
 			);
 
 	HEXA2: OutputInterface
-	generic map (SevenSegment => true, size => 8)
+	generic map (SevenSegment => true, size => 7)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX2,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(7 downto 0),
+			RWData => DataBus(6 downto 0),
 			IO_Out => HEX2
 			);
 
 	HEXA3: OutputInterface
-	generic map (SevenSegment => true, size => 8)
+	generic map (SevenSegment => true, size => 7)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX3,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(7 downto 0),
+			RWData => DataBus(6 downto 0),
 			IO_Out => HEX3
 			);
 
 	HEXA4: OutputInterface
-	generic map (SevenSegment => true, size => 8)
+	generic map (SevenSegment => true, size => 7)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX4,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(7 downto 0),
+			RWData => DataBus(6 downto 0),
 			IO_Out => HEX4
 			);
 	
 	HEXA5: OutputInterface
-	generic map (SevenSegment => true, size => 8)
+	generic map (SevenSegment => true, size => 7)
 	port map (clk => clk,
 			rst => rst,
 			ChipSelect => CS_HEX5,
 			MemRead => MemReadBus,
 			MemWrite => MemWriteBus,
-			RWData => DataBus(7 downto 0),
+			RWData => DataBus(6 downto 0),
 			IO_Out => HEX5
 			);
 	
