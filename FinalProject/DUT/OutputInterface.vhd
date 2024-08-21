@@ -36,7 +36,7 @@ begin
     SEVSEG: if (SevenSegment = true) generate
                 -- 7-segment display
                 SevenSegmentDisplay: SegmentDecoder
-                    port map (data => AUXREG(3 downto 0), seg => IO_Out); -- 7 bit output (trunked)
+                    port map (data => AUXREG(3 downto 0), seg => IO_Out); 
             end generate SEVSEG;
 
     LEDS:   if (SevenSegment = false) generate

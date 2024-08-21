@@ -25,7 +25,7 @@ port(
     -- Busses
     AddrBus: out std_logic_vector(Awidth-1 downto 0);
     DataBus: inout std_logic_vector(Dwidth-1 downto 0);
-    ControlBus: out std_logic_vector(15 downto 0)
+    GIE: out std_logic
 
 );
 end Datapath;
@@ -57,7 +57,7 @@ architecture behav of Datapath is
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
-registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, DataBusIn, RFMUX, LUIMUX, rt, RFData1, RFData2);
+registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, DataBusIn, RFMUX, LUIMUX, rt, RFData1, RFData2,GIE);
 ALUnit: ALU generic map (Dwidth) port map (ALUOPT, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -------------------- Data/Program Memory -------------------------------------------------------
 ProgMen: altsyncram

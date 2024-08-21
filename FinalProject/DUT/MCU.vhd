@@ -41,6 +41,13 @@ architecture behav of MCU is
     signal DIVIFG: std_logic;
     signal DivIn1, DivIn2, DivOut1, DivOut2: std_logic_vector(31 downto 0);
 
+    -- Basic Timer interface
+    signal BTIFG: std_logic;
+
+    -- INTERRUPT signals
+    signal IntSource, IRQ_OUT,IRQ_CLR: std_logic_vector(IRQSize-1 downto 0);
+    signal INTACTIVE, INTA, INTR: std_logic;
+
     component PLL is
 		port (
             refclk   : in  std_logic := '0'; --  refclk.clk
@@ -53,6 +60,8 @@ architecture behav of MCU is
 begin
 
     MCLK <= clk when sim = true else PLL_CLK;
+
+    IntSource <= (DIVIFG & (not KEY3) & (not KEY2) & (not KEY1) & BTIFG & "00");
 
 PLL_INST: if sim = false generate
 MASTER_CLK: PLL port map(
@@ -110,6 +119,29 @@ DIV: divider
         quotient => DivQUO,
         residue => DivRES,
         divflg => DIVIFG
+    );
+
+Interrupt_Controller: InterruptController
+    generic map(
+        AddressBusWidth => 12,
+        DataBusWidth => 32,
+        IRQSize => 7,
+        REGSize => 8
+    )
+    port map(
+        clk => MCLK,
+        rst => rst,
+        MemReadBus => Control(0),
+        MemWriteBus => Control(1),
+        AddressBus => Address,
+        DataBus => Data,
+        IntSRC => IntSource,
+        IRQOut => IRQ_OUT,
+        GIE => Control(3),
+        ClrIRQ => IRQ_CLR,
+        IntActive => INTACTIVE,
+        IntReq => INTR,
+        IntAck => INTA
     );
 -- add submodules and HW accelerators here    
 

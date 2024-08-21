@@ -9,7 +9,8 @@ generic( Dwidth: integer:=32;
 port(	clk,rst,WregEn: in std_logic;	
 		WregData:	in std_logic_vector(Dwidth-1 downto 0);
 		WregAddr, RregAddr1, RregAddr2: in std_logic_vector(Awidth-1 downto 0);
-		RregData1, RregData2: out std_logic_vector(Dwidth-1 downto 0)
+		RregData1, RregData2: out std_logic_vector(Dwidth-1 downto 0);
+		GIE: out std_logic
 );
 end RF;
 --------------------------------------------------------------
@@ -36,5 +37,6 @@ begin
 	
   RregData1 <= sysRF(conv_integer(RregAddr1));
   RregData2 <= sysRF(conv_integer(RregAddr2));
+  GIE <= sysRF(26)(0);
 
 end behav;

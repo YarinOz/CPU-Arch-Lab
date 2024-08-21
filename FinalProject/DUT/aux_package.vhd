@@ -82,7 +82,7 @@ package aux_package is
 		-- Busses
 		AddrBus: out std_logic_vector(Awidth-1 downto 0);
 		DataBus: inout std_logic_vector(Dwidth-1 downto 0);
-		ControlBus: out std_logic_vector(15 downto 0)
+		GIE: out std_logic
 	);
 	end component;	
 ---------------------------------------------------------	
@@ -93,7 +93,8 @@ package aux_package is
 			clk,rst,WregEn: in std_logic;	
 			WregData:	in std_logic_vector(Dwidth-1 downto 0);
 			WregAddr,RregAddr1, RregAddr2: in std_logic_vector(Awidth-1 downto 0);
-			RregData1, RregData2: out std_logic_vector(Dwidth-1 downto 0)
+			RregData1, RregData2: out std_logic_vector(Dwidth-1 downto 0);
+			GIE: out std_logic
 		);
 	end component;
 ---------------------------------------------------------
@@ -161,6 +162,24 @@ package aux_package is
 	);
 	end component;
 	---------------------------------------------------------
+	component InterruptController is
+	generic (AddressBusWidth : integer := 12;
+			DataBusWidth : integer := 32;
+			IRQSize : integer := 7;
+			REGSize : integer := 8);
+	port (
+		  clk, rst, MemReadBus, MemWriteBus : in std_logic;
+		  AddressBus : in std_logic_vector(AddressBusWidth-1 downto 0);
+		  DataBus : inout std_logic_vector(DataBusWidth-1 downto 0);
+		  IntSRC : in std_logic_vector(IRQSize-1 downto 0); -- IRQ0-IRQ6
+		  IRQOut : out std_logic_vector(IRQSize-1 downto 0); -- IRQ0-IRQ6
+		  GIE: in std_logic;
+		  ClrIRQ: out std_logic_vector(IRQSize-1 downto 0);
+		  IntActive: out std_logic;
+		  IntReq: out std_logic;
+		  IntAck: in std_logic
+	);
+	end component;
 
 end aux_package;
 
