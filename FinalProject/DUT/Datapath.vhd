@@ -31,6 +31,8 @@ port(
 end Datapath;
  
 architecture behav of Datapath is
+    -- Busses
+    signal DataBusIn: std_logic_vector(Dwidth-1 downto 0);
     -- Program counter
     signal PC, PCplus4: std_logic_vector(Dwidth-1 downto 0);
 
@@ -55,7 +57,7 @@ architecture behav of Datapath is
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
-registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, RFWDataMUX, RFMUX, LUIMUX, rt, RFData1, RFData2);
+registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, DataBusIn, RFMUX, LUIMUX, rt, RFData1, RFData2);
 ALUnit: ALU generic map (Dwidth) port map (ALUOPT, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -------------------- Data/Program Memory -------------------------------------------------------
 ProgMen: altsyncram
@@ -102,11 +104,11 @@ port map (
 ModelSim:
 if sim = true generate
     ImemAddr <= "00" & PC(Awidth-1 downto 2);
-    DmemAddr <= "00" & ALUout(Awidth-1 downto 2);
+    DmemAddr <= ALUout(Awidth-1 downto 0);
 end generate;
 FPGA:
 if sim = false generate
-    DmemAddr <= PC(Awidth-1 downto 0);
+    ImemAddr <= PC(Awidth-1 downto 0);
     DmemAddr <= ALUout(Awidth-1 downto 0);
 end generate;
 -----------------------------------------------------------------------------------------------
@@ -130,8 +132,12 @@ LUIMUX <= rt when opcode="001111" else rs;
 RamWrite <= RFData2;
 RamEN <= MemWrite and ena;
 -- Busses
+-- if lw address greater than 0x800 then it is IO
+DataBusIn <= DataBus when (ALUout(11)='1' and MemRead='1') else RFWDataMUX; -- Load data from memory/IO to RF
+-- Address to memory (for IO)
 AddrBus <= DmemAddr;
-DataBus <= RamWrite;
+-- Data to memory
+DataBus <= RamWrite when (ALUout(11)='1' and MemWrite='1') else (others => 'Z'); -- Store data to memory/IO from RF
 
 -- Branch condition
 process(opcode, rs, rt)
@@ -144,7 +150,9 @@ begin
 end process;    
 
 -- RF connectivity (for jal, r31 <= PC + 1)
+-- Address to RF
 RFMUX <= rt when (RegDst = '0' and PCsrc /= "10") else "11111" when (PCSrc="10") else rd;
+-- Data to RF
 RFWDataMUX <= ALUout when ((MemtoReg = '0' or opcode="001111") and PCsrc /= "10") else (PCplus4) when (PCSrc="10") else DataOut;
 
 -- ALU connectivity
