@@ -61,15 +61,13 @@ architecture Behavioral of ALU is
                     Result <= std_logic_vector(Result_uint);
                 when "101010" =>  -- slt
                     if A_int < B_int then
-                        Result <= (others => '0');
-                        Result(0) <= '1';
+                        Result <= X"0000000" & "0001";
                     else
                         Result <= (others => '0');
                     end if;
                 when "001010" =>  -- slti
                     if A_int < B_int then
-                        Result <= (others => '0');
-                        Result(0) <= '1';
+                        Result <= X"0000000" & "0001";
                     else
                         Result <= (others => '0');
                     end if;

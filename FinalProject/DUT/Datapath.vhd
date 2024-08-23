@@ -135,12 +135,12 @@ RamEN <= MemWrite and ena;
 -- if lw address greater than 0x800 then it is IO
 DataBusIn <= DataBus when (ALUout(11)='1' and MemRead='1') else RFWDataMUX; -- Load data from memory/IO to RF
 -- Address to memory (for IO)
-AddrBus <= DmemAddr;
+AddrBus <= DmemAddr when (ALUout(11)='1' and (MemWrite='1' or MemRead='1')) else (others => 'Z');
 -- Data to memory
 DataBus <= RamWrite when (ALUout(11)='1' and MemWrite='1') else (others => 'Z'); -- Store data to memory/IO from RF
 
 -- Branch condition
-bcond <= '1' when (opcode = "000100" and rs = rt) or (opcode = "000101" and rs /= rt) else '0';
+bcond <= '1' when (opcode = "000100" and RFData1 = RFData2) or (opcode = "000101" and RFData1 /= RFData2) else '0';
 
 -- RF connectivity (for jal, r31 <= PC + 1)
 -- Address to RF
