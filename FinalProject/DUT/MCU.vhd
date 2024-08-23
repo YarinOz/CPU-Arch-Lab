@@ -35,7 +35,7 @@ architecture behav of MCU is
     signal Address: std_logic_vector(Awidth-1 downto 0);
     signal Control: std_logic_vector(15 downto 0);
     signal Data: std_logic_vector(Dwidth-1 downto 0);
-    signal PLL_CLK, MCLK: std_logic;
+    signal PLL_CLK, MCLK, reset: std_logic;
 
     -- division unit interface
     signal DIVIFG: std_logic;
@@ -60,7 +60,7 @@ architecture behav of MCU is
 begin
 
     MCLK <= clk when sim = true else PLL_CLK;
-
+	reset <= rst when sim = true else not rst; -- not reset for pulldown
     IntSource <= (DIVIFG & (not KEY3) & (not KEY2) & (not KEY1) & BTIFG & "00");
 
 PLL_INST: if sim = false generate
@@ -79,7 +79,7 @@ MIPS_CORE: CPU
     )
     port map(
         clk => MCLK,
-        rst => rst,
+        rst => reset,
         ena => ena,
         AddressBus => Address,
         ControlBus => Control,
@@ -94,7 +94,7 @@ GPIO: IO_Controller
     )
     port map(
         clk => MCLK,
-        rst => rst,
+        rst => reset,
         MemReadBus => Control(0),
         MemWriteBus => Control(1),
         AddressBus => Address,
@@ -113,7 +113,7 @@ DIV: divider
     port map(
         divclk => MCLK,
         enable => ena,
-        rst => rst,
+        rst => reset,
         dividend => DivIn1,
         divisor => DivIn2,
         quotient => DivQUO,
@@ -130,7 +130,7 @@ Interrupt_Controller: InterruptController
     )
     port map(
         clk => MCLK,
-        rst => rst,
+        rst => reset,
         MemReadBus => Control(0),
         MemWriteBus => Control(1),
         AddressBus => Address,

@@ -21,7 +21,7 @@ begin
         if rst = '1' then
             -- Initialize the output
             AUXREG <= (others => '0');
-        elsif rising_edge(clk) then
+        elsif falling_edge(clk) then
             if (ChipSelect = '1' and MemWrite = '1') then
                 -- Write data to the output
                 AUXREG <= RWData;
