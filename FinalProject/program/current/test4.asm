@@ -13,28 +13,36 @@
 #define PORT_HEX5[7-0] 0x80D - LSB byte (Output Mode)
 #--------------------------------------------------------------
 #define PORT_SW[7-0]   0x810 - LSB byte (Input Mode)
-#--------------------------------------------------------------
-
+#---------------------- Data Segment --------------------------
 .data 
-	N: .word 0x0004 
+	x: 	.word 0x09
+	y: 	.word 0x10
+	N: 	.word 0xFFFF
 .text
-	lw   $t3,N
-	lw   $t0,0x810 # read the state of PORT_SW[7-0]
-	# move $t0,$zero  # $t0=0
+main:	addi $sp,$zero,0x800  	# $sp=0x800
+	lw   $t1,N
+	lw   $a0,x
+	lw   $a1,y
+	jal  func
+	sw   $v0,0x800 		# write to PORT_LEDR[7-0]
+L:	j L            		# infinite loop
 	
-Loop:	sw   $t0,0x800 # write to PORT_LEDR[7-0]
-	sw   $t0,0x804 # write to PORT_HEX0[7-0]
-	sw   $t0,0x805 # write to PORT_HEX1[7-0]
-	sw   $t0,0x808 # write to PORT_HEX2[7-0]
-	sw   $t0,0x809 # write to PORT_HEX3[7-0]
-	sw   $t0,0x80C # write to PORT_HEX4[7-0]
-	sw   $t0,0x80D # write to PORT_HEX5[7-0]
+func:	addi $sp,$sp,-8
+	sw   $ra,0($sp) 	
+	add  $t0,$a0,$a1 	# $t0=x+y
+	sw   $t0,4($sp)
+	jal  calc 
+	slt  $t0,$0,$v0		# if $0<v0 than $t0=1 
+	bne  $t0,$0,exit
+	lw   $v0,4($sp)
+exit:	lw   $ra,0($sp) 
+	addi $sp,$sp,8	 
+	jr   $ra        	# ret
 	
-	addi $t0,$t0,1 # $t0=$t0+1
-	move $t1,$zero  # $t1=0
-delay:	addi $t1,$t1,1  # $t1=$t1+1
-	slt  $t2,$t1,$t3      #if $t1<N than $t2=1
-	beq  $t2,$zero,Loop   #if $t1>=N then go to Loop label
-	j   delay
+calc:	addi $v0,$t0,-4		# $v0=$t0-4=x+y-4
+	jr   $ra		# ret	
+	
+	
 
-
+       
+         
