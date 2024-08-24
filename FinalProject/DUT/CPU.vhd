@@ -80,9 +80,9 @@ DATAPATHUNIT: Datapath
 );
 
 -- Data bus write to IO
-DataBus <= DataOut when ((MemWrite='1') and (ena = '1')) else (others => 'Z');
+DataBus <= DataOut;
 -- Memory address to address bus when load/store (IO)
-AddressBus <= Address when ((MemWrite='1' or MemRead='1') and (ena = '1')) else (others => '0');
+AddressBus <= Address;
 -- need to add the control bus to the port map (WIP)
 ControlBus <= zeros & GIE & MemWrite & MemRead;
 

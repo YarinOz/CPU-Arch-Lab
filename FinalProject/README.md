@@ -3,11 +3,13 @@
 -- remove delta in TB: configure list -delta collapse
 -- Compiled using VHDL_2008
 -- Project: top:MCU, Add PLL (50MHz to 25MHz normal mode) 
+!! fix read data from bus (SW INPUT)
 
 ## notes to do:
 1. now working with minimal ALU
 2. finish Interrupt controller
 3. add basic timer
+4. SW9 is for ena and SW8-SW0 is for operands
 
 ## notes to keep:
 1. in order to init the memory manually use tb_FILE.

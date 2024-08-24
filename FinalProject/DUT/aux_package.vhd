@@ -13,7 +13,7 @@ package aux_package is
 			sim: boolean := true
 	);
 	port(clk,rst, ena: in std_logic;
-		SW : in std_logic_vector(9 downto 0);
+		SW : in std_logic_vector(8 downto 0);
 		KEY0, KEY1, KEY2, KEY3 : in std_logic;
 		HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(6 downto 0);
 		LEDs: out std_logic_vector(7 downto 0);
@@ -120,7 +120,7 @@ package aux_package is
 	generic (DataBusWidth: integer := 32);
 	port (ChipSelect, MemRead: in std_logic;
 			RData: out std_logic_vector(DataBusWidth-1 downto 0);
-			IO_In : IN std_logic_vector(9 downto 0));
+			IO_In : IN std_logic_vector(8 downto 0));
 	end component;
 	---------------------------------------------------------
 	component OutputInterface is
@@ -141,7 +141,7 @@ package aux_package is
 			AddressBus : in std_logic_vector(AddressBusWidth-1 downto 0);
 			DataBus : inout std_logic_vector(DataBusWidth-1 downto 0);
 			-- Switch Port
-			SW : in std_logic_vector(9 downto 0);
+			SW : in std_logic_vector(8 downto 0);
 			-- 7 segment Ports
 			HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: out std_logic_vector(6 downto 0);
 			-- Leds Port

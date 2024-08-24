@@ -21,7 +21,7 @@ entity MCU is
             sim: boolean := false -- set to true for simulation
     );
     port(clk,rst, ena: in std_logic;
-         SW : in std_logic_vector(9 downto 0);
+         SW : in std_logic_vector(8 downto 0);
          KEY0, KEY1, KEY2, KEY3 : in std_logic;
          HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(6 downto 0);
          LEDs: out std_logic_vector(9 downto 0);

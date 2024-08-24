@@ -19,8 +19,8 @@
 	N: .word 0x0004 
 .text
 	lw   $t3,N
-	# lw   $t0,0x810 # read the state of PORT_SW[7-0]
-	move $t0,$zero  # $t0=0
+	lw   $t0,0x810 # read the state of PORT_SW[7-0]
+	# move $t0,$zero  # $t0=0
 	
 Loop:	sw   $t0,0x800 # write to PORT_LEDR[7-0]
 	sw   $t0,0x804 # write to PORT_HEX0[7-0]

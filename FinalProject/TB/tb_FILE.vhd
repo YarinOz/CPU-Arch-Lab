@@ -15,7 +15,7 @@ architecture sim of MCU_tb is
     signal rst : std_logic := '0';
     signal ena : std_logic := '0';
     
-    signal SW : std_logic_vector(9 downto 0);
+    signal SW : std_logic_vector(8 downto 0);
     signal KEY0, KEY1, KEY2, KEY3 : std_logic;
     signal HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(6 downto 0);
     signal LEDs : std_logic_vector(9 downto 0);
@@ -70,7 +70,7 @@ begin
             clk => clk,
             rst => rst,
             ena => ena,
-            SW => SW,
+            SW => "000001010",
             KEY0 => KEY0,
             KEY1 => KEY1,
             KEY2 => KEY2,

@@ -15,7 +15,7 @@ ENTITY IO_Controller IS
 		  AddressBus : in std_logic_vector(AddressBusWidth-1 downto 0);
 		  DataBus : inout std_logic_vector(DataBusWidth-1 downto 0);
 		  -- Switch Port
-		  SW : in std_logic_vector(9 downto 0);
+		  SW : in std_logic_vector(8 downto 0); -- SW9 for enable
 		  -- 7 segment Ports
 		  HEX0, HEX1, HEX2, HEX3, HEX4, HEX5: out std_logic_vector(6 downto 0);
 		  -- Leds Port
