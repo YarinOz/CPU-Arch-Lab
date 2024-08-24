@@ -29,6 +29,7 @@ ENTITY InterruptController IS
 END InterruptController;
 ------------------------------------------------
 ARCHITECTURE struct OF InterruptController IS 
+-- emulated JAL (link $k1 R31<=PC+4, jump ISR address) instruction
 -- Interrupt sources Addresses
 ----------------------------------------------------------------
 -- 0x814 KEYS 1-3 LSB nibble
@@ -66,7 +67,7 @@ DataBus <= X"000000" & TypeReg 	WHEN ((AddressBus = X"83E" AND MemReadBus = '1')
 -- MCU Input
 process(clk)
 begin -- Interrupt Enable Register (sw $t0, 0x83C)
-  if rising_edge(clk) then
+  if falling_edge(clk) then 
     if AddressBus = X"83C" and MemWriteBus = '1' then
       IE <= DataBus(IRQSize-1 downto 0);
     end if;

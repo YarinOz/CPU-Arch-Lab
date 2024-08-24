@@ -60,6 +60,7 @@ begin
 registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, DataBusIn, RFMUX, LUIMUX, rt, RFData1, RFData2,GIE);
 ALUnit: ALU generic map (Dwidth) port map (ALUOPT, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -------------------- Data/Program Memory -------------------------------------------------------
+-- Instruction and Data Memory read/write on falling edge
 ProgMen: altsyncram
 generic map (
     operation_mode => "ROM",
@@ -74,7 +75,7 @@ generic map (
     intended_device_family => "Cyclone"
 )
 port map (
-    clock0 => not clk,
+    clock0 => not clk, -- falling edge
     address_a => ImemAddr,
     q_a => instruction
 );
@@ -142,7 +143,7 @@ DataBus <= RamWrite when (ALUout(11)='1' and MemWrite='1') else (others => 'Z');
 -- Branch condition
 bcond <= '1' when (opcode = "000100" and RFData1 = RFData2) or (opcode = "000101" and RFData1 /= RFData2) else '0';
 
--- RF connectivity (for jal, r31 <= PC + 1)
+-- RF connectivity (for jal, r31 <= PC + 4)
 -- Address to RF
 RFMUX <= rt when (RegDst = '0' and PCsrc /= "10") else "11111" when (PCSrc="10") else rd;
 -- Data to RF
@@ -167,7 +168,7 @@ PCplus4 <= PC + 4;
                     when "01" => -- j (jump)
                         PC <= address;
                     when "10" => -- jal (jump and link)
-                        -- r31 <= PC + 1;
+                        -- r31 <= PC + 4;
                         PC <= address; 
                     when "11" => -- jr (jump register)
                         PC <= RFData1;
