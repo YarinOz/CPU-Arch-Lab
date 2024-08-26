@@ -152,7 +152,7 @@ BT: comparatorEnv
         MemWrite => Control(1),
         MemRead => Control(0),
         addressbus => Address,
-        databusin => Data,
+        databus => Data,
         PWMout => PWMSignal,
         set_BTIFG => BTIFG
     );  

@@ -199,7 +199,7 @@ package aux_package is
 		en: in std_logic;
 		BTCNT : in std_logic_vector(31 downto 0);
 		BTCLO : in std_logic_vector(31 downto 0);
-		CLKEDBTCNT : out std_logic_vector(31 downto 0);
+		CLKEDBTCNT : out std_logic_vector(31 downto 0)
 	);
 	end component;
 	---------------------------------------------------------
@@ -213,7 +213,7 @@ package aux_package is
 	end component;
 	---------------------------------------------------------
 	component TimerOutputUnit IS
-		PORT( BTCCR1: IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+		PORT( BTCCR0: IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 			  BTOUTEN, BTOUTMD: IN STD_LOGIC;
 			  counter: IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 			  PWMout: OUT STD_LOGIC);

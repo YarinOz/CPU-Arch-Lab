@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.aux_package.all;
 
-entity comperator is
+entity comparator is
     port(
         clk : in std_logic;
         rst : in std_logic;
@@ -12,9 +12,9 @@ entity comperator is
         BTCLO : in std_logic_vector(31 downto 0);
         CLKEDBTCNT : out std_logic_vector(31 downto 0)
     );
-end comperator;
+end comparator;
 
-architecture comperator of comperator is
+architecture behav of comparator is
     signal PLUS1 : std_logic_vector(31 downto 0);
 begin
     PLUS1 <= std_logic_vector(unsigned(BTCNT) + 1);
@@ -31,4 +31,4 @@ begin
             end if;
         end if;
     end process;
-end comperator;
+end behav;

@@ -1,21 +1,21 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use work.aux_package.all;
 use ieee.numeric_std.all;
+use work.aux_package.all;
 
 ENTITY TimerOutputUnit IS
-	PORT( BTCCR1: IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+	PORT( BTCCR0: IN STD_LOGIC_VECTOR(31 DOWNTO 0);
          BTOUTEN, BTOUTMD: IN STD_LOGIC;
          counter: IN STD_LOGIC_VECTOR(31 DOWNTO 0);
          PWMout: OUT STD_LOGIC);
 END TimerOutputUnit;
 
-ARCHITECTURE TimerOutputUnit OF TimerOutputUnit IS
+ARCHITECTURE behav OF TimerOutputUnit IS
     SIGNAL PWM: STD_LOGIC;
 BEGIN
     process (counter) begin
         if BTOUTEN = '1' then
-            if counter <= BTCCR1 then
+            if counter <= BTCCR0 then
                 PWM <= '0';    
             else
                 PWM <= '1';
@@ -24,4 +24,4 @@ BEGIN
     end process;
 
     PWMout <= PWM when BTOUTMD = '0' else not PWM;
-END TimerOutputUnit;
+END behav;

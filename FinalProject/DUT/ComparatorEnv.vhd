@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.aux_package.all;
+
 entity comparatorEnv is
     port(
         rst, clk: in std_logic;
@@ -13,9 +14,10 @@ entity comparatorEnv is
     );
 end comparatorEnv;
 
-architecture comparatorEnv of comparatorEnv is
+architecture behav of comparatorEnv is
     signal BTCCR0 ,BTCCR1 :std_logic_vector(31 downto 0);
     signal BTCTL :std_logic_vector(7 downto 0);
+    signal BTCTL_OUT :std_logic_vector(31 downto 0);
     signal BTCNT :std_logic_vector(31 downto 0 );
     signal CLKEDBTCNT :std_logic_vector(31 downto 0);
     signal writebusEn :std_logic;
@@ -27,6 +29,7 @@ architecture comparatorEnv of comparatorEnv is
     signal counterclk :std_logic;
 
 begin
+    BTCTL_OUT <= X"000000" & BTCTL;
     with addressbus select       
         writebusEn <= '1' when x"820",
                     '1' when x"824",
@@ -37,14 +40,15 @@ begin
     with addressbus select
         databusout <= BTCCR0 when x"824",
                     BTCCR1 when x"828",
-                    BTCTL when x"81C",
+                    BTCTL_OUT when x"81C",
                     BTCNT when x"820",
                     (others => '0') when others;
     with BTCTL( 4 downto 3) select
     counterclk <= clk when "00",
                     clk_2 when "01",
                     clk_4 when "10",
-                    clk_8 when "11";
+                    clk_8 when "11",
+                    '0' when others;
 
     databusinout: BidirPin port map(
         Dout => databusout,
@@ -83,10 +87,10 @@ begin
                 if addressbus = x"820" then
                     BTCNT <= databusin;
                 else
-                    BTCNT<=CLKEDBTCNT;
+                    BTCNT <= CLKEDBTCNT;
                 end if;
              else
-                BTCNT<=CLKEDBTCNT;   
+                BTCNT <= CLKEDBTCNT;   
             end if;
         end if;
     end process;
@@ -116,26 +120,31 @@ begin
         end if;
     end process;
 
-    clockdiv: ClockDivider port map(
-        clk => clk,
-        clk_2 => clk_2,
-        clk_4 => clk_4,
-        clk_8 => clk_8
-    );
+    CLKDIV: ClockDivider 
+        port map(
+            clk => clk,
+            clk_out2 => clk_2,
+            clk_out4 => clk_4,
+            clk_out8 => clk_8
+        );
 
-    comperator: comparator port map(
-        clk => counterclk,
-        rst => rst,
-        en => not BTCTL(5),
-        BTCNT => BTCNT,
-        BTCLO => BTCR0,
-        CLKEDBTCNT => CLKEDBTCNT
-    );
-    pwmoutput: TimerOutputUnit port map(
-        BTCCR0 => BTCCR0,
-    BTOUTEN => BTCTL(6),
-    BTOUTMD => BTCTL(7),
-    timer => BTCNT,
-    PWMout => PWMout);
+    COMP: comparator 
+        port map(
+            clk => counterclk,
+            rst => rst,
+            en => not BTCTL(5),
+            BTCNT => BTCNT,
+            BTCLO => BTCCR1,
+            CLKEDBTCNT => CLKEDBTCNT
+        );
+
+    PWM: TimerOutputUnit 
+        port map(
+            BTCCR0 => BTCCR0,
+            BTOUTEN => BTCTL(6),
+            BTOUTMD => BTCTL(7),
+            counter => BTCNT,
+            PWMout => PWMout
+        );
     
-end comparatorEnv;
+end behav;
