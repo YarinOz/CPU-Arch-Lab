@@ -180,6 +180,46 @@ package aux_package is
 		  IntAck: in std_logic
 	);
 	end component;
+	---------------------------------------------------------
+	component comparatorEnv is
+	port(
+		rst, clk: in std_logic;
+		MemWrite, MemRead: in std_logic;
+		addressbus: in std_logic_vector(11 downto 0);
+		databus: inout std_logic_vector(31 downto 0);
+		PWMout: out std_logic;
+		set_BTIFG: out std_logic
+	);
+	end component;
+	---------------------------------------------------------
+	component comparator is
+	port(
+		clk : in std_logic;
+		rst : in std_logic;
+		en: in std_logic;
+		BTCNT : in std_logic_vector(31 downto 0);
+		BTCLO : in std_logic_vector(31 downto 0);
+		CLKEDBTCNT : out std_logic_vector(31 downto 0);
+	);
+	end component;
+	---------------------------------------------------------
+	component ClockDivider is
+	Port (
+		clk  : in  std_logic; -- Input clock
+		clk_out2 : out std_logic; -- Output clock at half frequency
+		clk_out4 : out std_logic; -- Output clock at 1/4 frequency
+		clk_out8 : out std_logic  -- Output clock at 1/8 frequency
+	);
+	end component;
+	---------------------------------------------------------
+	component TimerOutputUnit IS
+		PORT( BTCCR1: IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+			  BTOUTEN, BTOUTMD: IN STD_LOGIC;
+			  counter: IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+			  PWMout: OUT STD_LOGIC);
+	END component;
+	---------------------------------------------------------
+
 
 end aux_package;
 

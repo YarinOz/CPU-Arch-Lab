@@ -42,7 +42,7 @@ architecture behav of MCU is
     signal DivIn1, DivIn2, DivOut1, DivOut2: std_logic_vector(31 downto 0);
 
     -- Basic Timer interface
-    signal BTIFG: std_logic;
+    signal BTIFG, PWMSignal: std_logic;
 
     -- INTERRUPT signals
     signal IntSource, IRQ_OUT,IRQ_CLR: std_logic_vector(IRQSize-1 downto 0);
@@ -143,7 +143,19 @@ Interrupt_Controller: InterruptController
         IntReq => INTR,
         IntAck => INTA
     );
--- add submodules and HW accelerators here    
+ 
+-- Basic Timer Module
+BT: comparatorEnv 
+    port map(
+        rst => reset,
+        clk => MCLK,
+        MemWrite => Control(1),
+        MemRead => Control(0),
+        addressbus => Address,
+        databusin => Data,
+        PWMout => PWMSignal,
+        set_BTIFG => BTIFG
+    );  
 
 
 end behav;
