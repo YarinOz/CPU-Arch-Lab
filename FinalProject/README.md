@@ -14,6 +14,7 @@
 ## notes to keep:
 1. in order to init the memory manually use tb_FILE.
 2. ISA is ready, left to connect HW accelerators
+3. theres a small delay before update of btcnt from clked btcnt due to clocks not being synchronized
 
 ! ask HANAN: 
 ISMC burn ITCM.HEX and DTCM.hex after logical burn
