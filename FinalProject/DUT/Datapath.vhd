@@ -75,7 +75,8 @@ generic map (
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=ITCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    init_file => "C:\lab chanan\FinalProject-20240827T103408Z-001\ITCM.hex",
+    init_file =>"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\ITCM.hex",
+	--"C:\lab chanan\FinalProject-20240827T103408Z-001\ITCM.hex",
     --"/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/ITCM.hex",
     --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/ITCM.hex",
     intended_device_family => "Cyclone"
@@ -95,7 +96,8 @@ generic map (
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=DTCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    init_file => "C:\lab chanan\FinalProject-20240827T103408Z-001\DTCM.hex",
+    init_file => "C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\DTCM.hex",
+	--"C:\lab chanan\FinalProject-20240827T103408Z-001\DTCM.hex",
     --"/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/DTCM.hex",
     --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/DTCM.hex",
     intended_device_family => "Cyclone"

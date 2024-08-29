@@ -27,7 +27,7 @@ begin
   begin
 	if (rst='1') then
 		sysRF(0) <= (others=>'0');   -- R[0] is constant Zero value 
-	elsif (clk'event and clk='1') then
+	elsif (clk'event and clk='0') then
 	    if (WregEn='1') then
 		    -- index is type of integer so we need to use 
 			-- buildin function conv_integer in order to change the type
