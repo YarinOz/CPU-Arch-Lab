@@ -139,7 +139,7 @@ Interrupt_Controller: InterruptController
         DataBus => Data,
         IntSRC => IntSource,
         IRQOut => IRQ_OUT,
-        GIE => Control(3),
+        GIE => Control(2),
         ClrIRQ => IRQ_CLR,
         IntActive => INTACTIVE,
         IntReq => INTR,

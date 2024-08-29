@@ -75,7 +75,8 @@ generic map (
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=ITCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    init_file =>"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\ITCM.hex",
+    init_file =>"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\Interrupt based IO\test1\ITCM.hex",
+    --"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\ITCM.hex",
 	--"C:\lab chanan\FinalProject-20240827T103408Z-001\ITCM.hex",
     --"/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/ITCM.hex",
     --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/ITCM.hex",
@@ -96,7 +97,8 @@ generic map (
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=DTCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    init_file => "C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\DTCM.hex",
+    init_file => "C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\Interrupt based IO\test1\DTCM.hex",
+    --"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\DTCM.hex",
 	--"C:\lab chanan\FinalProject-20240827T103408Z-001\DTCM.hex",
     --"/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/DTCM.hex",
     --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/DTCM.hex",
@@ -114,12 +116,12 @@ port map (
 ModelSim:
 if sim = true generate
     ImemAddr <= "00" & PC(Awidth-1 downto 2);
-    DmemAddr <= ALUout(Awidth-1 downto 0);
+    DmemAddr <= "00" & ALUout(Awidth-1 downto 2) when INTR='0' else "00" & DataBus(Awidth-1 downto 2);
 end generate;
 FPGA:
 if sim = false generate
     ImemAddr <= PC(Awidth-1 downto 0);
-    DmemAddr <= ALUout(Awidth-1 downto 0);
+    DmemAddr <= ALUout(Awidth-1 downto 0) when INTR='0' else DataBus(Awidth-1 downto 0);
 end generate;
 -----------------------------------------------------------------------------------------------
 INTA <= INTACK;
@@ -138,14 +140,15 @@ begin
                 STATE := "01";
                 INTACK <= '0'; -- Acknowledge interrupt
                 PCHLD <= '1';
+                ISRADDR <= DataOut; -- ISR address
             end if;
         elsif STATE = "01" then
             INTACK <= '1'; -- INTA idle
+            ISR2PC <= '1';
             STATE := "10";
         elsif STATE = "10" then
             STATE := "00";
-            ISRADDR <= DataOut;
-            ISR2PC <= '1';
+            ISR2PC <= '0';
             PCHLD <= '0';
         end if;
     end if;
@@ -174,7 +177,7 @@ RamEN <= MemWrite and ena;
 -- if lw address greater than 0x800 then it is IO
 DataBusIn <= DataBus when (ALUout(11)='1' and MemRead='1') else RFWDataMUX; -- Load data from memory/IO to RF
 -- Address to memory (for IO)
-AddrBus <= DmemAddr when (ALUout(11)='1' and (MemWrite='1' or MemRead='1')) else (others => '0');
+AddrBus <= ALUout(Awidth-1 downto 0) when (ALUout(11)='1' and (MemWrite='1' or MemRead='1')) else (others => '0');
 -- Data to memory
 DataBus <= RamWrite when (ALUout(11)='1' and MemWrite='1') else (others => 'Z'); -- Store data to memory/IO from RF
 
@@ -218,10 +221,9 @@ PCplus4 <= PC + 4;
             else
                 PC <= PCplus4;  -- Branch not taken
             end if;
-        elsif (rising_edge(clk) and ena='1' and PCHLD='1') then -- ISR to PC
+        elsif (rising_edge(clk) and ena='1' and ISR2PC='1') then -- ISR to PC
             PC <= ISRADDR;
-
-        elsif ena='0' then
+        else
             PC <= PC; -- Unaffected
         end if;
     end process;

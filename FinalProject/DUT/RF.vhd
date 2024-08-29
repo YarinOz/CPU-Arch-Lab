@@ -27,14 +27,17 @@ begin
   begin
 	if (rst='1') then
 		sysRF(0) <= (others=>'0');   -- R[0] is constant Zero value 
+		sysRF(26) <= (others=>'0');  -- GIE is set to 0
 	elsif (clk'event and clk='0') then
-	    if (WregEn='1') then
+	    if (WregEn='1' and WregAddr /= "11111") then
 		    -- index is type of integer so we need to use 
 			-- buildin function conv_integer in order to change the type
 		    -- from std_logic_vector to integer
 			sysRF(conv_integer(WregAddr)) <= WregData;
-		elsif (ISR2PC='1') then
-			sysRF(31) <= WregData; -- $ra(31) <= PC
+		end if;
+	elsif (clk'event and clk='1') then
+		if (ISR2PC='1' or (WregEn='1' and WregAddr="11111")) then
+			sysRF(31) <= WregData; -- $ra(31) <= PC+4
 		elsif (INTR='1') then -- interrupt, GIE is set to 0
 			sysRF(26)(0) <= '0';
 	    end if;

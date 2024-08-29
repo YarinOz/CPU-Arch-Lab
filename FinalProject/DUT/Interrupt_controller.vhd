@@ -53,6 +53,7 @@ ARCHITECTURE struct OF InterruptController IS
 
 	signal IE, IFG : std_logic_vector(IRQSize-1 downto 0);
   signal TypeREG : std_logic_vector(REGSize-1 downto 0);
+  signal holdTYPE : std_logic;
 
 BEGIN
 
@@ -168,16 +169,26 @@ end process;
 -- Clear IRQ When Interrupt Ack received
 -- IRQ_CLR(0) <= '0' WHEN (TypeReg = X"08" AND INTA = '1' AND INTA_Delayed = '0') ELSE '1';
 -- IRQ_CLR(1) <= '0' WHEN (TypeReg = X"0C" AND INTA = '1' AND INTA_Delayed = '0') ELSE '1';
-IRQ_CLR(2) <= '0' WHEN (TypeReg = X"10" AND IntAck = '1') ELSE '1';
-IRQ_CLR(3) <= '0' WHEN (TypeReg = X"14" AND IntAck = '1') ELSE '1';
-IRQ_CLR(4) <= '0' WHEN (TypeReg = X"18" AND IntAck = '1') ELSE '1';
-IRQ_CLR(5) <= '0' WHEN (TypeReg = X"1C" AND IntAck = '1') ELSE '1';
-IRQ_CLR(6) <= '0' WHEN (TypeReg = X"20" AND IntAck = '1') ELSE '1';
+IRQ_CLR(2) <= '0' WHEN (TypeReg = X"10" AND IntAck = '1' AND holdTYPE = '0') ELSE '1';
+IRQ_CLR(3) <= '0' WHEN (TypeReg = X"14" AND IntAck = '1' AND holdTYPE = '0') ELSE '1';
+IRQ_CLR(4) <= '0' WHEN (TypeReg = X"18" AND IntAck = '1' AND holdTYPE = '0') ELSE '1';
+IRQ_CLR(5) <= '0' WHEN (TypeReg = X"1C" AND IntAck = '1' AND holdTYPE = '0') ELSE '1';
+IRQ_CLR(6) <= '0' WHEN (TypeReg = X"20" AND IntAck = '1' AND holdTYPE = '0') ELSE '1';
 -- CLR_IRQ_STATUS <= '0' WHEN (TypeReg = X"04" AND INTA = '1' AND INTA_Delayed = '0') ELSE '1';
 
 IRQOut <= IRQ;
 IntActive <= '1' WHEN (IFG(2)='1' OR IFG(3)='1' OR IFG(4)='1' OR IFG(5)='1' OR IFG(6)='1') ELSE '0';
 ClrIRQ <= IRQ_CLR;
+
+-- Interrupt Acknowledge
+process (clk,rst,IntAck)
+begin 
+  if (rst = '1') then
+    holdTYPE <= '1';
+  elsif (falling_edge(clk)) then
+    holdTYPE <= IntAck;
+  end if;
+end process;
 
 
 -- Interrupt Vectors
