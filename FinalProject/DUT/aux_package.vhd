@@ -31,7 +31,9 @@ package aux_package is
     port(clk,rst,ena: in std_logic;
 		AddressBus: out std_logic_vector(Awidth-1 downto 0);
 		ControlBus: out std_logic_vector(15 downto 0);
-		DataBus: inout std_logic_vector(Dwidth-1 downto 0)
+		DataBus: inout std_logic_vector(Dwidth-1 downto 0);
+		INTA: out std_logic;
+		INTR: in std_logic
     );
 	end component;
 

@@ -83,7 +83,9 @@ MIPS_CORE: CPU
         ena => ena,
         AddressBus => Address,
         ControlBus => Control,
-        DataBus => Data
+        DataBus => Data,
+        INTA => INTA,
+        INTR => INTR
     );
 
 GPIO: IO_Controller
