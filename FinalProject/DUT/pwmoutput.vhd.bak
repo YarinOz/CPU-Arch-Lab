@@ -29,10 +29,10 @@ begin
         end if;
     end process;
     
-    
+    -- Output logic depending on BTOUTMD
     with BTOUTMD select
-        PWMout <= PWM     when '0',  
-                  not PWM when '1', 
-                  '0'     when others;  
+        PWMout <= PWM     when '0',  -- Pass PWM directly when BTOUTMD is '0'
+                  not PWM when '1',  -- Invert PWM when BTOUTMD is '1'
+                  '0'     when others;  -- Default to '0' in unexpected cases
     
 end behavior;

@@ -64,7 +64,7 @@ package aux_package is
 		);
 	END component;
 ---------------------------------------------------------
-	component Datapath is
+	entity Datapath is
 		generic(
     				Dwidth: integer;
     				Awidth: integer;
@@ -86,8 +86,6 @@ package aux_package is
     GIE: out std_logic;
     INTA: out std_logic;
     INTR: in std_logic
-	);
-    end component;
 ---------------------------------------------------------	
 	component RF IS
 	generic( Dwidth: integer:=32;
@@ -97,8 +95,7 @@ package aux_package is
 			WregData:	in std_logic_vector(Dwidth-1 downto 0);
 			WregAddr,RregAddr1, RregAddr2: in std_logic_vector(Awidth-1 downto 0);
 			RregData1, RregData2: out std_logic_vector(Dwidth-1 downto 0);
-			GIE: out std_logic;
-			INTR: in std_logic
+			GIE: out std_logic
 		);
 	end component;
 ---------------------------------------------------------
@@ -153,17 +150,17 @@ package aux_package is
 	);
 	end component;
 	---------------------------------------------------------
-	component divider is 
-    port (
-        divclk: in std_logic;
-        enable: in std_logic;
-        rst: in std_logic;
-        dividend: in std_logic_vector(31 downto 0);
-        divisor: in std_logic_vector(31 downto 0);
-        quotient: out std_logic_vector(31 downto 0);
-        residue: out std_logic_vector(31 downto 0);
-        set_divifg: out std_logic
-    );
+	component Divider is
+	PORT (
+		divclk: in std_logic;
+		enable: in std_logic;
+		rst: in std_logic;
+		dividend: in std_logic_vector(31 downto 0);
+		divisor: in std_logic_vector(31 downto 0);
+		quotient: out std_logic_vector(31 downto 0);
+		residue: out std_logic_vector(31 downto 0);
+		divflg: out std_logic
+	);
 	end component;
 	---------------------------------------------------------
 	component dividerEnv is
@@ -174,7 +171,7 @@ package aux_package is
         databus : inout std_logic_vector(31 downto 0);
         set_divifg : out std_logic
    	 );
-	end component;
+	end dividerEnv;
 
 	component InterruptController is
 	generic (AddressBusWidth : integer := 12;
@@ -215,7 +212,7 @@ package aux_package is
         BTCLO : in std_logic_vector(31 downto 0);
         CLKEDBTCNT : out std_logic_vector(31 downto 0)
     		);
-	end component;
+	end comparator;
 	---------------------------------------------------------
 	component ClockDivider is
 	Port (
@@ -234,7 +231,7 @@ package aux_package is
         counter  : in std_logic_vector(31 downto 0);
         PWMout   : out std_logic
     	);
-	end component;
+	end TimerOutputUnit;
 	---------------------------------------------------------
 
 

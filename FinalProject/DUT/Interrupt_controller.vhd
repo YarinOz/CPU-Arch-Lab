@@ -98,10 +98,10 @@ begin
     if falling_edge(clk) then
       if (rst = '1') then
         IRQ(2) <= '0';
-      elsif IntSRC(2)='1' then
-        IRQ(2) <= '1';
       elsif (IRQ_CLR(2)='0') then
         IRQ(2) <= '0';
+      elsif IntSRC(2)='1' then
+        IRQ(2) <= '1';
       end if;
   end if;
 end process;
@@ -111,10 +111,10 @@ begin
   if rising_edge(clk) then
     if (rst = '1') then
       IRQ(3) <= '0';
-    elsif IntSRC(3)='1' then
-      IRQ(3) <= '1';
     elsif (IRQ_CLR(3)='0') then
       IRQ(3) <= '0';
+    elsif IntSRC(3)='1' then
+      IRQ(3) <= '1';
     else
       IRQ(3) <= IRQ(3); -- Hold
     end if;
@@ -126,10 +126,10 @@ begin
   if rising_edge(clk) then
     if (rst = '1') then
       IRQ(4) <= '0';
-    elsif IntSRC(4)='1' then
-      IRQ(4) <= '1';
     elsif (IRQ_CLR(4)='0') then
       IRQ(4) <= '0';
+    elsif IntSRC(4)='1' then
+      IRQ(4) <= '1';
     else
       IRQ(4) <= IRQ(4); -- Hold
     end if;
@@ -141,10 +141,10 @@ begin
   if rising_edge(clk) then
     if (rst = '1') then
       IRQ(5) <= '0';
+    elsif (IRQ_CLR(5)='0') then
+       IRQ(5) <= '0';
     elsif IntSRC(5)='1' then
       IRQ(5) <= '1';
-    elsif (IRQ_CLR(5)='0') then
-      IRQ(5) <= '0';
     else
       IRQ(5) <= IRQ(5); -- Hold
     end if;
@@ -156,10 +156,10 @@ begin
   if falling_edge(clk) then
     if (rst = '1') then
       IRQ(6) <= '0';
-    elsif IntSRC(6)='1' then
-      IRQ(6) <= '1';
     elsif (IRQ_CLR(6)='0') then
       IRQ(6) <= '0';
+    elsif IntSRC(6)='1' then
+      IRQ(6) <= '1';
     end if;
   end if;
 end process;

@@ -118,7 +118,7 @@ DIV: divider
         divisor => DivIn2,
         quotient => DivQUO,
         residue => DivRES,
-        divflg => DIVIFG
+        set_divifg => DIVIFG
     );
 
 Interrupt_Controller: InterruptController

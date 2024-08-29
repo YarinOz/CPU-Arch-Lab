@@ -10,7 +10,8 @@ port(	clk,rst,WregEn: in std_logic;
 		WregData:	in std_logic_vector(Dwidth-1 downto 0);
 		WregAddr, RregAddr1, RregAddr2: in std_logic_vector(Awidth-1 downto 0);
 		RregData1, RregData2: out std_logic_vector(Dwidth-1 downto 0);
-		GIE: out std_logic
+		GIE: out std_logic;
+		INTR: in std_logic
 );
 end RF;
 --------------------------------------------------------------
@@ -31,6 +32,8 @@ begin
 			-- buildin function conv_integer in order to change the type
 		    -- from std_logic_vector to integer
 			sysRF(conv_integer(WregAddr)) <= WregData; 
+		elsif (INTR='1') then -- interrupt, GIE is set to 0
+			sysRF(26)(0) <= '0';
 	    end if;
 	end if;
   end process;

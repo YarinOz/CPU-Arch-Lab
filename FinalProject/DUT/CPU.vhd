@@ -11,7 +11,9 @@ entity CPU is
     port(clk,rst, ena: in std_logic;
          AddressBus: out std_logic_vector(Awidth-1 downto 0);
          ControlBus: out std_logic_vector(15 downto 0);-- optional
-         DataBus: inout std_logic_vector(Dwidth-1 downto 0)
+         DataBus: inout std_logic_vector(Dwidth-1 downto 0);
+         INTA: out std_logic;
+         INTR: in std_logic
     );
 
 end CPU;
@@ -74,7 +76,9 @@ DATAPATHUNIT: Datapath
         funct => funct,
         AddrBus => AddressBus,
         DataBus => DataBus,
-        GIE => GIE
+        GIE => GIE,
+        INTA => INTA,
+        INTR => INTR
 );
 
 -- need to add the control bus to the port map (WIP)

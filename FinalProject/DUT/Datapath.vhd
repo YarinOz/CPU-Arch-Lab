@@ -25,7 +25,9 @@ port(
     -- Busses
     AddrBus: out std_logic_vector(Awidth-1 downto 0);
     DataBus: inout std_logic_vector(Dwidth-1 downto 0);
-    GIE: out std_logic
+    GIE: out std_logic;
+    INTA: out std_logic;
+    INTR: in std_logic
 
 );
 end Datapath;
@@ -54,10 +56,13 @@ architecture behav of Datapath is
     signal ALUout: std_logic_vector(Dwidth-1 downto 0);
     -- ALU to memory address
     signal DataOut: std_logic_vector(Dwidth-1 downto 0);
+    -- Interrupt
+    signal INTACK, ISR2PC, PCHLD: std_logic;
+    signal ISRADDR: std_logic_vector(Dwidth-1 downto 0);
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
-registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, DataBusIn, RFMUX, LUIMUX, rt, RFData1, RFData2,GIE);
+registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, DataBusIn, RFMUX, LUIMUX, rt, RFData1, RFData2,GIE,INTR);
 ALUnit: ALU generic map (Dwidth) port map (ALUOPT, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -------------------- Data/Program Memory -------------------------------------------------------
 -- Instruction and Data Memory read/write on falling edge
@@ -113,6 +118,35 @@ if sim = false generate
     DmemAddr <= ALUout(Awidth-1 downto 0);
 end generate;
 -----------------------------------------------------------------------------------------------
+INTA <= INTACK;
+-- Interrupts
+process(clk,rst,INTR)
+  variable STATE : std_logic_vector(1 downto 0);
+begin
+    if rst = '1' then
+        STATE := "00";
+        INTACK <= '1';
+        ISR2PC <= '0';
+        PCHLD <= '0';
+    elsif falling_edge(clk) then
+        if STATE = "00" then
+            if INTR = '1' then
+                STATE := "01";
+                INTACK <= '0'; -- Acknowledge interrupt
+                PCHLD <= '1';
+            end if;
+        elsif STATE = "01" then
+            INTACK <= '1'; -- INTA idle
+            STATE := "10";
+        elsif STATE = "10" then
+            STATE := "00";
+            ISRADDR <= DataOut;
+            ISR2PC <= '1';
+            PCHLD <= '0';
+        end if;
+    end if;
+end process;
+-----------------------------------------------------------------------------------------------
 -- Instruction signals
 opcode <= instruction(31 downto 26) when ena='1' else (others => '1');
 rs <= instruction(25 downto 21);
@@ -162,7 +196,7 @@ PCplus4 <= PC + 4;
     begin  
         if rst = '1' then
             PC <= (others => '0');
-        elsif (rising_edge(clk) and ena='1') then
+        elsif (rising_edge(clk) and ena='1' and PCHLD='0') then
             if jump = '1' then
                 case PCSrc is
                     when "01" => -- j (jump)
@@ -180,6 +214,9 @@ PCplus4 <= PC + 4;
             else
                 PC <= PCplus4;  -- Branch not taken
             end if;
+        elsif (rising_edge(clk) and ena='1' and PCHLD='1') then -- ISR to PC
+            PC <= ISRADDR;
+            
         elsif ena='0' then
             PC <= PC; -- Unaffected
         end if;

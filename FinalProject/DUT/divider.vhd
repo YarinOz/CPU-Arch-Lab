@@ -11,12 +11,12 @@ entity divider is
         divisor: in std_logic_vector(31 downto 0);
         quotient: out std_logic_vector(31 downto 0);
         residue: out std_logic_vector(31 downto 0);
-        divflg: out std_logic
+        set_divifg: out std_logic
     );
 end divider;
 
 architecture bhv of divider is
-    type state_type is (IDLE, LOAD, DIVIDE, DONE);
+    type state_type is (IDLE, LOAD, DIVIDE, DONE,DONE2);
     signal state : state_type := IDLE;
     signal divdendreg: std_logic_vector(63 downto 0);
     signal divsereg: std_logic_vector(31 downto 0);
@@ -31,7 +31,7 @@ begin
     begin
         if rst = '1' then
             state <= IDLE;
-            divflg <= '0';
+            set_divifg <= '0';
             residuereg <= (others => '0');
             quotientreg <= (others => '0');
             divdendreg <= (others => '0');
@@ -40,6 +40,7 @@ begin
         elsif rising_edge(divclk) then
             case state is
                 when IDLE =>
+                    set_divifg <= '0';
                     if enable = '1' then
                         state <= LOAD;
                     end if;
@@ -73,18 +74,16 @@ begin
                     end if;
 
                 when DONE =>
-                    residuereg <= divdendreg(63 downto 32);
-                    divflg <= '1'; -- Set flag to indicate completion
+                    set_divifg <= '1'; -- Set flag to indicate completion
                     state <= IDLE;
-
-                when others =>
-                    state <= IDLE;
+                    quotient <= quotientreg;
+                    residue <= divdendreg(63 downto 32);
+                when DONE2 =>
+                    set_divifg <= '0'; -- Set flag to indicate completion
             end case;
         end if;
     end process;
 
     -- Output assignments
-    quotient <= quotientreg;
-    residue <= residuereg;
-
+   
 end bhv;

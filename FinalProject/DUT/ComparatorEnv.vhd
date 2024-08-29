@@ -1,3 +1,4 @@
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -27,6 +28,7 @@ architecture behav of comparatorEnv is
     signal clk_4 :std_logic;
     signal clk_8 :std_logic;
     signal counterclk :std_logic;
+    signal global_en :std_logic;
 
 begin
     BTCTL_OUT <= X"000000" & BTCTL;
@@ -42,20 +44,17 @@ begin
                     BTCCR1 when x"828",
                     BTCTL_OUT when x"81C",
                     BTCNT when x"820",
-                    (others => '0') when others;
+                    (others => 'Z') when others;
     with BTCTL( 4 downto 3) select
     counterclk <= clk when "00",
                     clk_2 when "01",
                     clk_4 when "10",
                     clk_8 when "11",
                     '0' when others;
+    global_en <= writebusEn and MemRead;
+    databusin <= databus when memwrite = '1' else (others => 'Z');
+    databus <= databusout when global_en = '1' else (others => 'Z');
 
-    databusinout: BidirPin port map(
-        Dout => databusout,
-        en => writebusEn and MemRead,
-        Din => databusin,
-        IOPin => databus
-    );
     with BTCTL(2 downto 0) select
     set_BTIFG <= BTCNT(0) when "000",
                  BTCNT(3) when "001",
@@ -134,13 +133,13 @@ begin
             rst => rst,
             en => not BTCTL(5),
             BTCNT => BTCNT,
-            BTCLO => BTCCR1,
+            BTCLO => BTCCR0,
             CLKEDBTCNT => CLKEDBTCNT
         );
 
     PWM: TimerOutputUnit 
         port map(
-            BTCCR0 => BTCCR0,
+            BTCCR1 => BTCCR1,
             BTOUTEN => BTCTL(6),
             BTOUTMD => BTCTL(7),
             counter => BTCNT,
