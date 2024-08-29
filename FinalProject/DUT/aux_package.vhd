@@ -98,7 +98,8 @@ package aux_package is
 			WregAddr,RregAddr1, RregAddr2: in std_logic_vector(Awidth-1 downto 0);
 			RregData1, RregData2: out std_logic_vector(Dwidth-1 downto 0);
 			GIE: out std_logic;
-			INTR: in std_logic
+			INTR: in std_logic;
+			ISR2PC: in std_logic
 		);
 	end component;
 ---------------------------------------------------------

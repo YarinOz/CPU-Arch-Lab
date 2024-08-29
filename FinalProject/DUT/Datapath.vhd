@@ -62,7 +62,7 @@ architecture behav of Datapath is
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
-registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, DataBusIn, RFMUX, LUIMUX, rt, RFData1, RFData2,GIE,INTR);
+registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, DataBusIn, RFMUX, LUIMUX, rt, RFData1, RFData2,GIE,INTR,ISR2PC);
 ALUnit: ALU generic map (Dwidth) port map (ALUOPT, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -------------------- Data/Program Memory -------------------------------------------------------
 -- Instruction and Data Memory read/write on falling edge
@@ -181,7 +181,7 @@ bcond <= '1' when (opcode = "000100" and RFData1 = RFData2) or (opcode = "000101
 -- Address to RF
 RFMUX <= rt when (RegDst = '0' and PCsrc /= "10") else "11111" when (PCSrc="10") else rd;
 -- Data to RF
-RFWDataMUX <= ALUout when ((MemtoReg = '0' or opcode="001111") and PCsrc /= "10") else (PCplus4) when (PCSrc="10") else DataOut;
+RFWDataMUX <= ALUout when ((MemtoReg = '0' or opcode="001111") and PCsrc /= "10" and INTR='0') else (PCplus4) when (PCSrc="10" or INTR='1') else DataOut;
 
 -- ALU connectivity
 -- rs or shamt for shift operations
@@ -216,7 +216,7 @@ PCplus4 <= PC + 4;
             end if;
         elsif (rising_edge(clk) and ena='1' and PCHLD='1') then -- ISR to PC
             PC <= ISRADDR;
-            
+
         elsif ena='0' then
             PC <= PC; -- Unaffected
         end if;
