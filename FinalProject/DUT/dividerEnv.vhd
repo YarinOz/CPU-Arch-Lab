@@ -5,7 +5,7 @@ use work.aux_package.all;
 
 entity dividerEnv is
     port (
-        rst, en, clk : in std_logic;
+        rst, clk : in std_logic;
         MemWrite, MemRead : in std_logic;
         addressbus : in std_logic_vector(11 downto 0);
         databus : inout std_logic_vector(31 downto 0);
@@ -14,16 +14,16 @@ entity dividerEnv is
 end dividerEnv;
 
 architecture behav of dividerEnv is
-    signal divisor : std_logic_vector(31 downto 0) := (others => '0');
-    signal dividend : std_logic_vector(31 downto 0) := (others => '0');
+    signal divisor : std_logic_vector(31 downto 0);
+    signal dividend : std_logic_vector(31 downto 0);
     signal quotient : std_logic_vector(31 downto 0);
     signal residue : std_logic_vector(31 downto 0);
-    signal databusin : std_logic_vector(31 downto 0);
+    -- signal databusin : std_logic_vector(31 downto 0);
     signal databusout : std_logic_vector(31 downto 0);
     signal writebusEn : std_logic;
     signal global_en : std_logic;
     signal divisionen : std_logic;
-    signal divisor_ready : std_logic;
+    signal divisor_ready, divifg: std_logic;
     constant zeroes:  std_logic_vector(31 downto 0) := (others => '0');
 begin
     divisor_ready <= '1' when divisor /= zeroes else '0';
@@ -44,8 +44,8 @@ begin
          '1' when x"838",
         '0' when others;
     
-    databusin <= databus when memwrite = '1' else (others => 'Z');
     databus <= databusout when global_en = '1' else (others => 'Z');
+    set_divifg <= divifg;
     -- Bidirectional pin interface
     
     -- Write to divisor
@@ -55,8 +55,8 @@ begin
             divisor <= (others => '0');
         elsif rising_edge(clk) then
             if MemWrite = '1' and addressbus = x"830" then
-                divisor <= databusin;
-            elsif set_divifg = '1' then
+                divisor <= databus;
+            elsif divifg = '1' then
                 divisor <= (others => '0');
             end if;
         end if;
@@ -69,7 +69,7 @@ begin
             dividend <= (others => '0');
         elsif rising_edge(clk) then
             if MemWrite = '1' and addressbus = x"82C" then
-                dividend <= databusin;
+                dividend <= databus;
             end if;
         end if;
     end process;
@@ -107,7 +107,7 @@ begin
         divisor => divisor,
         quotient => quotient,
         residue => residue,
-        set_divifg => set_divifg
+        set_divifg => divifg
     );
 
 end behav;

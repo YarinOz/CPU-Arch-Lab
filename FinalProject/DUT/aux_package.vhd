@@ -171,7 +171,7 @@ package aux_package is
 	---------------------------------------------------------
 	component dividerEnv is
    	 port (
-        rst, en, clk : in std_logic;
+        rst, clk : in std_logic;
         MemWrite, MemRead : in std_logic;
         addressbus : in std_logic_vector(11 downto 0);
         databus : inout std_logic_vector(31 downto 0);

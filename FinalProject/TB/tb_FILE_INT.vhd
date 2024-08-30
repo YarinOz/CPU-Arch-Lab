@@ -3,10 +3,10 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
-entity MCU_tb is
-end MCU_tb;
+entity MCUINT_tb is
+end MCUINT_tb;
 
-architecture sim of MCU_tb is
+architecture sim of MCUINT_tb is
     -- Constants
     constant CLK_PERIOD : time := 10 ns;
 

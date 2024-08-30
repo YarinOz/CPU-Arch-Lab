@@ -111,15 +111,14 @@ GPIO: IO_Controller
         LEDs => LEDs
     );
 
-DIV: divider
+DIV: dividerEnv
     port map(
-        divclk => MCLK,
-        enable => ena,
+        clk => MCLK,
         rst => reset,
-        dividend => DivIn1,
-        divisor => DivIn2,
-        quotient => DivQUO,
-        residue => DivRES,
+        MemWrite => Control(1),
+        MemRead => Control(0),
+        addressbus => Address,
+        databus => Data,
         set_divifg => DIVIFG
     );
 
