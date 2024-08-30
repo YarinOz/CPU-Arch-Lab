@@ -109,16 +109,14 @@ end process;
 -- KEY1-----------------------------------
 process (clk,rst,IRQ_CLR(3),IntSRC(3))
 begin 
-  if rising_edge(clk) then
-    if (rst = '1') then
-      IRQ(3) <= '0';
-    elsif (IRQ_CLR(3)='0') then
-      IRQ(3) <= '0';
-    elsif IntSRC(3)='1' then
-      IRQ(3) <= '1';
-    else
-      IRQ(3) <= IRQ(3); -- Hold
-    end if;
+  if (rst = '1') then
+    IRQ(3) <= '0';
+  elsif (IRQ_CLR(3)='0') then
+    IRQ(3) <= '0';
+  elsif rising_edge(IntSRC(3)) then
+    IRQ(3) <= '1';
+  else
+    IRQ(3) <= IRQ(3); -- Hold
   end if;
 end process;
 -- KEY2-----------------------------------

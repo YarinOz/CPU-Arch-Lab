@@ -75,10 +75,10 @@ generic map (
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=ITCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    init_file =>"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\Interrupt based IO\test1\ITCM.hex",
+    --init_file =>"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\Interrupt based IO\test1\ITCM.hex",
     --"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\ITCM.hex",
 	--"C:\lab chanan\FinalProject-20240827T103408Z-001\ITCM.hex",
-    --"/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/ITCM.hex",
+    init_file => "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/ITCM.hex",
     --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/ITCM.hex",
     intended_device_family => "Cyclone"
 )
@@ -97,10 +97,10 @@ generic map (
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=DTCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    init_file => "C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\Interrupt based IO\test1\DTCM.hex",
+    --init_file => "C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\Interrupt based IO\test1\DTCM.hex",
     --"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\DTCM.hex",
 	--"C:\lab chanan\FinalProject-20240827T103408Z-001\DTCM.hex",
-    --"/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/DTCM.hex",
+    init_file => "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/DTCM.hex",
     --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/DTCM.hex",
     intended_device_family => "Cyclone"
 )
@@ -140,11 +140,11 @@ begin
                 STATE := "01";
                 INTACK <= '0'; -- Acknowledge interrupt
                 PCHLD <= '1';
-                ISRADDR <= DataOut; -- ISR address
             end if;
         elsif STATE = "01" then
             INTACK <= '1'; -- INTA idle
             ISR2PC <= '1';
+            ISRADDR <= DataOut; -- ISR address
             STATE := "10";
         elsif STATE = "10" then
             STATE := "00";
@@ -188,7 +188,7 @@ bcond <= '1' when (opcode = "000100" and RFData1 = RFData2) or (opcode = "000101
 -- Address to RF
 RFMUX <= rt when (RegDst = '0' and PCsrc /= "10") else "11111" when (PCSrc="10") else rd;
 -- Data to RF
-RFWDataMUX <= ALUout when ((MemtoReg = '0' or opcode="001111") and PCsrc /= "10" and INTR='0') else (PCplus4) when (PCSrc="10" or INTR='1') else DataOut;
+RFWDataMUX <= PC when (ISR2PC='1') else ALUout when ((MemtoReg = '0' or opcode="001111") and PCsrc /= "10" and INTR='0') else (PCplus4) when (PCSrc="10" or INTR='1') else DataOut;
 
 -- ALU connectivity
 -- rs or shamt for shift operations

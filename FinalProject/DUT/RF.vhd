@@ -36,9 +36,12 @@ begin
 			sysRF(conv_integer(WregAddr)) <= WregData;
 		end if;
 	elsif (clk'event and clk='1') then
-		if (ISR2PC='1' or (WregEn='1' and WregAddr="11111")) then
+		if (WregEn='1' and WregAddr="11111") then -- jal
 			sysRF(31) <= WregData; -- $ra(31) <= PC+4
-		elsif (INTR='1') then -- interrupt, GIE is set to 0
+		elsif (ISR2PC='1') then  -- interrupt return
+			sysRF(27) <= WregData; -- $ra(27) <= PC+4
+		end if;
+		if (INTR='1') then -- interrupt, GIE is set to 0
 			sysRF(26)(0) <= '0';
 	    end if;
 	end if;
