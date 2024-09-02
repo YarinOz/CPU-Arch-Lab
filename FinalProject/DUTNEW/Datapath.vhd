@@ -36,11 +36,11 @@ architecture behav of Datapath is
     -- Busses
     signal DataBusIn: std_logic_vector(Dwidth-1 downto 0);
     -- Program counter
-    signal PC, PCplus4: std_logic_vector(Dwidth-1 downto 0);
+    signal PC, PCplus4, PC_JAL: std_logic_vector(Dwidth-1 downto 0);
 
     -- Memory signals
     signal RamWrite: std_logic_vector(Dwidth-1 downto 0);
-    signal RamEN: std_logic;
+    signal RamEN, RegEN: std_logic;
     signal DmemAddr, ImemAddr: std_logic_vector(Awidth-1 downto 0);
 
     -- Instruction signals
@@ -62,7 +62,7 @@ architecture behav of Datapath is
 
 begin 
 -------------------- port mapping ---------------------------------------------------------------
-registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegWrite, DataBusIn, RFMUX, LUIMUX, rt, RFData1, RFData2,GIE,INTR,ISR2PC);
+registerfile: RF generic map (Dwidth,5) port map (clk, rst, RegEN, DataBusIn, RFMUX, LUIMUX, rt, RFData1, RFData2,GIE,INTR,ISR2PC);
 ALUnit: ALU generic map (Dwidth) port map (ALUOPT, ALUMUX, ALUop, ALUout); -- B-A, B+A
 -------------------- Data/Program Memory -------------------------------------------------------
 -- Instruction and Data Memory read/write on falling edge
@@ -78,10 +78,10 @@ generic map (
     --init_file =>"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\Interrupt based IO\test1\ITCM.hex",
     --"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\ITCM.hex",
 	--"C:\lab chanan\FinalProject-20240827T103408Z-001\ITCM.hex",
-    init_file =>"C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\Interrupt based IO\test3\ITCM.hex",
+    --init_file =>"C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\Interrupt based IO\test3\ITCM.hex",
 --"C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\GPIO\test1\ITCM.hex",
 	-- "C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\Interrupt based IO\test2\ITCM.hex",
-	--"/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/ITCM.hex",
+	init_file =>"/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/ITCM.hex",
     --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/ITCM.hex",
     intended_device_family => "Cyclone"
 )
@@ -100,13 +100,13 @@ generic map (
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=DTCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    init_file => "C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\Interrupt based IO\test3\DTCM.hex",
+    --init_file => "C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\Interrupt based IO\test3\DTCM.hex",
 --"C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\GPIO\test1\DTCM.hex",
 	--"C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\Interrupt based IO\test2\DTCM.hex",
 	--"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\Interrupt based IO\test1\DTCM.hex",
     --"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\DTCM.hex",
 	--"C:\lab chanan\FinalProject-20240827T103408Z-001\DTCM.hex",
-    --init_file => "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/DTCM.hex",
+    init_file => "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/DTCM.hex",
     --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/DTCM.hex",
     intended_device_family => "Cyclone"
 )
@@ -179,6 +179,7 @@ LUIMUX <= rt when opcode="001111" else rs;
 -- Memory enaialization
 RamWrite <= RFData2;
 RamEN <= MemWrite and ena;
+RegEN <= RegWrite and ena;
 -- Busses
 -- if lw address greater than 0x800 then it is IO
 DataBusIn <= DataBus when (ALUout(11)='1' and MemRead='1') else RFWDataMUX; -- Load data from memory/IO to RF
@@ -194,7 +195,7 @@ bcond <= '1' when (opcode = "000100" and RFData1 = RFData2) or (opcode = "000101
 -- Address to RF
 RFMUX <= rt when (RegDst = '0' and PCsrc /= "10") else "11111" when (PCSrc="10") else rd;
 -- Data to RF
-RFWDataMUX <= PC when (ISR2PC='1') else ALUout when ((MemtoReg = '0' or opcode="001111") and PCsrc /= "10" and INTR='0') else (PCplus4) when (PCSrc="10" or INTR='1') else DataOut;
+RFWDataMUX <= PC when (ISR2PC='1') else ALUout when ((MemtoReg = '0' or opcode="001111") and PCsrc /= "10" and INTR='0') else (PC_JAL) when (PCSrc="10" or INTR='1') else DataOut;
 
 -- ALU connectivity
 -- rs or shamt for shift operations
@@ -203,6 +204,7 @@ ALUMUX <= RFData2 when ALUsrc = '0' else imm;
 -----------------------------------------------------------------------------------------------
 -- PC+4 for next instruction
 PCplus4 <= PC + 4;
+PC_JAL <= PCplus4 when clk = '0' else unaffected;
     -- Program counter process
     process(clk, rst)
     -- offset address in J-Type instructions
