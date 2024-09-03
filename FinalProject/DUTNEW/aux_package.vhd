@@ -17,8 +17,7 @@ package aux_package is
 		KEY0, KEY1, KEY2, KEY3 : in std_logic;
 		HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(6 downto 0);
 		LEDs: out std_logic_vector(7 downto 0);
-		BTOUT: out std_logic;
-		DivRES, DivQUO: out std_logic_vector(31 downto 0)
+		BTOUT: out std_logic
 	);
 	end component;
 --------------------------------------------------------

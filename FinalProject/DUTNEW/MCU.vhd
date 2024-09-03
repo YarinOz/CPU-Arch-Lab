@@ -25,8 +25,7 @@ entity MCU is
          KEY0, KEY1, KEY2, KEY3 : in std_logic;
          HEX0,HEX1,HEX2,HEX3,HEX4,HEX5: out std_logic_vector(6 downto 0);
          LEDs: out std_logic_vector(9 downto 0);
-         BTOUT: out std_logic;
-         DivRES, DivQUO: out std_logic_vector(31 downto 0)
+         BTOUT: out std_logic
     );
 
 end MCU;
@@ -39,7 +38,6 @@ architecture behav of MCU is
 
     -- division unit interface
     signal DIVIFG: std_logic;
-    signal DivIn1, DivIn2, DivOut1, DivOut2: std_logic_vector(31 downto 0);
 
     -- Basic Timer interface
     signal BTIFG, PWMSignal: std_logic;
@@ -61,6 +59,7 @@ begin
 
     MCLK <= clk when sim = true else PLL_CLK;
 	reset <= rst when sim = true else not rst; -- not reset for pulldown
+    BTOUT <= PWMSignal;
     IntSource <= (DIVIFG & (not KEY3) & (not KEY2) & (not KEY1) & BTIFG & "00");
 
 PLL_INST: if sim = false generate

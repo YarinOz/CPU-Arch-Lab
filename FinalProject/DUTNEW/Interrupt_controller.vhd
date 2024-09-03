@@ -61,8 +61,8 @@ BEGIN
 -- MCU Output
 -- Read to DataBus IE, IFG, TypeReg
 DataBus <= X"000000" & TypeReg 	WHEN ((AddressBus = X"83E" AND MemReadBus = '1') OR (IntAck = '0' AND MemReadBus = '0')) ELSE
-			X"000000"&"0" 	& IE 	WHEN (AddressBus = X"83C" AND MemReadBus = '1') ELSE
-			X"000000"&"0" 	& IFG		WHEN (AddressBus = X"83D" AND MemReadBus = '1') ELSE
+			X"000000"&"0"	& IE 	WHEN (AddressBus = X"83C" AND MemReadBus = '1') ELSE
+			X"000000"&"0" & IFG		WHEN (AddressBus = X"83D" AND MemReadBus = '1') ELSE
 			(OTHERS => 'Z');
 
 -- MCU Input
@@ -75,10 +75,8 @@ begin -- Interrupt Enable Register (sw $t0, 0x83C)
   end if;
 end process;
 
-IFG		<=	DataBus(IRQSize-1 DOWNTO 0)	WHEN (AddressBus = X"83D" AND MemWriteBus = '1') ELSE
-			IRQ AND IE;		
-TypeReg	<=	DataBus(REGSize-1 DOWNTO 0)	WHEN (AddressBus = X"83E" AND MemWriteBus = '1') ELSE
-			(OTHERS => 'Z');
+IFG		<=	DataBus(IRQSize-1 DOWNTO 0)	WHEN (AddressBus = X"83D" AND MemWriteBus = '1') ELSE IRQ AND IE;		
+TypeReg	<=	DataBus(REGSize-1 DOWNTO 0)	WHEN (AddressBus = X"83E" AND MemWriteBus = '1') ELSE (OTHERS => 'Z');
 
 -- Interrupt Request
 process (clk, IFG) 
@@ -163,17 +161,13 @@ begin
     end if;
   end if;
 end process;
-	 
 
 -- Clear IRQ When Interrupt Ack received
--- IRQ_CLR(0) <= '0' WHEN (TypeReg = X"08" AND INTA = '1' AND INTA_Delayed = '0') ELSE '1';
--- IRQ_CLR(1) <= '0' WHEN (TypeReg = X"0C" AND INTA = '1' AND INTA_Delayed = '0') ELSE '1';
 IRQ_CLR(2) <= '0' WHEN (TypeReg = X"10" AND IntAck = '1' AND holdTYPE = '0') ELSE '1';
 IRQ_CLR(3) <= '0' WHEN (TypeReg = X"14" AND IntAck = '1' AND holdTYPE = '0') ELSE '1';
 IRQ_CLR(4) <= '0' WHEN (TypeReg = X"18" AND IntAck = '1' AND holdTYPE = '0') ELSE '1';
 IRQ_CLR(5) <= '0' WHEN (TypeReg = X"1C" AND IntAck = '1' AND holdTYPE = '0') ELSE '1';
 IRQ_CLR(6) <= '0' WHEN (TypeReg = X"20" AND IntAck = '1' AND holdTYPE = '0') ELSE '1';
--- CLR_IRQ_STATUS <= '0' WHEN (TypeReg = X"04" AND INTA = '1' AND INTA_Delayed = '0') ELSE '1';
 
 IRQOut <= IRQ;
 IntActive <= '1' WHEN (IFG(2)='1' OR IFG(3)='1' OR IFG(4)='1' OR IFG(5)='1' OR IFG(6)='1') ELSE '0';
@@ -188,7 +182,6 @@ begin
     holdTYPE <= IntAck;
   end if;
 end process;
-
 
 -- Interrupt Vectors
 TypeReg	<= 	X"00" WHEN rst  = '1' ELSE -- main
