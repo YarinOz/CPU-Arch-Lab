@@ -87,7 +87,8 @@ begin
     elsif rising_edge(clk) then
         if addressbus = x"820" and Memwrite='1' then
                 BTCNT <= databusin;
-                
+        elsif ( BTCCR0 <= BTCNT) then
+            BTCNT <= (others => '0');       
         elsif conv_integer(CLKEDBTCNT) = (conv_integer(BTCNT) + 1 ) then
             BTCNT <= CLKEDBTCNT;
         else 
