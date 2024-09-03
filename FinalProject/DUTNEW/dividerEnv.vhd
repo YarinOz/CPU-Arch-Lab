@@ -56,7 +56,9 @@ begin
         elsif rising_edge(clk) then
             if MemWrite = '1' and addressbus = x"830" then
                 divisor <= databus;
-            elsif divifg = '1' then
+            end if; 
+        elsif falling_edge(clk) then
+            if divifg = '1' then
                 divisor <= (others => '0');
             end if;
         end if;
@@ -73,30 +75,6 @@ begin
             end if;
         end if;
     end process;
-
-    -- Write to quotient
-    -- process(clk, rst)
-    -- begin
-    --     if rst = '1' then
-    --         quotient <= (others => '0');
-    --     elsif rising_edge(clk) then
-    --         if MemWrite = '1' and addressbus = x"834" then
-    --             quotient <= databusin;
-    --         end if;
-    --     end if;
-    -- end process;
-
-    -- -- Write to residue
-    -- process(clk, rst)
-    -- begin
-    --     if rst = '1' then
-    --         residue <= (others => '0');
-    --     elsif rising_edge(clk) then
-    --         if MemWrite = '1' and addressbus = x"838" then
-    --             residue <= databusin;
-    --         end if;
-    --     end if;
-    -- end process;
 
     -- Divider component instantiation
     dividor: divider port map(
