@@ -151,6 +151,7 @@ BT: comparatorEnv
         clk => MCLK,
         MemWrite => Control(1),
         MemRead => Control(0),
+        IRQ => IRQ_OUT(2),
         addressbus => Address,
         databus => Data,
         PWMout => PWMSignal,

@@ -200,7 +200,7 @@ package aux_package is
 	component comparatorEnv is
 	port(
 		rst, clk: in std_logic;
-		MemWrite, MemRead: in std_logic;
+		MemWrite, MemRead, IRQ: in std_logic;
 		addressbus: in std_logic_vector(11 downto 0);
 		databus: inout std_logic_vector(31 downto 0);
 		PWMout: out std_logic;

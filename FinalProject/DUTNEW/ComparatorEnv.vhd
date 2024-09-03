@@ -9,7 +9,7 @@ use ieee.std_logic_unsigned.all;
 entity comparatorEnv is
     port(
         rst, clk: in std_logic;
-        MemWrite, MemRead: in std_logic;
+        MemWrite, MemRead, IRQ: in std_logic;
         addressbus: in std_logic_vector(11 downto 0);
         databus: inout std_logic_vector(31 downto 0);
         PWMout: out std_logic;
@@ -32,7 +32,6 @@ architecture behav of comparatorEnv is
     signal counterclk :std_logic;
     signal global_en :std_logic;
     signal prevCLKEDBTCNT :std_logic_vector(31 downto 0);
-    signal BTIFG_AUX :std_logic;
 
 begin
     BTCTL_OUT <= X"000000" & BTCTL;
@@ -60,7 +59,7 @@ begin
     databus <= databusout when global_en = '1' else (others => 'Z');
 
     with BTCTL(2 downto 0) select
-    BTIFG_AUX <= BTCNT(0) when "000",
+    set_BTIFG <= BTCNT(0) when "000",
                  BTCNT(3) when "001",
                  BTCNT(7) when "010",
                  BTCNT(11) when "011",
@@ -69,17 +68,6 @@ begin
                  BTCNT(23) when "110",
                  BTCNT(25) when "111",
                  '0' when others;
-
-    process(clk,rst)
-    begin 
-        if rst='1' then 
-            set_BTIFG <= '0';
-        elsif rising_edge(BTIFG_AUX) then
-            set_BTIFG <= '1';
-        else
-            set_BTIFG <= '0';
-        end if;
-    end process;
 
     process(clk, rst) begin
         if rst = '1' then
@@ -94,7 +82,7 @@ begin
     end process;
 
     process(clk, rst) begin
-    if rst = '1' then
+    if (rst = '1' or IRQ = '1') then
         BTCNT <= (others => '0');
     elsif rising_edge(clk) then
         if addressbus = x"820" and Memwrite='1' then
