@@ -61,7 +61,7 @@ main:	addi $sp,$zero,0x800 		# $sp=0x800
 	addi $t0,$zero,0x02  
 	sw   $t0,0x81C       		# BTCTL=0x06(BTHOLD=0,BTIP=7, 50MHz/2^26)
 
-	addi $t0,$zero,0x3E8
+	addi $t0,$zero,0x3E80
 	sw   $t0,0x824        		# CCR0
 	srl  $t0,$t0,2
 	sw   $t0,0x828        		# CCR1

@@ -52,9 +52,9 @@ begin
         -- No need to change AddressBus or DataBus as program memory is initialized from ITCM.hex
         wait for CLK_PERIOD * 10;
 		
-		KEY3 <= '0';
-		wait for CLK_PERIOD*30;
-		KEY3 <= '1';
+		KEY1 <= '0';
+		wait for CLK_PERIOD*2;
+		KEY1 <= '1';
 
         -- Check outputs or observe simulation results
         -- You can add additional checks or log outputs if needed
