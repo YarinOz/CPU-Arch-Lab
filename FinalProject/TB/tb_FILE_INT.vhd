@@ -53,9 +53,16 @@ begin
         -- No need to change AddressBus or DataBus as program memory is initialized from ITCM.hex
         wait for CLK_PERIOD * 10;
 		
+        SW <= "011001010";
 		KEY1 <= '0';
 		wait for CLK_PERIOD;
 		KEY1 <= '1';
+
+        wait for CLK_PERIOD * 30;
+        SW <= "000000011";
+		KEY2 <= '0';
+		wait for CLK_PERIOD;
+		KEY2 <= '1';
 
         -- Check outputs or observe simulation results
         -- You can add additional checks or log outputs if needed
@@ -77,7 +84,7 @@ begin
             clk => clk,
             rst => rst,
             ena => ena,
-            SW => "000001010",
+            SW => SW,
             KEY0 => KEY0,
             KEY1 => KEY1,
             KEY2 => KEY2,
