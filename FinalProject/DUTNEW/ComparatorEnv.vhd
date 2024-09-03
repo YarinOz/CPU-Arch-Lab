@@ -3,6 +3,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.aux_package.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
 
 entity comparatorEnv is
     port(
@@ -80,21 +82,22 @@ begin
     end process;
 
     process(clk, rst) begin
-        if rst = '1' then
-            BTCNT <= (others => '0');
-        elsif rising_edge(clk) then
-            if MemWrite = '1' then
-                if addressbus = x"820" then
-                    BTCNT <= databusin;
-                elsif prevCLKEDBTCNT /= CLKEDBTCNT then
-                    BTCNT <= CLKEDBTCNT;
-                else
-                    BTCNT <= BTCNT;
-                end if;   
-            end if;
+    if rst = '1' then
+        BTCNT <= (others => '0');
+    elsif rising_edge(clk) then
+        if addressbus = x"820" and Memwrite='1' then
+                BTCNT <= databusin;
+                
+        elsif conv_integer(CLKEDBTCNT) = (conv_integer(BTCNT) + 1 ) then
+            BTCNT <= CLKEDBTCNT;
+        else 
+            BTCNT <= BTCNT;
         end if;
-        prevCLKEDBTCNT <= CLKEDBTCNT;
-    end process;
+        
+    end if;
+    
+end process;
+
 
     process(clk, rst) begin
         if rst = '1' then
