@@ -209,14 +209,14 @@ package aux_package is
 	end component;
 	---------------------------------------------------------
 	component comparator is
-    	port(
-        clk : in std_logic;
-        rst : in std_logic;
-        en: in std_logic;
-        BTCNT : in std_logic_vector(31 downto 0);
-        BTCLO : in std_logic_vector(31 downto 0);
-        CLKEDBTCNT : out std_logic_vector(31 downto 0)
-    		);
+	port(
+		clk : in std_logic;
+		rst : in std_logic;
+		en: in std_logic;
+		BTCNT : in std_logic_vector(31 downto 0);
+		BTCLO : in std_logic_vector(31 downto 0);
+		CLKEDBTCNT : out std_logic_vector(31 downto 0)
+	);
 	end component;
 	---------------------------------------------------------
 	component ClockDivider is
