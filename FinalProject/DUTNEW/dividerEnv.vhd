@@ -27,7 +27,7 @@ architecture behav of dividerEnv is
     signal divisor_ready, divifg: std_logic;
     constant zeroes:  std_logic_vector(31 downto 0) := (others => '0');
 begin
-    divisor_ready <= '1' when divisor /= previous_divisor else '0';
+    -- divisor_ready <= '1' when divisor /= previous_divisor else '0';
     global_en <= writebusEn and MemRead;
     -- Address decoding for read operations
     with addressbus select
@@ -45,6 +45,16 @@ begin
          '1' when x"838",
         '0' when others;
     
+    -- process(clk, rst)
+    -- begin
+    --     if rising_edge(clk) then
+    --         if global_en = '1' then
+    --             databus <= databusout
+    --         else
+    --             databus <= (others => 'Z');
+    --         end if;
+    --     end if;
+    -- end process;
     databus <= databusout when global_en = '1' else (others => 'Z');
     set_divifg <= divifg;
     -- Bidirectional pin interface
@@ -54,9 +64,13 @@ begin
     begin
         if rst = '1' then
             divisor <= (others => '0');
+            divisor_ready <= '0';
         elsif rising_edge(clk) then
             if MemWrite = '1' and addressbus = x"830" then
                 divisor <= databus;
+                divisor_ready <= '1';
+            else
+                divisor_ready <= '0';
             end if; 
             previous_divisor <= divisor;
         end if;
