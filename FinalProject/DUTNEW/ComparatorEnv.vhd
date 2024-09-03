@@ -95,10 +95,8 @@ begin
         else 
             BTCNT <= BTCNT;
         end if;
-        
     end if;
-    
-end process;
+    end process;
 
 
     process(clk, rst) begin
