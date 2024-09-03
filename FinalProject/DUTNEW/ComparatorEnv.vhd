@@ -66,7 +66,8 @@ begin
                  BTCNT(15) when "100",
                  BTCNT(19) when "101",
                  BTCNT(23) when "110",
-                 BTCNT(25) when others;
+                 BTCNT(25) when "111",
+                 '0' when others;
 
 
     process(clk, rst) begin

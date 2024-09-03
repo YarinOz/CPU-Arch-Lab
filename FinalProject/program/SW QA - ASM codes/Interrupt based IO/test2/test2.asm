@@ -58,13 +58,13 @@ main:	addi $sp,$zero,0x800 		# $sp=0x800
 	sw   $0,0x820        		# BTCNT=0
 	sw   $0,0x83C        		# IE=0
 	sw   $0,0x83D        		# IFG=0
-	addi $t0,$zero,0x07  
+	addi $t0,$zero,0x02  
 	sw   $t0,0x81C       		# BTCTL=0x06(BTHOLD=0,BTIP=7, 50MHz/2^26)
 
-	addi $t6,$zero,0x000000D4
-	sw   $t6,0x828        		# CCR1
-	addi $t7,$zero,0x01000000
-	sw   $t7,0x824        		# CCR0
+	addi $t0,$zero,0x3E8
+	sw   $t0,0x824        		# CCR0
+	srl  $t0,$t0,2
+	sw   $t0,0x828        		# CCR1
 
 	addi $t0,$zero,0x7C 
 	sw   $t0,0x83C        		# IE=0x7C

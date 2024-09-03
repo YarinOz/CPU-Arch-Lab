@@ -115,7 +115,6 @@ begin
     IRQ(3) <= '1';
   else
     IRQ(3) <= IRQ(3); -- Hold
-    
   end if;
 end process;
 -- KEY2-----------------------------------
