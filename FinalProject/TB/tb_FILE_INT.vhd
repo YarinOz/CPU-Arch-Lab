@@ -20,7 +20,6 @@ architecture sim of MCUINT_tb is
     signal HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(6 downto 0);
     signal LEDs : std_logic_vector(9 downto 0);
     signal BTOUT : std_logic;
-    signal DivRES, DivQUO : std_logic_vector(31 downto 0);
 
 begin
     -- Clock generation process
@@ -96,9 +95,7 @@ begin
             HEX4 => HEX4,
             HEX5 => HEX5,
             LEDs => LEDs,
-            BTOUT => BTOUT,
-            DivRES => DivRES,
-            DivQUO => DivQUO
+            BTOUT => BTOUT
         );
 
 end sim;
