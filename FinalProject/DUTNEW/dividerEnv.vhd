@@ -15,6 +15,7 @@ end dividerEnv;
 
 architecture behav of dividerEnv is
     signal divisor : std_logic_vector(31 downto 0);
+    signal previous_divisor : std_logic_vector(31 downto 0):= (others => '0');
     signal dividend : std_logic_vector(31 downto 0);
     signal quotient : std_logic_vector(31 downto 0);
     signal residue : std_logic_vector(31 downto 0);
@@ -26,7 +27,7 @@ architecture behav of dividerEnv is
     signal divisor_ready, divifg: std_logic;
     constant zeroes:  std_logic_vector(31 downto 0) := (others => '0');
 begin
-    divisor_ready <= '1' when divisor /= zeroes else '0';
+    divisor_ready <= '1' when divisor /= previous_divisor else '0';
     global_en <= writebusEn and MemRead;
     -- Address decoding for read operations
     with addressbus select
@@ -57,12 +58,10 @@ begin
             if MemWrite = '1' and addressbus = x"830" then
                 divisor <= databus;
             end if; 
-        elsif falling_edge(clk) then
-            if divifg = '1' then
-                divisor <= (others => '0');
-            end if;
+            previous_divisor <= divisor;
         end if;
     end process;
+
 
     -- Write to dividend
     process(clk, rst)
