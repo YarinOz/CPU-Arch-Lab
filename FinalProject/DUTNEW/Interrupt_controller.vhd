@@ -120,31 +120,27 @@ end process;
 -- KEY2-----------------------------------
 process (clk,rst,IRQ_CLR(4),IntSRC(4))
 begin 
-  if rising_edge(clk) then
-    if (rst = '1') then
-      IRQ(4) <= '0';
-    elsif (IRQ_CLR(4)='0') then
-      IRQ(4) <= '0';
-    elsif IntSRC(4)='1' then
-      IRQ(4) <= '1';
-    else
-      IRQ(4) <= IRQ(4); -- Hold
-    end if;
+  if (rst = '1') then
+    IRQ(4) <= '0';
+  elsif (IRQ_CLR(4)='0') then
+    IRQ(4) <= '0';
+  elsif IntSRC(4)='1' then
+    IRQ(4) <= '1';
+  else
+    IRQ(4) <= IRQ(4); -- Hold
   end if;
 end process;
 -- KEY3-----------------------------------
 process (clk,rst,IRQ_CLR(5),IntSRC(5))
 begin 
-  if rising_edge(clk) then
-    if (rst = '1') then
+  if (rst = '1') then
+    IRQ(5) <= '0';
+  elsif (IRQ_CLR(5)='0') then
       IRQ(5) <= '0';
-    elsif (IRQ_CLR(5)='0') then
-       IRQ(5) <= '0';
-    elsif IntSRC(5)='1' then
-      IRQ(5) <= '1';
-    else
-      IRQ(5) <= IRQ(5); -- Hold
-    end if;
+  elsif IntSRC(5)='1' then
+    IRQ(5) <= '1';
+  else
+    IRQ(5) <= IRQ(5); -- Hold
   end if;
 end process;
 --DIVIDER-----------------------------------
