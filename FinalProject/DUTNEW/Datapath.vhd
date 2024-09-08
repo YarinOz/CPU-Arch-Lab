@@ -75,15 +75,7 @@ generic map (
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=ITCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    --init_file =>"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\Interrupt based IO\test1\ITCM.hex",
-    --"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\ITCM.hex",
-	--"C:\lab chanan\FinalProject-20240827T103408Z-001\ITCM.hex",
-    --init_file =>"C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\Interrupt based IO\test3\ITCM.hex",
---"C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\GPIO\test1\ITCM.hex",
-	-- "C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\Interrupt based IO\test2\ITCM.hex",
-	--init_file =>"/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/ITCM.hex",
-    init_file => "/home/lehamim/BGU/CPU-Arch/FinalProject/program/current/ITCM.hex",
-    --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/ITCM.hex",
+    init_file => "path_to_mem/ITCM.hex",
     intended_device_family => "Cyclone"
 )
 port map (
@@ -101,15 +93,7 @@ generic map (
     lpm_hint => "ENABLE_RUNTIME_MOD=YES, INSTANCE_NAME=DTCM",
     lpm_type => "altsyncram",
     outdata_reg_a => "UNREGISTERED",
-    --init_file => "C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\Interrupt based IO\test3\DTCM.hex",
---"C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\GPIO\test1\DTCM.hex",
-	--"C:\updated final project\CPU-Arch-main\FinalProject\SW QA - ASM codes\Interrupt based IO\test2\DTCM.hex",
-	--"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\Interrupt based IO\test1\DTCM.hex",
-    --"C:\lab chanan\FinalProject-20240827T103408Z-001\FinalProject\program\SW QA - ASM codes\GPIO\test4\DTCM.hex",
-	--"C:\lab chanan\FinalProject-20240827T103408Z-001\DTCM.hex",
-    --init_file => "/home/oziely/BGU/semester F/CPU & HW Lab/LABS/FinalProject/program/current/DTCM.hex",
-    init_file => "/home/lehamim/BGU/CPU-Arch/FinalProject/program/current/DTCM.hex",
-    --init_file => "C:\Users\YarinPc\Desktop\FinalProject_ARCH/program/DTCM.hex",
+    init_file => "path_to_mem/DTCM.hex",
     intended_device_family => "Cyclone"
 )
 port map (
